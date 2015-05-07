@@ -30,6 +30,7 @@
 /nbproject/
 /build/
 /dist/
+/bin/
 
 #File strani
 .dep.inc
