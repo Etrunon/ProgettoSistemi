@@ -25,15 +25,15 @@ assets:
 
 test: assets bin
 	#fa partire il testing
-	
+
 checkDir:
 	-@mkdir -p $(BUILDIR)
 
 #compila tutti i file *.c in file *.o nella cartella build/
 %.o: %.c
-	gcc $< -o $(BUILDIR)/$@ -c
+	@gcc $< -o $(BUILDIR)/$@ -c
 
 $(BUILDNAME): $(OBJ)
-	#linking finale
-	gcc $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$@
-	rm $(addprefix $(BUILDIR)/,$(^F))
+	@#linking finale
+	@gcc $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$@
+	-@rm $(addprefix $(BUILDIR)/,$(^F))
