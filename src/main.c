@@ -1,59 +1,75 @@
-/*
- * File:   main.c
- * Author: etrunon
- *
- * Created on April 30, 2015, 11:35 AM
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include "server.h"
+#include "client.h"
+
+void explainParameters() {
+    printf("Per avviare il server, usare l'opzione --server, con argomenti --max <numero massimo giocatori> e --win <punteggio per vittoria>\n");
+    printf("Per avviare il client, usare l'opzione --client\n");
+}
 
 int main(int argc, char** argv) {
-    int argument_value;
+
+    int server = 0;
+    int maxClients;
+    int winPoints;
+
+    if (argc == 1) {
+        explainParameters();
+        return (EXIT_FAILURE);
+    }
 
     int option_index = 0;
 
-    static struct option long_options[] = {
-        {"max", no_argument, 0, 'm'},
-        {"win", required_argument, 0, 'w'},
-        {"server", no_argument, 0, 's'},
-        {"client", no_argument, 0, 'c'},
-        {0, 0, 0, 0}
+    struct option long_options[] = {
+        {"max", required_argument, NULL, 'm'},
+        {"win", required_argument, NULL, 'w'},
+        {"server", no_argument, &server, 1},
+        {"client", no_argument, &server, 0},
+        {NULL, 0, NULL, 0}
     };
 
-    while (argument_value != -1) {
-        argument_value = getopt_long(argc, argv, NULL, long_options, &option_index);
+    int argument_value;
+    while ((argument_value = getopt_long(argc, argv, "", long_options, &option_index)) != -1) {
         switch (argument_value) {
-            case 's':
-            {
-                printf("serverSide!\n");
-                //server_side(argc, argv);
+            case 0: case 1:
                 break;
-            }
             case 'm':
             {
-                printf("Numero massino giocatori:\n",);
-                //server_side(argc, argv);
+                int value = strtol(optarg, NULL, 10);
+                if (value <= 1 || value > 10) {
+                    printf("Il numero di giocatori deve essere compreso tra 1 e 10!\n");
+                    exit(EXIT_FAILURE);
+                }
+                maxClients = value;
                 break;
             }
-
-            case 'c':
+            case 'w':
             {
-                printf("clientSide!\n");
-                //client_side();
+                int value = strtol(optarg, NULL, 10);
+                if (value < 10 || value > 100) {
+                    printf("Il punteggio deve essere compreso tra 10 e 100!\n");
+                    exit(EXIT_FAILURE);
+                }
+                winPoints = value;
                 break;
             }
-
-            case -1: default:
+            case '?':
+                break;
+            default:
             {
-                printf("Errore nei parametri!\n");
-                exit(EXIT_FAILURE);
+                explainParameters();
+                return (EXIT_FAILURE);
             }
         }
     }
 
-    //aggiungo cose fichissime e belle
+    if (server) {
+        initServer(maxClients, winPoints);
+    } else {
+        initClient();
+    }
     return (EXIT_SUCCESS);
 }
 

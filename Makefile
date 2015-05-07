@@ -1,6 +1,5 @@
 #lista delle librerie necessarie
-OBJ = creaFifoMain.o creaFifo.o 
- #main.o
+OBJ = main.o server.o client.o
 
 #Definiamo quali direttive non producono file
 .PHONY: clean
@@ -35,13 +34,13 @@ checkDir:
 
 $(BUILDNAME): $(OBJ)
 	@#linking finale
-	gcc $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$@
-	-rm $(addprefix $(BUILDIR)/,$(^F))
+	@gcc $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$@
+	@-rm $(addprefix $(BUILDIR)/,$(^F))
 
 
 BUILDTESTLIB: checkDir buildtest
 	
 buildtest: allFifo.o creaFifoMain.o 
 	@#linking finale
-	gcc $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$(BUILDNAME)
-	-rm $(addprefix $(BUILDIR)/,$(^F))
+	@gcc $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$(BUILDNAME)
+	@-rm $(addprefix $(BUILDIR)/,$(^F))
