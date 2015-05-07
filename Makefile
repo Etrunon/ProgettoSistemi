@@ -1,5 +1,6 @@
 #lista delle librerie necessarie
-OBJ = main.o main2.o
+OBJ = creaFifoMain.o creaFifo.o
+ #main.o
 
 #Definiamo quali direttive non producono file
 .PHONY: clean

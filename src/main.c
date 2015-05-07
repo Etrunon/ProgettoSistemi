@@ -12,6 +12,7 @@
  * 
  */
 int main(int argc, char** argv) {
+        printf("main  ");
 
     
     //aggiungo cose fichissime e belle
