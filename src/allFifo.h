@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   creaFifo.h
  * Author: etrunon
  *
@@ -11,8 +11,8 @@
 #include <stdbool.h>
 
 int creaFifoLettura(char* path);
-int creaFifoScrittura(char* path);
-void chiudiFifo(char* path, bool eliminare);
+int apriFiFoScrittura(char* path);
+int chiudiFifo(char* path, int fileDescriptor, bool eliminare);
 bool leggiMessaggio(char* buffer, int lunghMax, int handlerFifo);
 bool inviaMessaggio(char* messaggio, int handlerFifo);
 

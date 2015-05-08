@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "allFifo.h"
 
@@ -31,27 +32,25 @@ int creaFifoLettura(char* path) {
     errCheck = mkfifo(path, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
 
     if (errCheck == -1) {
-        gestisciErrore(path);
+        return -1;
     }
 
     hand = open(path, O_RDWR);
 
-    /*
-     TODO gestione errore, stampare errore e ritornare -1 a livello esterno
-     */
     return hand;
 }
 
 /**
- * Funzione che crea una fifo da SCRITTURA al path specificato, aprendola WRITE only
- * Nel caso in cui nessuno stia leggendo La funzione rileva uno stato d'errore e lo comunica tramite un valore di
+ * Funzione che apre la FIFO al path specificato, aprendola WRITE only
+ * Nel caso in cui nessuno stia leggendo o la FIFO non esista la funzione rileva uno stato d'errore e lo comunica tramite un valore di
  *      hand di -1
  * @param path stringa con il path beraglio
  * @return hand, handler della pipe
+ * @exception -1 se la FIFO non esiste o nessuno la ha aperta in lettura
  */
-int creaFifoScrittura(char* path) {
+int apriFiFoScrittura(char* path) {
 
-    int hand = 0, errCheck = 0;
+    int hand = 0;
 
     /*
      S_IWUSR write permission owner
@@ -59,11 +58,14 @@ int creaFifoScrittura(char* path) {
      S_IRGRP read permission group
      S_IROTH read permission other
      */
-    errCheck = mkfifo(path, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
+    //errCheck = mkfifo(path, O_CREAT | S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
 
-    if (errCheck == -1) {
-        gestisciErrore(path);
-    }
+    /*
+        if (errCheck == -1) {
+            perror("mkfifo:");
+            return -1;
+        }
+     */
 
     //Questa chiamata blocca il processo nel caso in cui non ci sia nessuno a leggere dalla fifo
     hand = open(path, O_WRONLY | O_NONBLOCK);
@@ -76,17 +78,20 @@ int creaFifoScrittura(char* path) {
  * @param handler, handler della fifo da chiudere
  * @param delete, settare vero se si vuole eliminare la fifo
  */
-void chiudiFifo(char* path, bool eliminare) {
+int chiudiFifo(char* path, int fileDescriptor, bool eliminare) {
     int errore = 0;
+
+    errore = close(fileDescriptor);
+    if (errore == -1) {
+        return errore;
+    }
+
     errore = unlink(path);
 
     if (errore = -1) {
-        gestisciErrore(path);
+        return errore;
     }
-
-    /*
-     TODO gestire eliminazione
-     */
+    return errore;
 }
 
 bool leggiMessaggio(char* buffer, int lunghMax, int handlerFifo) {
