@@ -1,5 +1,7 @@
 #lista delle librerie necessarie
 OBJ = main.o server.o client.o
+#lista delle librerie da testare
+OBJTEST = allFifo.o creaFifoMain.o
 
 #Definiamo quali direttive non producono file
 .PHONY: clean
@@ -40,7 +42,7 @@ $(BUILDNAME): $(OBJ)
 
 BUILDTESTLIB: checkDir buildtest
 	
-buildtest: allFifo.o creaFifoMain.o 
+buildtest: $(OBJTEST)
 	@#linking finale
 	@gcc $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$(BUILDNAME)
 	@-rm $(addprefix $(BUILDIR)/,$(^F))
