@@ -8,20 +8,13 @@
 #ifndef CREAFIFO_H
 #define	CREAFIFO_H
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-
-#ifdef	__cplusplus
-}
-#endif
+#include <stdbool.h>
 
 int creaFifoLettura(char* path);
-
 int creaFifoScrittura(char* path);
-
-
+void chiudiFifo(char* path, bool eliminare);
+bool leggiMessaggio(char* buffer, int lunghMax, int handlerFifo);
+bool inviaMessaggio(char* messaggio, int handlerFifo);
 
 #endif	/* CREAFIFO_H */
 

@@ -3,32 +3,33 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <signal.h>
-
-
-
 #include <linux/stat.h>
 
-#include "creaFifo.h"
+#include "allFifo.h"
 
 void handler(int signo) {
     printf("Errore: %i\n", signo);
 }
 
 int main(int argc, char** argv) {
+
+    //handler dei SIGNAL
     signal(SIGPIPE, handler);
 
-    int hand = creaFifoScrittura("/tmp/testLibFifo");
-    printf("%i\n", hand);
+
+    char* path = "/tmp/testLibFifo";
+
+    //Test LibreriaFIFO
+    int hand = creaFifoLettura(path);
 
 
-    char* stringa = "Ciao";
-    write(hand, stringa, sizeof (stringa));
+    char buff[100];
+    leggiMessaggio(buff, 99, hand);
+    printf("%s\n", buff);
 
-    int x = 0;
-    scanf("%i", &x);
+    chiudiFifo(path, true);
 
-    write(hand, stringa, sizeof (stringa));
-
+    //File ServerFiglio.c in SysOp/Progetto 
 
     int letti = 0;
     int pid, pidVecchio = 0;
@@ -38,10 +39,6 @@ int main(int argc, char** argv) {
      
      while (1) {
      
-     char buff[100];
-     letti = read(hand, buff, 99);
-     
-     
      pid = atoi(buff);
      
      counter++;
@@ -50,9 +47,7 @@ int main(int argc, char** argv) {
      printf("%i \t Byte letti %i \t Lettura numero %i\n", pid, letti, counter);
      //pidVecchio = pid;
      
-     
      //}
-     
      
      //		close(hand);
      //		hand = open(path, O_RDONLY);
