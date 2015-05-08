@@ -4,18 +4,19 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <linux/stat.h>
-
 #include <stdio.h> 
-
 #include <time.h> 
 
 #include "allFifo.h"
+#include "parser.h"
 
 void handler(int signo) {
     printf("Errore: %i\n", signo);
 }
 
 int main(int argc, char** argv) {
+
+    crInvDatiRisp();
 
     /*
      //handler dei SIGNAL
@@ -58,29 +59,8 @@ int main(int argc, char** argv) {
      
      }
      
-     * 
-     
-     
-     
      //	unlink(path);
      */
-
-
-
-
-
-    char s[1000];
-
-    time_t t = time(NULL);
-
-    struct tm * p = localtime(&t);
-
-    strftime(s, 1000, "%A%B%d%Y", p);
-
-    printf("[%s]\n", s);
-
-
-
 
     return (0);
 }

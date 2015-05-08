@@ -8,77 +8,88 @@
 #ifndef PARSER_H
 #define	PARSER_H
 
-struct messaggio;
+
+#include <time.h>
+
+/**
+ Struct contente tutti i dati logici dei messaggi inviati tramite le FIFO
+ */
+typedef struct messaggioTag {
+    int pidMit;
+    int numArg;
+    struct tm timestamp;
+    char messFinale[64];
+} messaggio;
 
 /**
  * Ciao
  * @return 
  */
-char* crInvDatiRisp(int pid);
+char* crInvDatiRisp();
 
 /**
  * 
  * @return 
  */
-char* crRichPartec(int pid);
+char* crRichPartec();
 
 /**
  * 
  * @return 
  */
-char* crInvLogOut(int pid);
+char* crInvLogOut();
 
 /**
  * 
  * @return 
  */
-char* crMesgCorrotto(int pid);
+char* crMesgCorrotto();
 
 /**
  * 
  * @return 
  */
-char* crAccettaClient(int pid);
+char* crAccettaClient();
 
 /**
  * 
  * @return 
  */
-char* crRifiutaClient(int pid);
+char* crRifiutaClient();
 
 /**
  * 
  * @return 
  */
-char* crInvClassifica(int pid);
+char* crInvClassifica();
 
 /**
  * 
  * @return 
  */
-char* crBroadNuovoGiocatore(int pid);
+char* crBroadNuovoGiocatore();
 
 /**
  * 
  * @return 
  */
-char* crBroadAggPunti(int pid);
+char* crBroadAggPunti();
 
 /**
  * 
  * @return 
  */
-char* crInvDomanda(int pid);
+char* crInvDomanda();
 
 /**
  * Funzione che dato l'array dei processi conosciuti con cui si è in contatto controlla se il mittente è nella lista.
  * @param contatti
  * @return 
  */
-bool checkPid(int pid, int* contatti);
+bool checkPid(int* contatti);
 
 
-messaggio leggiMessaggio(char* input);
+messaggio leggiComm(messaggio msg, char* input);
 
 
 #endif	/* PARSER_H */

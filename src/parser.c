@@ -4,21 +4,24 @@
 #include <stdbool.h>
 
 /**
- * Funzione che concatena le due stringhe in inpud secondo il formato definito dal protocollo del messaggio
+ * Funzione che concatena un nuovo segmento al messaggio finale. Se il risultato della concatenazione fosse piu lungo di
+ * 64 (lunghezza massima della stringa in uscita sulla fifo) la funzione non concatenerebbe e ritornerebbe false.
  * @param messaggio stringa del messaggio parziale da concatenare
  * @param seconda stringa da aggiungere
  * @return true se success, false se errore
  */
-bool concatena(char* messaggio, char* seconda) {
+bool concatena(char* msg, int indice, char* seconda) {
 
-    sprintf(temp, "%s\0%s\0", prima, seconda);
+    if ((indice + strlen(seconda)) >= 64) {
+        return false;
+    }
 
-    sprintf(messaggio, "%s", temp);
-
+    sprintf(msg, "%s!%s", msg, seconda);
+    return true;
 }
 
 /**
- * Funzione che dato una STRINGA di 19 celle ritorna il timestamp come stringa seguito da \0
+ * Funzione che data una STRINGA di 19 celle ritorna il timestamp come stringa seguito da \0
  * @return 
  */
 char* timestamp(char* s) {
@@ -27,25 +30,30 @@ char* timestamp(char* s) {
     struct tm * p = localtime(&t);
     strftime(s, 19, "%A,%B,%d,%Y", p);
 
-    printf("[%s]\n", s);
-    printf("%i", (strlen(s) + 1));
-
     return s;
 }
 
-char* crInvDatiRisp(int pid, int rispo) {
+/*
+ TODO Sistemare chiamata qui alla struct. Parser.c non conosce la dimensione della variabile messaggio->messFinale[] dichiarata
+ *      nel file parser.h
+ */
+char* crInvDatiRisp(int rispo) {
+    messaggio msg;
+
+    msg->messFinale = "Ciao";
+
+    printf("%s", msg->messFinale);
+}
+char* crRichPartec();
+char* crInvLogOut();
+char* crMesgCorrotto();
+
+char* crAccettaClient() {
 
 }
-char* crRichPartec(int pid);
-char* crInvLogOut(int pid);
-char* crMesgCorrotto(int pid);
-
-char* crAccettaClient(int pid) {
-
-}
-char* crRifiutaClient(int pid);
-char* crInvClassifica(int pid);
-char* crBroadNuovoGiocatore(int pid);
-char* crBroadAggPunti(int pid);
-char* crInvDomanda(int pid);
+char* crRifiutaClient();
+char* crInvClassifica();
+char* crBroadNuovoGiocatore();
+char* crBroadAggPunti();
+char* crInvDomanda();
 
