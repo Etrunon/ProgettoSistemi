@@ -8,7 +8,7 @@
 #ifndef PARSER_H
 #define	PARSER_H
 
-
+#define MSG_SIZE 50
 #include <time.h>
 
 /**
@@ -18,68 +18,68 @@ typedef struct messaggioTag {
     int pidMit;
     int numArg;
     struct tm timestamp;
-    char messFinale[64];
+    char* msg;
 } messaggio;
 
 /**
  * Ciao
  * @return 
  */
-char* crInvDatiRisp();
+bool crInvDatiRisp(messaggio x, int risposta);
 
 /**
  * 
  * @return 
  */
-char* crRichPartec();
+bool crRichPartec(messaggio x, char* pathFifo);
 
 /**
  * 
  * @return 
  */
-char* crInvLogOut();
+bool crInvLogOut(messaggio x);
 
 /**
  * 
  * @return 
  */
-char* crMesgCorrotto();
+bool crMesgCorrotto(messaggio x);
 
 /**
  * 
  * @return 
  */
-char* crAccettaClient();
+bool crAccettaClient(messaggio x);
 
 /**
  * 
  * @return 
  */
-char* crRifiutaClient();
+bool crRifiutaClient(messaggio x);
 
 /**
  * 
  * @return 
  */
-char* crInvClassifica();
+bool crInvClassifica(messaggio x, char* classifica);
 
 /**
  * 
  * @return 
  */
-char* crBroadNuovoGiocatore();
+bool crBroadNuovoGiocatore(messaggio x, char* nome, int punti, int codice);
 
 /**
  * 
  * @return 
  */
-char* crBroadAggPunti();
+bool crBroadAggPunti(messaggio x, int codice, int punti);
 
 /**
  * 
  * @return 
  */
-char* crInvDomanda();
+bool crInvDomanda(messaggio x, int primoNum, int secondoNum);
 
 /**
  * Funzione che dato l'array dei processi conosciuti con cui si è in contatto controlla se il mittente è nella lista.

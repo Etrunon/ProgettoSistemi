@@ -16,7 +16,22 @@ void handler(int signo) {
 
 int main(int argc, char** argv) {
 
-    crInvDatiRisp();
+
+    messaggio x;
+    x.msg = (char*) malloc(MSG_SIZE * sizeof (char));
+
+    //crInvDatiRisp(x, 200);
+    //crRichPartec(x, "/tmp/mioNom");
+    //crAccettaClient(x);
+    //crBroadAggPunti(x, 8, 21);
+    //crBroadNuovoGiocatore(x, "Pippo", 8, 7);
+    //crInvClassifica(x, "32,23,20,15,40");
+    //crInvDomanda(x, 32, 46);
+    //crInvLogOut(x);
+    //crMesgCorrotto(x);
+    crRifiutaClient(x);
+
+    printf("\n%s\n", x.msg);
 
     /*
      //handler dei SIGNAL
