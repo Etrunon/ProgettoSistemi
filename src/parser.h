@@ -16,9 +16,14 @@
  */
 typedef struct messaggioTag {
     int pidMit;
+    int codiceMsg;
     int numArg;
     struct tm timestamp;
+    char* timestring;
     char* msg;
+    int* dato;
+    int* dato2;
+
 } messaggio;
 
 /**
@@ -81,15 +86,7 @@ bool crBroadAggPunti(messaggio x, int codice, int punti);
  */
 bool crInvDomanda(messaggio x, int primoNum, int secondoNum);
 
-/**
- * Funzione che dato l'array dei processi conosciuti con cui si è in contatto controlla se il mittente è nella lista.
- * @param contatti
- * @return 
- */
-bool checkPid(int* contatti);
-
-
-messaggio leggiComm(messaggio msg, char* input);
+messaggio leggiComm(messaggio msg, char* input, int* contatti, int dim);
 
 
 #endif	/* PARSER_H */

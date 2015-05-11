@@ -14,7 +14,7 @@ void timestamp(char* s) {
 
     time_t t = time(NULL);
     struct tm * p = localtime(&t);
-    strftime(s, 25, "%y %m %d %H:%M:%S", p);
+    strftime(s, 25, "%y-%m-%d %H:%M:%S", p);
 
 }
 
@@ -40,8 +40,10 @@ bool crInvDatiRisp(messaggio x, int rispo) {
 
     char* tmp = (char*) malloc(7 * sizeof (char));
 
-    sprintf(tmp, "!ri!%i", rispo);
+    sprintf(tmp, "!1!%i", rispo);
     strcat(x.msg, tmp);
+
+    //sprintf(x.msg, "%s%s", x.msg, tmp);
 
     free(tmp);
     return true;
@@ -53,7 +55,7 @@ bool crRichPartec(messaggio x, char* pathFifo) {
     int spazioDisponibile = MSG_SIZE - strlen(x.msg);
     char* tmp = (char*) malloc(spazioDisponibile * sizeof (char));
 
-    sprintf(tmp, "!jn!%s", pathFifo);
+    sprintf(tmp, "!2!%s", pathFifo);
 
     if (strlen(tmp) >= spazioDisponibile) {
         return NULL;
@@ -70,7 +72,7 @@ bool crInvLogOut(messaggio x) {
 
     char* tmp = (char*) malloc(3 * sizeof (char));
 
-    sprintf(tmp, "!lo");
+    sprintf(tmp, "!3");
     strcat(x.msg, tmp);
 
     free(tmp);
@@ -82,7 +84,7 @@ bool crMesgCorrotto(messaggio x) {
 
     char* tmp = (char*) malloc(3 * sizeof (char));
 
-    sprintf(tmp, "!co");
+    sprintf(tmp, "!4");
     strcat(x.msg, tmp);
 
     free(tmp);
@@ -94,7 +96,7 @@ bool crAccettaClient(messaggio x) {
 
     char* tmp = (char*) malloc(3 * sizeof (char));
 
-    sprintf(tmp, "!ok");
+    sprintf(tmp, "!5");
     strcat(x.msg, tmp);
 
     free(tmp);
@@ -105,7 +107,7 @@ bool crRifiutaClient(messaggio x) {
 
     char* tmp = (char*) malloc(3 * sizeof (char));
 
-    sprintf(tmp, "!no");
+    sprintf(tmp, "!6");
     strcat(x.msg, tmp);
 
     free(tmp);
@@ -117,7 +119,7 @@ bool crInvClassifica(messaggio x, char* classifica) {
     int spazioDisponibile = MSG_SIZE - strlen(x.msg);
     char* tmp = (char*) malloc(spazioDisponibile * sizeof (char));
 
-    sprintf(tmp, "!cl!%s", classifica);
+    sprintf(tmp, "!7!%s", classifica);
 
     if (strlen(tmp) >= spazioDisponibile) {
         return NULL;
@@ -135,7 +137,7 @@ bool crBroadNuovoGiocatore(messaggio x, char* nome, int codice, int punti) {
     int spazioDisponibile = MSG_SIZE - strlen(x.msg);
     char* tmp = (char*) malloc(spazioDisponibile * sizeof (char));
 
-    sprintf(tmp, "!np!%s!%i!%i", nome, codice, punti);
+    sprintf(tmp, "!8!%s!%i!%i", nome, codice, punti);
 
     if (strlen(tmp) >= spazioDisponibile) {
         return NULL;
@@ -151,7 +153,7 @@ bool crBroadAggPunti(messaggio x, int codice, int punti) {
 
     char* tmp = (char*) malloc(12 * sizeof (char));
 
-    sprintf(tmp, "!ap!%i!%i", codice, punti);
+    sprintf(tmp, "!9!%i!%i", codice, punti);
     strcat(x.msg, tmp);
 
     free(tmp);
@@ -162,9 +164,56 @@ bool crInvDomanda(messaggio x, int primoNum, int secondoNum) {
 
     char* tmp = (char*) malloc(11 * sizeof (char));
 
-    sprintf(tmp, "!ap!%i!%i", primoNum, secondoNum);
+    sprintf(tmp, "!10!%i!%i", primoNum, secondoNum);
     strcat(x.msg, tmp);
 
     free(tmp);
 }
+
+bool checkPid(int*contatti, int dim, int pid) {
+    return true;
+    return false;
+}
+
+messaggio leggiComm(messaggio msg, char* input, int* contatti, int dim) {
+
+    char *indice = NULL, *indiceTmp = NULL;
+    char tmp[20];
+    memcpy(tmp, input, 6);
+
+    //PID
+    int pid;
+    tmp[5] = '\0';
+    sscanf(tmp, "%i", &pid);
+    msg.pidMit = pid;
+    indice = &input[6];
+
+    //TIMESTAMP
+    indiceTmp = strchr(indice, '!');
+    memcpy(tmp, indice, (int) (indiceTmp - indice));
+    tmp[17] = '\0';
+    msg.timestring = (char*) malloc(17 * sizeof (char));
+    strcpy(msg.timestring, tmp);
+
+    //CODICE MSG
+    indice = indiceTmp + 1;
+    indiceTmp = strchr(indice, '!');
+
+    printf("%s\n%s", indice, indiceTmp);
+
+    char tmp2[20];
+    memcpy(tmp2, indice, (int) (indiceTmp - indice));
+
+    printf("\n Print di tmp2 : \n%s\n %lu \t %lu \n", tmp2, (long) indice, (long) indiceTmp);
+
+    //sscanf(tmp, "%i", msg.codiceMsg);
+    printf("%s \t %i", indice, msg.codiceMsg);
+
+
+
+
+    printf("\n\nPrintfFinale\n%s\nOriginale: %s\nLong: %i\n", tmp, input, pid);
+    //checkPid(contatti, );
+}
+
 
