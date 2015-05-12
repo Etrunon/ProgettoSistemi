@@ -9,6 +9,7 @@
 
 #include "allFifo.h"
 #include "parser.h"
+#include "CONST.h"
 
 void handler(int signo) {
     printf("Errore: %i\n", signo);
@@ -17,11 +18,12 @@ void handler(int signo) {
 int main(int argc, char** argv) {
 
 
-    messaggio x, y;
-    x.msg = (char*) malloc(MSG_SIZE * sizeof (char));
+    messaggio x = messaggioConstructor();
+    messaggio y = messaggioConstructor();
 
-    crInvDatiRisp(x, 200);
-    //crRichPartec(x, "/tmp/mioNom");
+
+    //crInvDatiRisp(x, 200);
+    crRichPartec(x, "/tmp/mioNom");
     //crAccettaClient(x);
     //crBroadAggPunti(x, 8, 21);
     //crBroadNuovoGiocatore(x, "Pippo", 8, 7);
@@ -30,13 +32,14 @@ int main(int argc, char** argv) {
     //crInvLogOut(x);
     //crMesgCorrotto(x);
     //crRifiutaClient(x);
+
     //printf("\n%s\n", x.msg);
 
     int cont[3] = {1, 2, 3};
     leggiComm(y, x.msg, cont, 3);
 
     /*
-    decodifica: 
+     decodifica: 
      * da una stringa devo ottenere un Messaggio. 
      * Mando la lista dei miei contatti, se non lo conosco e non si vuole unire non leggo nemmeno
      * se lo conosco guardo il tipo del messaggio e in base a quello riempio la struct

@@ -8,8 +8,8 @@
 #ifndef PARSER_H
 #define	PARSER_H
 
-#define MSG_SIZE 50
 #include <time.h>
+#include "CONST.h"
 
 /**
  Struct contente tutti i dati logici dei messaggi inviati tramite le FIFO
@@ -17,14 +17,24 @@
 typedef struct messaggioTag {
     int pidMit;
     int codiceMsg;
-    int numArg;
-    struct tm timestamp;
+    struct tm *timestamp;
     char* timestring;
     char* msg;
-    int* dato;
-    int* dato2;
+    char* pathFifo;
+    char* nomeClient;
+    int* classifica;
+    int numeroClient;
+    int valRisposta;
+    int clientSpecificato;
+    int clientSpecPunti;
+    int domandaNum1;
+    int domandaNum2;
 
 } messaggio;
+
+messaggio messaggioConstructor();
+
+void messaggioDestructor(messaggio x);
 
 /**
  * Ciao
@@ -87,6 +97,7 @@ bool crBroadAggPunti(messaggio x, int codice, int punti);
 bool crInvDomanda(messaggio x, int primoNum, int secondoNum);
 
 messaggio leggiComm(messaggio msg, char* input, int* contatti, int dim);
+
 
 
 #endif	/* PARSER_H */
