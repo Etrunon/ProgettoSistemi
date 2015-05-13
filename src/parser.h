@@ -11,6 +11,13 @@
 #include <time.h>
 #include "CONST.h"
 
+/*
+ * TODO:
+ *  - Refactoring
+ *  - Allocazione dimanica della string in invio
+ *  - 
+ */
+
 /**
  Struct contente tutti i dati logici dei messaggi inviati tramite le FIFO
  */
@@ -25,8 +32,8 @@ typedef struct messaggioTag {
     int* classifica;
     int numeroClient;
     int valRisposta;
-    int clientSpecificato;
-    int clientSpecPunti;
+    int clientID;
+    int clientPunti;
     int domandaNum1;
     int domandaNum2;
 
@@ -96,7 +103,7 @@ bool crBroadAggPunti(messaggio x, int codice, int punti);
  */
 bool crInvDomanda(messaggio x, int primoNum, int secondoNum);
 
-messaggio leggiComm(messaggio msg, char* input, int* contatti, int dim);
+messaggio leggiComm(messaggio msg, char* input);
 
 
 

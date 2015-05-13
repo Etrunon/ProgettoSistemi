@@ -23,8 +23,8 @@ messaggio messaggioConstructor() {
     msg.classifica = NULL;
     msg.numeroClient = -1;
     msg.valRisposta = -1;
-    msg.clientSpecificato = -1;
-    msg.clientSpecPunti = -1;
+    msg.clientID = -1;
+    msg.clientPunti = -1;
     msg.domandaNum1 = -1;
     msg.domandaNum2 = -1;
 
@@ -285,10 +285,10 @@ bool decBroadNuovoGiocatore(messaggio *x) {
     //Raccolgo codice client e punti iniziali
     indice++;
     char *check = NULL;
-    x->clientSpecificato = strtol(indice, &check, 10);
+    x->clientID = strtol(indice, &check, 10);
     indice = check + 1;
     check = NULL;
-    x->clientSpecPunti = strtol(indice, &check, 10);
+    x->clientPunti = strtol(indice, &check, 10);
 
     if (check != NULL) {
         if (*check != '\0');
@@ -308,10 +308,10 @@ bool decBroadAggPunti(messaggio *x) {
 
     //Raccolgo codice client e punti
     char *check = NULL;
-    x->clientSpecificato = strtol(aliasMsg, &check, 10);
+    x->clientID = strtol(aliasMsg, &check, 10);
     aliasMsg = check + 1;
     check = NULL;
-    x->clientSpecPunti = strtol(aliasMsg, &check, 10);
+    x->clientPunti = strtol(aliasMsg, &check, 10);
 
     if (check != NULL) {
         if (*check != '\0')
@@ -345,7 +345,7 @@ bool decInvDomanda(messaggio *x) {
 
 }
 
-messaggio leggiComm(messaggio msg, char* input, int* contatti, int dim) {
+messaggio leggiComm(messaggio msg, char* input) {
 
     char *indice = NULL, *indiceTmp = NULL;
     char tmp[20];

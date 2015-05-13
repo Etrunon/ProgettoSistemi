@@ -10,6 +10,7 @@
 
 #include "allFifo.h"
 #include "parser.h"
+#include "logica.h"
 #include "CONST.h"
 
 void handler(int signo) {
@@ -18,26 +19,35 @@ void handler(int signo) {
 
 int main(int argc, char** argv) {
 
+    /*
+     messaggio mittando = messaggioConstructor();
+     messaggio mittuto = messaggioConstructor();
+     
+     
+     //crInvDatiRisp(x, 200);
+     mittando.valRisposta = 200;
+     mittando.codiceMsg = 1;
+     //crRichPartec(x, "/tmp/mioNom");
+     //crAccettaClient(x);
+     //crBroadAggPunti(x, 8, 21);
+     //crBroadNuovoGiocatore(x, "Pippo", 8, 7);
+     //crInvClassifica(x, "32,23,20,15,40");
+     //crInvDomanda(x, 33, 45);
+     //crInvLogOut(x);
+     //crMesgCorrotto(x);
+     //crRifiutaClient(x);
+     
+     //creaRisposta(&mittando);
+     //inviamessaggio(mittando.msg, handlerFifo)
+     
+     //mittuto.msg = leggiMessaggio(dalla fifo);
+     //leggiComm(mittuto);
+     leggiComm(mittuto, mittando.msg, 3);
+     */
 
-    messaggio x = messaggioConstructor();
-    messaggio y = messaggioConstructor();
+    domanda dom = generaDomanda();
 
-
-    //crInvDatiRisp(x, 200);
-    //crRichPartec(x, "/tmp/mioNom");
-    //crAccettaClient(x);
-    //crBroadAggPunti(x, 8, 21);
-    //crBroadNuovoGiocatore(x, "Pippo", 8, 7);
-    //crInvClassifica(x, "32,23,20,15,40");
-    //crInvDomanda(x, 33, 45);
-    //crInvLogOut(x);
-    //crMesgCorrotto(x);
-    //crRifiutaClient(x);
-
-    //printf("\n%s\n", x.msg);
-
-    int cont[3] = {1, 2, 3};
-    leggiComm(y, x.msg, cont, 3);
+    printf("%i, %i\n", dom.numero1, dom.numero2);
 
     return (0);
 }
