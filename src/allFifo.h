@@ -9,11 +9,12 @@
 #define	CREAFIFO_H
 
 #include <stdbool.h>
+#include "parser.h"
 /*Crea una FIFO in lettura, tornando -1 se l'operazione non va a buon fine*/
 int creaFifoLettura(char* path);
 int apriFiFoScrittura(char* path);
 int chiudiFifo(char* path, int fileDescriptor, bool eliminare);
-bool leggiMessaggio(char* buffer, int lunghMax, int handlerFifo);
+bool leggiMessaggio(int handlerFifo, messaggio* msg);
 bool inviaMessaggio(char* messaggio, int handlerFifo);
 
 #endif	/* CREAFIFO_H */

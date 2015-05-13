@@ -22,6 +22,8 @@ Togliere il file delle cose da fare;
     - [ ] check domande
 
 
-
-
-
+#INTERFACCIA DI FIFO
+    * Per scrivere: puntatore a messaggio già fatto, con i vari campi compilati + FIFO in cui mandare;
+        Parser distrugge messaggio
+    * Per leggere: puntatore nullo a messaggio da riempire;
+        Server/client distrugge messaggio

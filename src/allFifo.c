@@ -8,6 +8,7 @@
 
 #include "allFifo.h"
 #include "CONST.h"
+#include "parser.h"
 
 /**
  * Funzione che crea una fifo da LETTURA al path specificato, aprendola in READ and WRITE
@@ -95,9 +96,12 @@ int chiudiFifo(char* path, int fileDescriptor, bool eliminare) {
     return errore;
 }
 
-bool leggiMessaggio(char* buffer, int lunghMax, int handlerFifo) {
+bool leggiMessaggio(int handlerFifo, messaggio* msg) {
+    int letti;
 
-    read(handlerFifo, buffer, MSG_SIZE + 1);
+    letti = read(handlerFifo, msg->msg, MSG_SIZE + 1);
+
+    //printf("Letti: %i\n", letti);
     //perror("Dentro leggi messaggio: ");
 
     return true;

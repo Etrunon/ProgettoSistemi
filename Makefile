@@ -1,5 +1,5 @@
 #lista delle librerie necessarie
-OBJ = main.o server.o client.o allFifo.o
+OBJ = main.o server.o client.o allFifo.o parser.o
 #lista delle librerie da testare
 OBJTEST = allFifo.o parser.o mainBoss.o
 

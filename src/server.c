@@ -13,7 +13,7 @@
 
 int maxClients;
 int maxWin;
-int fifo;
+int ascoltoDaiClient;
 
 pthread_mutex_t mutex;
 int a = 0;
@@ -23,7 +23,7 @@ int a = 0;
  */
 void cleanupServer(int sig) {
     printf("\n%30s\n", "Disattivazione del server!");
-    close(fifo);
+    close(ascoltoDaiClient);
     unlink(SERVERPATH);
     exit(EXIT_SUCCESS);
 }
@@ -44,8 +44,10 @@ void * inputUtente(void* arg) {
 }
 
 int initServer(int Clients, int Win) {
+    /*Segnali di chiusura*/
     signal(SIGTERM, cleanupServer);
     signal(SIGINT, cleanupServer);
+    signal(SIGSEGV, cleanupServer);
 
     /*Controllo se esiste già un server*/
     int exist = access(SERVERPATH, F_OK);
@@ -57,8 +59,8 @@ int initServer(int Clients, int Win) {
     maxWin = Win;
 
     /* Creo la FIFO per ascoltare i client*/
-    fifo = creaFifoLettura(SERVERPATH);
-    if (fifo == -1) {
+    ascoltoDaiClient = creaFifoLettura(SERVERPATH);
+    if (ascoltoDaiClient == -1) {
         printf("%s\n", "Errore nell'apertura del server");
         cleanupServer(0);
         exit(EXIT_FAILURE);
@@ -72,8 +74,18 @@ int initServer(int Clients, int Win) {
     /*Avvio thread per interazione da terminale*/
     pthread_t threadID;
     pthread_create(&threadID, NULL, &inputUtente, NULL);
-    pthread_join(threadID, NULL);
 
+    /*Test lettura*/
+    while (1) {
+        printf("%s\n", "In attesa di messaggi!");
+        messaggio msg = messaggioConstructor();
+        leggiMessaggio(ascoltoDaiClient, &msg);
+        printf("Messaggio: %s\n", msg.msg);
+        leggiComm(msg, msg.msg);
+    }
+
+
+    pthread_join(threadID, NULL);
     cleanupServer(0);
 
     return 0;

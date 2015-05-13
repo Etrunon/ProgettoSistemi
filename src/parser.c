@@ -8,7 +8,7 @@
 
 /**
  * Costruttore della struct messaggio
- * @return 
+ * @return
  */
 messaggio messaggioConstructor() {
 
@@ -59,7 +59,7 @@ void messaggioDestructor(messaggio x) {
 
 /**
  * Funzione che data una STRINGA di 19 celle ritorna il timestamp come stringa seguito da \0
- * @return 
+ * @return
  */
 void timestamp(char* s) {
 
@@ -163,7 +163,7 @@ bool crRifiutaClient(messaggio x) {
 /**
  * TODO Eliminare? Per ragioni di lunghezza stringa
  * @param x
- * @return 
+ * @return
  */
 bool crInvClassifica(messaggio x, char *classifica) {
     headerMsg(&x);
@@ -244,8 +244,8 @@ bool decInvDatiRisp(messaggio *x) {
 }
 
 /**
- * 
- * @return 
+ *
+ * @return
  */
 bool decRichPartec(messaggio *x) {
 
@@ -267,8 +267,8 @@ bool decRichPartec(messaggio *x) {
 }
 
 /**
- * 
- * @return 
+ *
+ * @return
  */
 bool decBroadNuovoGiocatore(messaggio *x) {
 
@@ -299,8 +299,8 @@ bool decBroadNuovoGiocatore(messaggio *x) {
 }
 
 /**
- * 
- * @return 
+ *
+ * @return
  */
 bool decBroadAggPunti(messaggio *x) {
 
@@ -321,8 +321,8 @@ bool decBroadAggPunti(messaggio *x) {
 }
 
 /**
- * 
- * @return 
+ *
+ * @return
  */
 bool decInvDomanda(messaggio *x) {
     printf("%s\n", x->msg);
@@ -350,7 +350,7 @@ messaggio leggiComm(messaggio msg, char* input) {
     char *indice = NULL, *indiceTmp = NULL;
     char tmp[20];
 
-    printf("%s\n", input);
+    //printf("%s\n", input);
 
     //PID
     memcpy(tmp, input, 6);
