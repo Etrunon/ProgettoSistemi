@@ -1,7 +1,7 @@
 #lista delle librerie necessarie
 OBJ = main.o server.o client.o allFifo.o
 #lista delle librerie da testare
-OBJTEST = allFifo.o parser.o creaFifoMain.o
+OBJTEST = allFifo.o parser.o mainBoss.o
 
 #Definiamo quali direttive non producono file
 .PHONY: clean
