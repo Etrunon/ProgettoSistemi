@@ -8,7 +8,7 @@
 #define MAXCOMMAND 25
 #define MAXNAME 20
 #define MAXANSWER 5
-
+#define NUM_CLIENT 10
 
 #endif	/* CONST_H */
 

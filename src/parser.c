@@ -23,8 +23,8 @@ messaggio messaggioConstructor() {
     msg.classifica = NULL;
     msg.numeroClient = -1;
     msg.valRisposta = -1;
-    msg.clientSpecificato = -1;
-    msg.clientSpecPunti = -1;
+    msg.clientID = -1;
+    msg.clientPunti = -1;
     msg.domandaNum1 = -1;
     msg.domandaNum2 = -1;
 
@@ -160,7 +160,12 @@ bool crRifiutaClient(messaggio x) {
     free(tmp);
 }
 
-bool crInvClassifica(messaggio x, char* classifica) {
+/**
+ * TODO Eliminare? Per ragioni di lunghezza stringa
+ * @param x
+ * @return 
+ */
+bool crInvClassifica(messaggio x, char *classifica) {
     headerMsg(&x);
 
     int spazioDisponibile = MSG_SIZE - strlen(x.msg);
@@ -255,13 +260,8 @@ bool decRichPartec(messaggio *x) {
 
     x->pathFifo = (char*) malloc(lgPath * (sizeof (char)));
 
-    memcpy(x->pathFifo, x->msg, lgPath);
+    sprintf(x->pathFifo, "%s%c", x->msg, '\0');
     x->pathFifo[(lgPath + 1)] = '\0';
-
-    /*
-     TODO l'ultimo carattere è una schifezza!!
-     */
-    printf("%s\n%i\n%i\n", x->pathFifo, strlen(x->pathFifo), lgMax);
 
     return true;
 }
@@ -270,47 +270,31 @@ bool decRichPartec(messaggio *x) {
  * 
  * @return 
  */
-bool decInvLogOut(messaggio *x) {
-
-}
-
-/**
- * 
- * @return 
- */
-bool decMesgCorrotto(messaggio *x) {
-
-}
-
-/**
- * 
- * @return 
- */
-bool decAccettaClient(messaggio *x) {
-
-}
-
-/**
- * 
- * @return 
- */
-bool decRifiutaClient(messaggio *x) {
-
-}
-
-/**
- * 
- * @return 
- */
-bool decInvClassifica(messaggio *x) {
-
-}
-
-/**
- * 
- * @return 
- */
 bool decBroadNuovoGiocatore(messaggio *x) {
+
+    char * aliasMsg = x->msg + 1;
+
+    //Raccolgo la stringa col nome
+    char *indice = strchr(aliasMsg, '!');
+    int lgNome = strlen(aliasMsg) - strlen(indice) + 1;
+    char *nome = (char*) malloc(lgNome * (sizeof (char)));
+    memcpy(nome, aliasMsg, lgNome - 1);
+    nome[lgNome - 1] = '\0';
+    x->nomeClient = nome;
+
+    //Raccolgo codice client e punti iniziali
+    indice++;
+    char *check = NULL;
+    x->clientID = strtol(indice, &check, 10);
+    indice = check + 1;
+    check = NULL;
+    x->clientPunti = strtol(indice, &check, 10);
+
+    if (check != NULL) {
+        if (*check != '\0');
+        return false;
+    }
+    return true;
 
 }
 
@@ -320,6 +304,20 @@ bool decBroadNuovoGiocatore(messaggio *x) {
  */
 bool decBroadAggPunti(messaggio *x) {
 
+    char * aliasMsg = x->msg + 1;
+
+    //Raccolgo codice client e punti
+    char *check = NULL;
+    x->clientID = strtol(aliasMsg, &check, 10);
+    aliasMsg = check + 1;
+    check = NULL;
+    x->clientPunti = strtol(aliasMsg, &check, 10);
+
+    if (check != NULL) {
+        if (*check != '\0')
+            return false;
+    }
+    return true;
 }
 
 /**
@@ -327,13 +325,32 @@ bool decBroadAggPunti(messaggio *x) {
  * @return 
  */
 bool decInvDomanda(messaggio *x) {
+    printf("%s\n", x->msg);
+
+    char * aliasMsg = x->msg + 1;
+
+    //Raccolgo codice client e punti
+    char *check = NULL;
+    x->domandaNum1 = strtol(aliasMsg, &check, 10);
+    aliasMsg = check + 1;
+    check = NULL;
+    x->domandaNum2 = strtol(aliasMsg, &check, 10);
+
+    if (check != NULL) {
+        if (*check != '\0')
+            return false;
+    }
+    printf("Finale %s %i %i\n", x->msg, x->domandaNum1, x->domandaNum2);
+    return true;
 
 }
 
-messaggio leggiComm(messaggio msg, char* input, int* contatti, int dim) {
+messaggio leggiComm(messaggio msg, char* input) {
 
     char *indice = NULL, *indiceTmp = NULL;
     char tmp[20];
+
+    printf("%s\n", input);
 
     //PID
     memcpy(tmp, input, 6);
@@ -371,15 +388,15 @@ messaggio leggiComm(messaggio msg, char* input, int* contatti, int dim) {
             break;
         case 2: decRichPartec(&msg);
             break;
-        case 3: decInvLogOut(&msg);
+        case 3: //InvLogOut;
             break;
-        case 4: decMesgCorrotto(&msg);
+        case 4: //MesgCorrotto;
             break;
-        case 5: decAccettaClient(&msg);
+        case 5: //AccettaClient;
             break;
-        case 6: decRifiutaClient(&msg);
+        case 6: //RifiutaClient;
             break;
-        case 7: decInvClassifica(&msg);
+        case 7: //InvClassifica;
             break;
         case 8: decBroadNuovoGiocatore(&msg);
             break;
