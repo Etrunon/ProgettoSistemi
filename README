@@ -27,3 +27,6 @@ Togliere il file delle cose da fare;
         Parser distrugge messaggio
     * Per leggere: puntatore nullo a messaggio da riempire;
         Server/client distrugge messaggio
+
+#CLASSIFICA
+    INvio di messaggi a tutti per ogni singolo aggiornamento di punteggio

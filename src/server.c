@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include "allFifo.h"
@@ -9,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-
+#include "commands.h"
 
 int maxClients;
 int maxWin;
@@ -22,24 +23,22 @@ int a = 0;
  * rimaste aperte
  */
 void cleanupServer(int sig) {
-    printf("\n%30s\n", "Disattivazione del server!");
+    printf("\n%30s\n", "Server disattivato");
     close(ascoltoDaiClient);
     unlink(SERVERPATH);
-    exit(EXIT_SUCCESS);
+    exit(errno);
 }
 
 void * inputUtente(void* arg) {
-    char* commands = (char*) malloc(sizeof (char) * MAXCOMMAND);
-    size_t size = sizeof (commands);
-    char command [MAXCOMMAND];
+    comando c;
+    data* d = (data*) malloc(sizeof (data));
 
-    while (strcmp(command, "exit")) {
+    do {
+        c = leggiInput(true, d);
+        printf("%s\n", d->nome);
 
-        printf("%s", "Server:");
-        int read = getline(&commands, &size, stdin);
-        commands[read - 1] = '\0';
-        sscanf(commands, "%s", command);
-    }
+    } while (c != CHIUSURA);
+
     return NULL;
 }
 
@@ -75,15 +74,23 @@ int initServer(int Clients, int Win) {
     pthread_t threadID;
     pthread_create(&threadID, NULL, &inputUtente, NULL);
 
-    /*Test lettura*/
-    while (1) {
-        printf("%s\n", "In attesa di messaggi!");
-        //Luca
-        messaggio *msg = messaggioConstructor();
+    //Test lettura
+    /*
+        while (1) {
+            //printf("%s\n", "In attesa di messaggi!");
 
-        leggiMessaggio(ascoltoDaiClient, msg);
-        printf("Messaggio: %s\n", msg->msg);
-    }
+            //messaggio msg = messaggioConstructor();
+            //leggiMessaggio(ascoltoDaiClient, &msg);
+            //printf("Messaggio: %s", msg.msg);
+            sleep(2);
+            printf("\r%-30s", "Un messaggio!");
+            fflush(stdout);
+            sleep(2);
+            printf("\r%-30s", "Un altro messaggio!");
+            fflush(stdout);
+            //leggiComm(msg, msg.msg);
+        }
+     */
 
 
     pthread_join(threadID, NULL);

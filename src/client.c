@@ -16,11 +16,19 @@ int clientID;
  * rimaste aperte
  */
 void cleanupClient(int sig) {
+    printf("\n%30s\n", "Client disconnesso!");
     close(ascoltoDalServer);
     unlink(clientFifo);
     exit(EXIT_SUCCESS);
 }
 
+/*Gestisco la disconnesione del server*/
+void serverDisconnesso(int sig) {
+    printf("%30s\n", "Server disconnesso!");
+    cleanupClient(0);
+}
+
+/*Thread che rimane in attesa di messaggi dal server*/
 void * ascoltaServer(void* arg) {
     while (1) {
         messaggio* m = (messaggio*) malloc(sizeof (messaggio));
@@ -30,9 +38,12 @@ void * ascoltaServer(void* arg) {
 }
 
 int initClient() {
-    /*Segnali di chiusura*/
+    /*Gestisco segnali di chiusura improvvisa dell'applicazione*/
     signal(SIGTERM, cleanupClient);
     signal(SIGINT, cleanupClient);
+
+    /*Segnali di chiusura FIFO, se perdo collegamento con il server brutalmente*/
+    signal(SIGPIPE, serverDisconnesso);
 
     /*Controllo se esiste un server*/
     int exist = access(SERVERPATH, F_OK);
@@ -61,14 +72,16 @@ int initClient() {
     if (scriviAlServer == -1) {
         printf("%s\n", "Errore nell'apertura del client");
         cleanupClient(0);
-        exit(EXIT_FAILURE);
     }
 
     /*test scrittura*/
-    messaggio *x = messaggioConstructor();
-    inviaMessaggio(scriviAlServer, x);
-    printf("Scritto messaggio\n");
-
+    while (true) {
+        messaggio x = messaggioConstructor();
+        crInvDatiRisp(x, 200);
+        inviaMessaggio(x.msg, scriviAlServer);
+        printf("Scritto messaggio\n");
+        sleep(10);
+    }
     pthread_join(threadID, NULL);
 
     cleanupClient(0);

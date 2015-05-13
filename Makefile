@@ -1,5 +1,5 @@
 #lista delle librerie necessarie
-OBJ = main.o server.o client.o allFifo.o parser.o
+OBJ = main.o server.o client.o allFifo.o parser.o commands.o
 #lista delle librerie da testare
 OBJTEST = allFifo.o parser.o mainBoss.o
 
@@ -15,6 +15,7 @@ SRCDIR = src
 #nome e posizione dell'eseguibile
 BUILDNAME = main
 BUILDIR = bin
+CFLAGS = -c -g #-fno-stack-protector
 
 all:
 	@printf "%s\n" "Target Make disponibili:"
@@ -39,7 +40,7 @@ checkDir:
 
 #compila tutti i file *.c in file *.o nella cartella build/
 %.o: %.c
-	@gcc $< -o $(BUILDIR)/$@ -c -g
+	@gcc $< -o $(BUILDIR)/$@ $(CFLAGS)
 
 $(BUILDNAME): $(OBJ)
 	@#linking finale

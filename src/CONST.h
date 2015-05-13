@@ -5,7 +5,8 @@
 #define CLIENTFIFO "/tmp/gameClient"
 #define MAX_FIFONAME 30
 #define MSG_SIZE 50
-#define MAXCOMMAND 25
+#define MAXLINE 50
+#define MAXCOMMAND 19
 #define MAXNAME 20
 #define MAXANSWER 5
 #define NUM_CLIENT 10
