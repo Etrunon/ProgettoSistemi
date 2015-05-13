@@ -54,10 +54,18 @@ void rispostaDelCLient(messaggio *msg) {
 
 }
 
-void rispostaDelCLient(messaggio *msg) {
+/**
+ * 
+ * @param msg
+ */
+void ingressoDelClient(messaggio *msg) {
 
 }
 
+/**
+ * 
+ * @param msg
+ */
 void processaRisposta(messaggio msg) {
 
     switch (msg.codiceMsg) {
@@ -66,8 +74,6 @@ void processaRisposta(messaggio msg) {
         case 2: ingressoDelClient(&msg);
             break;
         case 3: //InvLogOut;
-            break;
-        case 4: //MesgCorrotto;
             break;
         default: break;
     }

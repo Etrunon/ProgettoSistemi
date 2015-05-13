@@ -65,9 +65,8 @@ int initClient() {
     }
 
     /*test scrittura*/
-    messaggio x = messaggioConstructor();
-    crInvDatiRisp(x, 200);
-    inviaMessaggio(x.msg, scriviAlServer);
+    messaggio *x = messaggioConstructor();
+    inviaMessaggio(scriviAlServer, x);
     printf("Scritto messaggio\n");
 
     pthread_join(threadID, NULL);

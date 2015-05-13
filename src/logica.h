@@ -23,15 +23,15 @@ typedef struct domandaTag {
     int numero2;
 } domanda;
 
-typedef struct classificaTag {
+typedef struct giocatoriTag {
     int clientAttivi;
     int *listaPunti;
     char **listaNomi;
-} classifica;
+} giocatori;
 
 typedef struct partitaTag {
     domanda domanda;
-    classifica *classifica;
+    giocatori *giocatori;
 
 } partita;
 

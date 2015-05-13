@@ -78,10 +78,11 @@ int initServer(int Clients, int Win) {
     /*Test lettura*/
     while (1) {
         printf("%s\n", "In attesa di messaggi!");
-        messaggio msg = messaggioConstructor();
-        leggiMessaggio(ascoltoDaiClient, &msg);
-        printf("Messaggio: %s\n", msg.msg);
-        leggiComm(msg, msg.msg);
+        //Luca
+        messaggio *msg = messaggioConstructor();
+
+        leggiMessaggio(ascoltoDaiClient, msg);
+        printf("Messaggio: %s\n", msg->msg);
     }
 
 

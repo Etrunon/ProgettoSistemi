@@ -39,7 +39,7 @@ checkDir:
 
 #compila tutti i file *.c in file *.o nella cartella build/
 %.o: %.c
-	@gcc $< -o $(BUILDIR)/$@ -c
+	@gcc $< -o $(BUILDIR)/$@ -c -g
 
 $(BUILDNAME): $(OBJ)
 	@#linking finale

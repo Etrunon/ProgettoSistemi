@@ -14,8 +14,8 @@
 int creaFifoLettura(char* path);
 int apriFiFoScrittura(char* path);
 int chiudiFifo(char* path, int fileDescriptor, bool eliminare);
-bool leggiMessaggio(int handlerFifo, messaggio* msg);
-bool inviaMessaggio(char* messaggio, int handlerFifo);
+bool leggiMessaggio(int handlerFifo, messaggio *msg);
+bool inviaMessaggio(int handlerFifo, messaggio *msg);
 
 #endif	/* CREAFIFO_H */
 

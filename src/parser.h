@@ -39,71 +39,13 @@ typedef struct messaggioTag {
 
 } messaggio;
 
-messaggio messaggioConstructor();
+messaggio* messaggioConstructor();
 
-void messaggioDestructor(messaggio x);
+void messaggioDestructor(messaggio *x);
 
-/**
- * Ciao
- * @return 
- */
-bool crInvDatiRisp(messaggio x, int risposta);
+bool creaMessaggio(messaggio *msg);
 
-/**
- * 
- * @return 
- */
-bool crRichPartec(messaggio x, char* pathFifo);
-
-/**
- * 
- * @return 
- */
-bool crInvLogOut(messaggio x);
-
-/**
- * 
- * @return 
- */
-bool crMesgCorrotto(messaggio x);
-
-/**
- * 
- * @return 
- */
-bool crAccettaClient(messaggio x);
-
-/**
- * 
- * @return 
- */
-bool crRifiutaClient(messaggio x);
-
-/**
- * 
- * @return 
- */
-bool crInvClassifica(messaggio x, char* classifica);
-
-/**
- * 
- * @return 
- */
-bool crBroadNuovoGiocatore(messaggio x, char* nome, int punti, int codice);
-
-/**
- * 
- * @return 
- */
-bool crBroadAggPunti(messaggio x, int codice, int punti);
-
-/**
- * 
- * @return 
- */
-bool crInvDomanda(messaggio x, int primoNum, int secondoNum);
-
-messaggio leggiComm(messaggio msg, char* input);
+messaggio traduciComm(messaggio *msg);
 
 
 

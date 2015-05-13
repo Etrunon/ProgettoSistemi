@@ -1,3 +1,11 @@
+/*
+ * costruttore messggio                 x
+ * metodi invio ricevi
+ * creazione messaggio metodo unico
+ * refactoring con funzioni coerenti
+ */
+
+
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -96,7 +104,7 @@ int chiudiFifo(char* path, int fileDescriptor, bool eliminare) {
     return errore;
 }
 
-bool leggiMessaggio(int handlerFifo, messaggio* msg) {
+bool leggiMessaggio(int handlerFifo, messaggio *msg) {
     int letti;
 
     letti = read(handlerFifo, msg->msg, MSG_SIZE + 1);
@@ -107,10 +115,15 @@ bool leggiMessaggio(int handlerFifo, messaggio* msg) {
     return true;
 }
 
-bool inviaMessaggio(char* messaggio, int handlerFifo) {
+bool inviaMessaggio(int handlerFifo, messaggio *msg) {
 
-    write(handlerFifo, messaggio, sizeof (messaggio));
 
+    msg->msg = (char*) malloc(MSG_SIZE * (sizeof (char)));
+    printf("Prima di creazione\n");
+    creaMessaggio(msg);
+    printf("Ecco il messaggio finito \t %s \n", msg->msg);
+    //write(handlerFifo, messaggio, sizeof (messaggio));
     //perror("Dentro invia messaggio: ");
+
     return true;
 }
