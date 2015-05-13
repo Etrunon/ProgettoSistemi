@@ -1,5 +1,5 @@
 #lista delle librerie necessarie
-OBJ = main.o server.o client.o
+OBJ = main.o server.o client.o allFifo.o
 #lista delle librerie da testare
 OBJTEST = allFifo.o creaFifoMain.o
 
@@ -15,6 +15,13 @@ SRCDIR = src
 #nome e posizione dell'eseguibile
 BUILDNAME = main
 BUILDIR = bin
+
+all:
+	@printf "%s\n" "Target Make disponibili:"
+	@printf "\t%s\t\t%s\n" "bin" "compila i sorgenti"
+	@printf "\t%s\t\t%s\n" "assets" "genera i file di test"
+	@printf "\t%s\t\t%s\n" "test" "avvia il testing"
+	@printf "\t%s\t\t%s\n" "clean" "elimina i file generati dalla compilazione o testing"
 
 bin: checkDir $(BUILDNAME)
 
@@ -36,13 +43,13 @@ checkDir:
 
 $(BUILDNAME): $(OBJ)
 	@#linking finale
-	@gcc $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$@
+	@gcc -pthread $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$@
 	@-rm $(addprefix $(BUILDIR)/,$(^F))
 
 
 BUILDTESTLIB: checkDir buildtest
-	
+
 buildtest: $(OBJTEST)
 	@#linking finale
-	@gcc $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$(BUILDNAME)
+	@gcc -pthread $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$(BUILDNAME)
 	@-rm $(addprefix $(BUILDIR)/,$(^F))

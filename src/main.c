@@ -12,8 +12,8 @@ void explainParameters() {
 int main(int argc, char** argv) {
 
     int server = 0;
-    int maxClients;
-    int winPoints;
+    int maxClients = 1;
+    int winPoints = 10;
 
     if (argc == 1) {
         explainParameters();
@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
             case 'm':
             {
                 int value = strtol(optarg, NULL, 10);
-                if (value <= 1 || value > 10) {
+                if (value < 1 || value > 10) {
                     printf("Il numero di giocatori deve essere compreso tra 1 e 10!\n");
                     exit(EXIT_FAILURE);
                 }
