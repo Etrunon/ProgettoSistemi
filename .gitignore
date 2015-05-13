@@ -26,11 +26,15 @@
 # Debug files
 *.dSYM/
 
-#Netbeans FOlder
+#Netbeans Folders
 /nbproject/
 /build/
 /dist/
 /bin/
 
 #File strani
-.dep.inc
+*.dep.inc
+
+#File backup degli editor
+*.orig
+*.*~

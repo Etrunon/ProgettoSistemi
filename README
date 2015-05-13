@@ -4,6 +4,7 @@ Togliere il file delle cose da fare;
     - [ ] L "PARSER" messaggi. Prende/Crea stringa vuota, intero significato messaggio, più parametri necessari. Formatta il messaggio coerentemente e
     - [ ] gestione classifica (array di nomi e punteggi che viene aggiornato dai vari messaggi ricevuti)
     - [ ] C Gestione errori FIFO
+    - [ ] Modulo per la gestione degli errori della scrittura tramite parser e fifo
 - [ ] Server
     - [ ] C Controllo unicità
     - [ ] gestione signal
