@@ -9,6 +9,9 @@ void explainParameters() {
     printf("Per avviare il client, usare l'opzione --client\n");
 }
 
+/* Controlla che i parametri siano validi, abortendo il programma in caso contrario
+ * In base ai parametri invocati, avvia un server od un client
+ */
 int main(int argc, char** argv) {
 
     int server = 0;

@@ -9,7 +9,7 @@
 #define	CREAFIFO_H
 
 #include <stdbool.h>
-
+/*Crea una FIFO in lettura, tornando -1 se l'operazione non va a buon fine*/
 int creaFifoLettura(char* path);
 int apriFiFoScrittura(char* path);
 int chiudiFifo(char* path, int fileDescriptor, bool eliminare);
