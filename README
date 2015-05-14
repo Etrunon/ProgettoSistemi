@@ -1,25 +1,27 @@
 Togliere il file delle cose da fare;
 
 - [ ] Parti comuni
-    - [ ] L "PARSER" messaggi. Prende/Crea stringa vuota, intero significato messaggio, più parametri necessari. Formatta il messaggio coerentemente e
+    - [x] L "PARSER" messaggi. Prende/Crea stringa vuota, intero significato messaggio, più parametri necessari. Formatta il messaggio coerentemente e
     - [ ] gestione classifica (array di nomi e punteggi che viene aggiornato dai vari messaggi ricevuti)
     - [ ] C Gestione errori FIFO
     - [ ] Modulo per la gestione degli errori della scrittura tramite parser e fifo
 - [ ] Server
-    - [ ] C Controllo unicità
+    - [x] C Controllo unicità
     - [ ] gestione signal
     - [ ] gestione I/O giocatori
     - [ ] interfaccia
 
 - [ ] Client
     - [ ] gestione signal
-    - [ ] modulo interazione utente
+        - [] Se signal inviato da server, deve avvisare a schermo che non c'è più server
+        - [] Se signal inviato da esterno, deve avvisare server che se ne è andato
+    - [x] modulo interazione utente
     - [ ] interfaccia
 
 - [ ] Logica Gioco
     - [ ] modulo che gestisce la partita
-    - [ ] generatore domante
-    - [ ] check domande
+        - [ ] check domande
+    - [ ] generatore domande
 
 
 #INTERFACCIA DI FIFO

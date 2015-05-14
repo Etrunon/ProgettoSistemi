@@ -84,7 +84,7 @@ bool richiestaPartecipazione() {
 
     do {
         printf("%s", "Inserisci il nome:");
-        leggiInput(false, &d);
+        c = leggiInput(false, &d);
 
     } while (c != NOME);
 
@@ -97,14 +97,6 @@ bool richiestaPartecipazione() {
     messaggioDestructor(m);
     return true;
 
-}
-
-void testMessaggio() {
-    messaggio* m = messaggioConstructor();
-    m->codiceMsg = 3;
-    inviaMessaggio(scriviAlServer, m);
-    inviaMessaggio(scriviAlServer, m);
-    messaggioDestructor(m);
 }
 
 int initClient() {
@@ -140,8 +132,9 @@ int initClient() {
         cleanupClient(0);
     }
 
-    //richiestaPartecipazione();
-    testMessaggio();
+    /*Richiedo la partecipazione al gioco*/
+    richiestaPartecipazione();
+
 
 
     /*Faccio partire l'ascoltatore di messaggi da terminale*/
