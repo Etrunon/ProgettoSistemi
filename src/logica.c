@@ -3,42 +3,22 @@
 
 #include "logica.h"
 
-domanda* generaDomanda() {
-
-    domanda dom;
-    srand(time(NULL));
-    dom.numero1 = rand();
-    dom.numero2 = rand();
-
-    printf("%i, %i\n", dom.numero1, dom.numero2);
-    return dom;
-}
-
-void rispostaDelCLient(messaggio *msg) {
+void initLogica() {
 
 }
 
-/**
- *
- * @param msg
- */
-void ingressoDelClient(messaggio *msg) {
+void serverCambiaDomanda();
 
-}
+void serverGeneraClassifica(int* IDclients, int* punteggi);
 
-/**
- *
- * @param msg
- */
-void processaRisposta(messaggio msg) {
+int serverAggiungiGiocatore(char* nome, char* FIFO);
 
-    switch (msg.codiceMsg) {
-        case 1: rispostaDelCLient(&msg);
-            break;
-        case 2: ingressoDelClient(&msg);
-            break;
-        case 3: //InvLogOut;
-            break;
-        default: break;
-    }
-}
+bool serverAggiornaPunti(int ID, int punti);
+
+char* serverFIFOGiocatore(int ID);
+
+void togliGiocatore(int ID);
+
+void clientAggiornaPunti(int ID, int punti);
+
+void clientNuovoGiocatore(char* nome, int ID, int punti);

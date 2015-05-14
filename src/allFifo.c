@@ -111,23 +111,15 @@ bool leggiMessaggio(int handlerFifo, messaggio *msg) {
     int letti;
 
     letti = read(handlerFifo, msg->msg, MSG_SIZE + 1);
-
     traduciComm(msg);
-    //printf("Letti: %i\n", letti);
-    //perror("Dentro leggi messaggio: ");
 
     return true;
 }
 
 bool inviaMessaggio(int handlerFifo, messaggio *msg) {
 
-
-    msg->msg = (char*) malloc(MSG_SIZE * (sizeof (char)));
-    printf("Prima di creazione\n");
     creaMessaggio(msg);
-    //printf("Ecco il messaggio finito \t %s \n", msg->msg);
-    write(handlerFifo, msg->msg, strlen(msg->msg) + 1);
-    //perror("Dentro invia messaggio: ");
+    write(handlerFifo, msg->msg, MSG_SIZE + 1);
 
     return true;
 }
