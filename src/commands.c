@@ -17,13 +17,12 @@ comando analizzaInput(data* output, char* input) {
     //se ho un numero, controllo se è nel range ammissibile per essere inviato al server
     if (*carattereErrore == '\0') {
         if (numero > 999999 || numero < -99999) {
-            printf("%s", "Risposta non ammissibile");
+            printf("%s", ANSI_COLOR_RED "Risposta non ammissibile" ANSI_COLOR_RESET);
             return ERRORE;
         }
         output->risposta = numero;
         return RISPOSTA;
     } else {
-        /*L'utente ha inserito un nome*/
         strcpy(output->nome, input);
         return NOME;
     }
@@ -41,14 +40,14 @@ comando leggiInput(bool server, data* inputUtente) {
 
     commands[read - 1] = '\0';
     /*Considero solo il primo comando inviato nell'intera linea*/
+    if (strlen(commands) > MAXCOMMAND) {
+        printf("%s\n", ANSI_COLOR_RED "Input non valido" ANSI_COLOR_RESET);
+        return ERRORE;
+    }
     sscanf(commands, "%s", command);
     free(commands);
 
     /*Conrollo che non abbia stringhe troppo lunghe in input*/
-    if (strlen(command) > MAXCOMMAND) {
-        printf("%s\n", "Input non valido");
-        return ERRORE;
-    }
 
     if ((strcasecmp(command, "exit")) == 0) {
         return CHIUSURA;

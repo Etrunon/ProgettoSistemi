@@ -54,16 +54,13 @@ void * inputUtenteClient(void* arg) {
                 inviaMessaggio(scriviAlServer, msg);
                 break;
             }
-            case NOME:
-            {
-
-                break;
-            }
             case HELP:
             {
                 printHelp(false);
                 break;
             }
+            default:
+                break;
         }
 
     } while (c != CHIUSURA);
@@ -79,19 +76,35 @@ void ascoltaServer() {
         messaggio* m = (messaggio*) malloc(sizeof (messaggio));
         leggiMessaggio(ascoltoDalServer, m);
     }
-    return NULL;
 }
 
 bool richiestaPartecipazione() {
-    messaggio* m = messaggioConstructor();
-    m->codiceMsg = 2;
+    comando c;
+    data d;
 
+    do {
+        printf("%s", "Inserisci il nome:");
+        leggiInput(false, &d);
+
+    } while (c != NOME);
+
+    messaggio* m = messaggioConstructor();
+
+    m->codiceMsg = 2;
     sprintf(m->pathFifo, "%s%c", clientFifo, '\0');
-    printf("%s\n", m->pathFifo);
+
     inviaMessaggio(scriviAlServer, m);
     messaggioDestructor(m);
     return true;
 
+}
+
+void testMessaggio() {
+    messaggio* m = messaggioConstructor();
+    m->codiceMsg = 3;
+    inviaMessaggio(scriviAlServer, m);
+    inviaMessaggio(scriviAlServer, m);
+    messaggioDestructor(m);
 }
 
 int initClient() {
@@ -120,11 +133,6 @@ int initClient() {
         exit(EXIT_FAILURE);
     }
 
-    /*Faccio partire l'ascoltatore di messaggi da terminale*/
-    pthread_t threadID;
-    pthread_create(&threadID, NULL, &inputUtenteClient, NULL);
-
-
     /*Apro la FIFO per contattare il server*/
     scriviAlServer = creaFiFoScrittura(SERVERPATH);
     if (scriviAlServer == -1) {
@@ -132,9 +140,14 @@ int initClient() {
         cleanupClient(0);
     }
 
-    richiestaPartecipazione();
+    //richiestaPartecipazione();
+    testMessaggio();
 
-    pthread_join(threadID, NULL);
+
+    /*Faccio partire l'ascoltatore di messaggi da terminale*/
+    pthread_t threadID;
+    //pthread_create(&threadID, NULL, &inputUtenteClient, NULL);
+    //pthread_join(threadID, NULL);
 
     cleanupClient(0);
     return 0;

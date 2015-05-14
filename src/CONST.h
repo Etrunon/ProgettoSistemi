@@ -15,8 +15,8 @@
 #define MAX_FIFONAME 30
 #define MSG_SIZE 50
 #define MAXLINE 50
-#define MAXCOMMAND 19
-#define MAXNAME 20
+#define MAXCOMMAND 14
+#define MAXNAME 14
 #define MAXANSWER 5
 #define NUM_CLIENT 10
 

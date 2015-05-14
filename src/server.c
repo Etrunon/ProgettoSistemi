@@ -10,6 +10,7 @@
 #include <string.h>
 #include <signal.h>
 #include "commands.h"
+#include "logica.h"
 
 int ascoltoDaiClient;
 
@@ -19,7 +20,7 @@ pthread_mutex_t MutexGiocatori;
  * rimaste aperte
  */
 void cleanupServer(int sig) {
-    printf("\r%30s\n", "Server disattivato");
+    printf("\r%40s\n", ANSI_COLOR_CYAN "Server disattivato" ANSI_COLOR_RESET);
     fflush(stdout);
     close(ascoltoDaiClient);
     unlink(SERVERPATH);
@@ -48,9 +49,9 @@ void * inputUtente(void* arg) {
 void ascoltaClients() {
     while (1) {
         messaggio* msg = messaggioConstructor();
+
         leggiMessaggio(ascoltoDaiClient, msg);
 
-        printf("%i %s\n", msg->codiceMsg, msg->pathFifo);
         messaggioDestructor(msg);
     }
 }
@@ -80,14 +81,18 @@ int initServer(int Clients, int Win) {
     }
 
     /*Messaggio di benvenuto*/
-    printf("%40s\n%-40s%s%i%s\n%-40s%s%i%s\n", ANSI_COLOR_BLUE "Server avviato!" ANSI_COLOR_RESET,
+    printf("%40s\n%-40s%s%i%s\n%-40s%s%i%s\n", ANSI_COLOR_BLUE "Server avviato" ANSI_COLOR_RESET,
             "Numero massimo di giocatori:", ANSI_COLOR_YELLOW, maxClients, ANSI_COLOR_RESET,
             "Punteggio necessario per la vittoria:", ANSI_COLOR_YELLOW, maxWin, ANSI_COLOR_RESET);
+
+    /*Inizializza le strutture dati relative al gioco*/
+    initLogica();
 
     /*Avvio thread per interazione da terminale*/
     pthread_t threadID;
     pthread_create(&threadID, NULL, &inputUtente, NULL);
 
+    /*Mi metto in ascolto dei client sulla FIFO*/
     ascoltaClients();
 
     pthread_join(threadID, NULL);

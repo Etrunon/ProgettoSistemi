@@ -111,6 +111,9 @@ bool leggiMessaggio(int handlerFifo, messaggio *msg) {
     int letti;
 
     letti = read(handlerFifo, msg->msg, MSG_SIZE + 1);
+#ifdef DEBUGFIFO
+    printf("\rMessaggio ricevuto: %s\n", msg->msg);
+#endif
     traduciComm(msg);
 
     return true;
@@ -119,7 +122,7 @@ bool leggiMessaggio(int handlerFifo, messaggio *msg) {
 bool inviaMessaggio(int handlerFifo, messaggio *msg) {
 
     creaMessaggio(msg);
-    write(handlerFifo, msg->msg, MSG_SIZE + 1);
+    int written = write(handlerFifo, msg->msg, MSG_SIZE + 1);
 
     return true;
 }

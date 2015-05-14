@@ -213,6 +213,7 @@ bool creaMessaggio(messaggio *msg) {
         default: break;
     }
 
+    msg->msg[strlen(msg->msg) + 1] = '\0';
 
 }
 
@@ -247,7 +248,7 @@ bool decRichPartec(messaggio *x) {
 
     int lgMax = MSG_SIZE - 26 - strlen(tmp), lgPath = strlen(tmp);
 
-    if (lgMax <= lgPath) {
+    if (lgMax <= 0) {
         //printf("Sono nell'if che controlla la lunghezza");
         return false;
     }
