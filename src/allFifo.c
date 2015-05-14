@@ -13,6 +13,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include "allFifo.h"
 #include "CONST.h"
@@ -117,9 +118,7 @@ bool leggiMessaggio(int handlerFifo, messaggio *msg) {
 
 bool inviaMessaggio(int handlerFifo, messaggio *msg) {
 
-
     msg->msg = (char*) malloc(MSG_SIZE * (sizeof (char)));
-    printf("Prima di creazione\n");
     creaMessaggio(msg);
     printf("Ecco il messaggio finito \t %s \n", msg->msg);
     //write(handlerFifo, messaggio, sizeof (messaggio));

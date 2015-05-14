@@ -46,11 +46,9 @@ void messaggioDestructor(messaggio *x) {
         free(x->timestring);
     }
     if (x->msg != NULL) {
-        printf("Distruggo il msg\n");
         free(x->msg);
     }
     if (x->pathFifo != NULL) {
-        printf("Distruggo la path\n");
         free(x->pathFifo);
     }
     if (x->nomeClient != NULL) {
@@ -59,7 +57,6 @@ void messaggioDestructor(messaggio *x) {
     if (x->classifica != NULL) {
         free(x->classifica);
     }
-    printf("Distruggo la struct\n");
     free(x);
 }
 
