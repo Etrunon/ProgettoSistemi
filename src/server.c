@@ -19,7 +19,7 @@ pthread_mutex_t MutexGiocatori;
  * rimaste aperte
  */
 void cleanupServer(int sig) {
-    printf("\r%30s", "Server disattivato");
+    printf("\r%30s\n", "Server disattivato");
     fflush(stdout);
     close(ascoltoDaiClient);
     unlink(SERVERPATH);
@@ -50,6 +50,7 @@ void ascoltaClients() {
         messaggio* msg = messaggioConstructor();
         leggiMessaggio(ascoltoDaiClient, msg);
 
+        printf("%i %s\n", msg->codiceMsg, msg->pathFifo);
         messaggioDestructor(msg);
     }
 }
@@ -59,6 +60,7 @@ int initServer(int Clients, int Win) {
     signal(SIGTERM, cleanupServer);
     signal(SIGINT, cleanupServer);
     signal(SIGSEGV, cleanupServer);
+    signal(SIGABRT, cleanupServer);
 
     /*Controllo se esiste già un server*/
     int exist = access(SERVERPATH, F_OK);

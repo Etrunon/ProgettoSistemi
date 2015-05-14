@@ -12,12 +12,13 @@ int ascoltoDalServer;
 int scriviAlServer;
 char clientFifo [MAX_FIFONAME];
 int clientID;
+bool connesso = false;
 
 /*Chiude la FIFO ed eventuali altre risorse
  * rimaste aperte
  */
 void cleanupClient(int sig) {
-    printf("\r%30s", "Client disconnesso!");
+    printf("\r%30s\n", "Client disconnesso!");
     fflush(stdout);
     close(ascoltoDalServer);
     unlink(clientFifo);
@@ -30,17 +31,34 @@ void serverDisconnesso(int sig) {
     cleanupClient(0);
 }
 
+void prompt() {
+    printf("%s", "Client:");
+    fflush(stdout);
+}
+
 void * inputUtenteClient(void* arg) {
     printHelp(false);
     comando c;
     data d;
 
     do {
-        printf("%s", "Client:");
-        fflush(stdout);
+        prompt();
         c = leggiInput(true, &d);
 
         switch (c) {
+            case RISPOSTA:
+            {
+                messaggio* msg = messaggioConstructor();
+                msg->codiceMsg = 1;
+                msg->valRisposta = d.risposta;
+                inviaMessaggio(scriviAlServer, msg);
+                break;
+            }
+            case NOME:
+            {
+
+                break;
+            }
             case HELP:
             {
                 printHelp(false);
@@ -55,13 +73,25 @@ void * inputUtenteClient(void* arg) {
     return NULL;
 }
 
-/*Thread che rimane in attesa di messaggi dal server*/
-void * ascoltaServer(void* arg) {
+/*Rimane in attesa di messaggi dal server*/
+void ascoltaServer() {
     while (1) {
         messaggio* m = (messaggio*) malloc(sizeof (messaggio));
         leggiMessaggio(ascoltoDalServer, m);
     }
     return NULL;
+}
+
+bool richiestaPartecipazione() {
+    messaggio* m = messaggioConstructor();
+    m->codiceMsg = 2;
+
+    sprintf(m->pathFifo, "%s%c", clientFifo, '\0');
+    printf("%s\n", m->pathFifo);
+    inviaMessaggio(scriviAlServer, m);
+    messaggioDestructor(m);
+    return true;
+
 }
 
 int initClient() {
@@ -102,16 +132,8 @@ int initClient() {
         cleanupClient(0);
     }
 
-    /*test scrittura*/
-    /*
-        while (true) {
-            messaggio x = messaggioConstructor();
-            crInvDatiRisp(x, 200);
-            inviaMessaggio(x.msg, scriviAlServer);
-            printf("Scritto messaggio\n");
-            sleep(10);
-        }
-     */
+    richiestaPartecipazione();
+
     pthread_join(threadID, NULL);
 
     cleanupClient(0);
