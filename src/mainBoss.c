@@ -9,30 +9,23 @@
 #include <errno.h>
 
 #include "allFifo.h"
-#include "parser.h"
 #include "CONST.h"
 
 void handler(int signo) {
     printf("Errore: %i\n", signo);
 }
 
-void testPrint(messaggio *pm) {
-    inviaMessaggio(1, pm);
-    messaggioDestructor(pm);
-    //pm = messaggioConstructor();
-}
-
-int main(int argc, char** argv) {
-
-
+void testPrintTuttiMessaggi() {
+    int handler;
+    handler = creaFiFoScrittura("/tmp/miaFifo");
     messaggio *mittando = messaggioConstructor();
 
     //crInvDatiRisp(x, 200);
     mittando->codiceMsg = 1;
-    mittando->valRisposta = 20000000000;
+    mittando->valRisposta = 200;
     mittando->codiceMsg = 1;
 
-    inviaMessaggio(1, mittando);
+    inviaMessaggio(handler, mittando);
     messaggioDestructor(mittando);
     mittando = messaggioConstructor();
 
@@ -42,14 +35,14 @@ int main(int argc, char** argv) {
     mittando->pathFifo = (char*) malloc(40 * (sizeof (char)));
     sprintf(mittando->pathFifo, "%s", "/tmp/path");
 
-    inviaMessaggio(1, mittando);
+    inviaMessaggio(handler, mittando);
     messaggioDestructor(mittando);
     mittando = messaggioConstructor();
 
     //crAccettaClient(x);
     mittando->codiceMsg = 5;
 
-    inviaMessaggio(1, mittando);
+    inviaMessaggio(handler, mittando);
     messaggioDestructor(mittando);
     mittando = messaggioConstructor();
 
@@ -58,7 +51,7 @@ int main(int argc, char** argv) {
     mittando->clientID = 5;
     mittando->clientPunti = 34;
 
-    inviaMessaggio(1, mittando);
+    inviaMessaggio(handler, mittando);
     messaggioDestructor(mittando);
     mittando = messaggioConstructor();
 
@@ -70,7 +63,7 @@ int main(int argc, char** argv) {
     mittando->clientID = 3;
     mittando->clientPunti = 56;
 
-    inviaMessaggio(1, mittando);
+    inviaMessaggio(handler, mittando);
     messaggioDestructor(mittando);
     mittando = messaggioConstructor();
 
@@ -79,39 +72,41 @@ int main(int argc, char** argv) {
     mittando->domandaNum1 = 87;
     mittando->domandaNum2 = 45;
 
-    inviaMessaggio(1, mittando);
+    inviaMessaggio(handler, mittando);
     messaggioDestructor(mittando);
     mittando = messaggioConstructor();
 
     //crInvLogOut(x);
     mittando->codiceMsg = 3;
 
-    inviaMessaggio(1, mittando);
+    inviaMessaggio(handler, mittando);
     messaggioDestructor(mittando);
     mittando = messaggioConstructor();
 
     //crMesgCorrotto(x);
     mittando->codiceMsg = 4;
 
-    inviaMessaggio(1, mittando);
+    inviaMessaggio(handler, mittando);
     messaggioDestructor(mittando);
     mittando = messaggioConstructor();
 
     //crRifiutaClient(x);
     mittando->codiceMsg = 6;
 
-    inviaMessaggio(1, mittando);
+    inviaMessaggio(handler, mittando);
     messaggioDestructor(mittando);
-    mittando = messaggioConstructor();
 
+}
 
+int main(int argc, char** argv) {
+
+    testPrintTuttiMessaggi();
     //creaRisposta(&mittando);
     //inviamessaggio(mittando.msg, handlerFifo)
 
     //mittuto.msg = leggiMessaggio(dalla fifo);
     //leggiComm(mittuto);
     //    leggiComm(mittuto, mittando.msg, 3);
-
 
     return (0);
 }
