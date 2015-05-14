@@ -16,12 +16,10 @@ messaggio* messaggioConstructor() {
 
     msg->pidMit = -1;
     msg->codiceMsg = -1;
-    msg->timestamp = NULL;
-    msg->timestring = NULL;
-    msg->msg = NULL;
-    msg->pathFifo = NULL;
-    msg->nomeClient = NULL;
-    msg->classifica = NULL;
+    msg->timestring = (char*) malloc(25 * (sizeof (char)));
+    msg->msg = (char*) malloc(MSG_SIZE * (sizeof (char)));
+    msg->pathFifo = (char*) malloc(MAX_FIFONAME * (sizeof (char)));
+    msg->nomeClient = (char*) malloc(MAXNAME * (sizeof (char)));
     msg->numeroClient = -1;
     msg->valRisposta = -1;
     msg->clientID = -1;
@@ -39,27 +37,18 @@ messaggio* messaggioConstructor() {
  */
 void messaggioDestructor(messaggio *x) {
 
-    if (x->timestamp != NULL) {
-        free(x->timestamp);
-    }
     if (x->timestring != NULL) {
         free(x->timestring);
     }
     if (x->msg != NULL) {
-        printf("Distruggo il msg\n");
         free(x->msg);
     }
     if (x->pathFifo != NULL) {
-        printf("Distruggo la path\n");
         free(x->pathFifo);
     }
     if (x->nomeClient != NULL) {
         free(x->nomeClient);
     }
-    if (x->classifica != NULL) {
-        free(x->classifica);
-    }
-    printf("Distruggo la struct\n");
     free(x);
 }
 
@@ -259,7 +248,7 @@ bool decRichPartec(messaggio *x) {
     int lgMax = MSG_SIZE - 26 - strlen(x->msg), lgPath = strlen(x->msg);
 
     if (lgMax <= lgPath) {
-        printf("Sono nell'if che controlla la lunghezza");
+        //printf("Sono nell'if che controlla la lunghezza");
         return false;
     }
 
@@ -330,7 +319,7 @@ bool decBroadAggPunti(messaggio *x) {
  * @return
  */
 bool decInvDomanda(messaggio *x) {
-    printf("%s\n", x->msg);
+    //printf("%s\n", x->msg);
 
     char * aliasMsg = x->msg + 1;
 
@@ -345,7 +334,7 @@ bool decInvDomanda(messaggio *x) {
         if (*check != '\0')
             return false;
     }
-    printf("Finale %s %i %i\n", x->msg, x->domandaNum1, x->domandaNum2);
+    //printf("Finale %s %i %i\n", x->msg, x->domandaNum1, x->domandaNum2);
     return true;
 
 }

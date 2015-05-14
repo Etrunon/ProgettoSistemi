@@ -25,12 +25,10 @@
 typedef struct messaggioTag {
     int pidMit;
     int codiceMsg;
-    struct tm *timestamp;
     char* timestring;
     char* msg;
     char* pathFifo;
     char* nomeClient;
-    int* classifica;
     int numeroClient;
     int valRisposta;
     int clientID;

@@ -5,16 +5,21 @@
  * refactoring con funzioni coerenti
  */
 
+
+#include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/types.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "allFifo.h"
 #include "CONST.h"
+#include "parser.h"
 
 /**
  * Funzione che crea una fifo da LETTURA al path specificato, aprendola in READ and WRITE
@@ -56,7 +61,7 @@ int creaFifoLettura(char* path) {
  * @return hand, handler della pipe
  * @exception -1 se la FIFO non esiste o nessuno la ha aperta in lettura
  */
-int apriFiFoScrittura(char* path) {
+int creaFiFoScrittura(char* path) {
 
     int hand = 0;
 
@@ -107,6 +112,7 @@ bool leggiMessaggio(int handlerFifo, messaggio *msg) {
 
     letti = read(handlerFifo, msg->msg, MSG_SIZE + 1);
 
+    traduciComm(msg);
     //printf("Letti: %i\n", letti);
     //perror("Dentro leggi messaggio: ");
 
@@ -119,8 +125,8 @@ bool inviaMessaggio(int handlerFifo, messaggio *msg) {
     msg->msg = (char*) malloc(MSG_SIZE * (sizeof (char)));
     printf("Prima di creazione\n");
     creaMessaggio(msg);
-    printf("Ecco il messaggio finito \t %s \n", msg->msg);
-    //write(handlerFifo, messaggio, sizeof (messaggio));
+    //printf("Ecco il messaggio finito \t %s \n", msg->msg);
+    write(handlerFifo, msg->msg, strlen(msg->msg) + 1);
     //perror("Dentro invia messaggio: ");
 
     return true;
