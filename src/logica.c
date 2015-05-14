@@ -7,18 +7,34 @@ void initLogica() {
 
 }
 
-void serverCambiaDomanda();
+void serverCambiaDomanda() {
 
-void serverGeneraClassifica(int* IDclients, int* punteggi);
+}
 
-int serverAggiungiGiocatore(char* nome, char* FIFO);
+void serverGeneraClassifica(int* IDclients, int* punteggi) {
 
-bool serverAggiornaPunti(int ID, int punti);
+}
 
-char* serverFIFOGiocatore(int ID);
+int serverAggiungiGiocatore(char* nome, char* FIFO) {
+    return -1;
+}
 
-void togliGiocatore(int ID);
+bool serverAggiornaPunti(int ID, int punti) {
+    return false;
+}
 
-void clientAggiornaPunti(int ID, int punti);
+char* serverFIFOGiocatore(int ID) {
+    return NULL;
+}
 
-void clientNuovoGiocatore(char* nome, int ID, int punti);
+void togliGiocatore(int ID) {
+
+}
+
+void clientAggiornaPunti(int ID, int punti) {
+
+}
+
+void clientNuovoGiocatore(char* nome, int ID, int punti) {
+
+}
