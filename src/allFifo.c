@@ -1,8 +1,8 @@
 /*
  * costruttore messggio                 x
- * metodi invio ricevi
- * creazione messaggio metodo unico
- * refactoring con funzioni coerenti
+ * metodi invio ricevi                  x
+ * creazione messaggio metodo unico     x
+ * refactoring con funzioni coerenti    x
  */
 
 
@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "allFifo.h"
 #include "CONST.h"
@@ -59,7 +60,7 @@ int creaFifoLettura(char* path) {
  * @return hand, handler della pipe
  * @exception -1 se la FIFO non esiste o nessuno la ha aperta in lettura
  */
-int apriFiFoScrittura(char* path) {
+int creaFiFoScrittura(char* path) {
 
     int hand = 0;
 
@@ -106,10 +107,12 @@ int chiudiFifo(char* path, int fileDescriptor, bool eliminare) {
 }
 
 bool leggiMessaggio(int handlerFifo, messaggio *msg) {
+
     int letti;
 
     letti = read(handlerFifo, msg->msg, MSG_SIZE + 1);
 
+    traduciComm(msg);
     //printf("Letti: %i\n", letti);
     //perror("Dentro leggi messaggio: ");
 
@@ -118,10 +121,9 @@ bool leggiMessaggio(int handlerFifo, messaggio *msg) {
 
 bool inviaMessaggio(int handlerFifo, messaggio *msg) {
 
-    msg->msg = (char*) malloc(MSG_SIZE * (sizeof (char)));
     creaMessaggio(msg);
-    printf("Ecco il messaggio finito \t %s \n", msg->msg);
-    //write(handlerFifo, messaggio, sizeof (messaggio));
+    //printf("Ecco il messaggio finito \t %s \n", msg->msg);
+    write(handlerFifo, msg->msg, strlen(msg->msg) + 1);
     //perror("Dentro invia messaggio: ");
 
     return true;
