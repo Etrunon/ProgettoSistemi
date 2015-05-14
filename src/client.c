@@ -96,7 +96,7 @@ int initClient() {
 
 
     /*Apro la FIFO per contattare il server*/
-    scriviAlServer = apriFiFoScrittura(SERVERPATH);
+    scriviAlServer = creaFiFoScrittura(SERVERPATH);
     if (scriviAlServer == -1) {
         printf("%s\n", ANSI_COLOR_RED "Errore nell'apertura del client" ANSI_COLOR_RESET);
         cleanupClient(0);

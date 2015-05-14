@@ -11,8 +11,6 @@
 #include <signal.h>
 #include "commands.h"
 
-int maxClients;
-int maxWin;
 int ascoltoDaiClient;
 
 pthread_mutex_t MutexGiocatori;
