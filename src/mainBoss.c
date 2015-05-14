@@ -16,6 +16,12 @@ void handler(int signo) {
     printf("Errore: %i\n", signo);
 }
 
+/*
+ void superStampa(){
+ printf("Msg: %s \t Nome client: %s \t PathFifo: %s \t Timestring: %s \t ClientID:%i \t ClientPunti: %i\n", msg->msg, msg->nomeClient, msg->pathFifo, msg->timestring, msg->clientID, msg->clientPunti);
+ +        printf("CodiceMsg %i \t Dom.num1 %i \t DomNum2 %i \t NumClient %i \t Pid %i \t ValoreRisposta: %i \n", msg->codiceMsg, msg->domandaNum1, msg->domandaNum2, msg->numeroClient, msg->pidMit, msg->valRisposta);
+ }
+ */
 void testPrintTuttiMessaggi() {
     int handler = 1;
     handler = creaFiFoScrittura("/tmp/miaFifo");
@@ -158,8 +164,8 @@ void testInviaMessaggiAlServer() {
     mittando = messaggioConstructor();
 
     //crBroadNuovoGiocatore(x, "Pippo", 8, 7);
+
     mittando->codiceMsg = 8;
-    mittando->nomeClient = (char*) malloc(40 * (sizeof (char)));
     sprintf(mittando->nomeClient, "%s", "pippo");
 
     mittando->clientID = 3;
