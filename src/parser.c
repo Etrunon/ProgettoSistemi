@@ -228,8 +228,8 @@ bool decInvDatiRisp(messaggio *x) {
     char *check = NULL;
 
     //Escludo il separatore '!'
-    (x->msg)++;
-    x->valRisposta = strtol(x->msg, &check, 10);
+    char *tmp = (x->msg) + 1;
+    x->valRisposta = strtol(tmp, &check, 10);
 
     if (check == NULL)
         return true;
@@ -243,9 +243,9 @@ bool decInvDatiRisp(messaggio *x) {
  */
 bool decRichPartec(messaggio *x) {
 
-    (x->msg)++;
+    char *tmp = (x->msg) + 1;
 
-    int lgMax = MSG_SIZE - 26 - strlen(x->msg), lgPath = strlen(x->msg);
+    int lgMax = MSG_SIZE - 26 - strlen(tmp), lgPath = strlen(tmp);
 
     if (lgMax <= lgPath) {
         //printf("Sono nell'if che controlla la lunghezza");
@@ -254,7 +254,7 @@ bool decRichPartec(messaggio *x) {
 
     x->pathFifo = (char*) malloc(lgPath * (sizeof (char)));
 
-    sprintf(x->pathFifo, "%s%c", x->msg, '\0');
+    sprintf(x->pathFifo, "%s%c", tmp, '\0');
     x->pathFifo[(lgPath + 1)] = '\0';
 
     return true;

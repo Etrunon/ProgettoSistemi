@@ -8,6 +8,7 @@
 #ifndef LOGICA_H
 #define	LOGICA_H
 
+
 #include "parser.h"
 
 /*
@@ -29,10 +30,11 @@ typedef struct giocatore {
     int punteggio;
 } giocatore;
 
-typedef struct giocatori {
-    int numeroGiocatori;
-    giocatore* listaGiocatori;
-} giocatori;
+static int maxClients;
+static int currentClients;
+static int maxWin;
+static domanda domandaCorrente;
+static giocatore giocatoriCorrenti[10];
 
 /*INIZIALIZZAZIONE*/
 void initLogica();
