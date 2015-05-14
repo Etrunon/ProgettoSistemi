@@ -3,43 +3,7 @@
 
 #include "logica.h"
 
-classifica classificaConstructor() {
-    classifica cla;
-
-    cla.listaNomi = (char**) malloc(NUM_CLIENT * (sizeof (char*)));
-    cla.listaPunti = (int*) malloc(NUM_CLIENT * (sizeof (int)));
-    cla.clientAttivi = 0;
-    return cla;
-}
-
-void classificaDestructor(classifica cla) {
-
-    free(cla.listaPunti);
-    int i = 0;
-
-    for (i; i < cla.clientAttivi; i++) {
-        free(cla.listaNomi[i]);
-    }
-
-    free(cla.listaNomi);
-}
-
-partita partitaConstructor() {
-
-    partita par;
-    domanda domanda;
-    par.classifica = (classifica*) malloc(sizeof (classifica));
-    par.classifica = classificaConstructor();
-
-    return par;
-}
-
-void partitaDestructor(partita par) {
-    classificaDestructor(par.classifica);
-    free(par.classifica);
-}
-
-domanda generaDomanda() {
+domanda* generaDomanda() {
 
     domanda dom;
     srand(time(NULL));
@@ -55,7 +19,7 @@ void rispostaDelCLient(messaggio *msg) {
 }
 
 /**
- * 
+ *
  * @param msg
  */
 void ingressoDelClient(messaggio *msg) {
@@ -63,7 +27,7 @@ void ingressoDelClient(messaggio *msg) {
 }
 
 /**
- * 
+ *
  * @param msg
  */
 void processaRisposta(messaggio msg) {

@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   Logica.h
  * Author: etrunon
  *
@@ -14,32 +14,27 @@
  logica della partita
  * servono le strutture
  * servono le funzioni
- * 
- * 
+ *
+ *
  */
 
-typedef struct domandaTag {
+typedef struct domanda {
     int numero1;
     int numero2;
 } domanda;
 
-typedef struct giocatoriTag {
-    int clientAttivi;
-    int *listaPunti;
-    char **listaNomi;
+typedef struct giocatore {
+    char* FIFO;
+    char* name;
+    int punteggio;
+} giocatore;
+
+typedef struct giocatori {
+    int numeroGiocatori;
+    giocatore* listaGiocatori;
 } giocatori;
 
-typedef struct partitaTag {
-    domanda domanda;
-    giocatori *giocatori;
-
-} partita;
-
-partita partitaConstructor();
-
-void partitaDestructor(partita par);
-
-domanda generaDomanda();
+domanda* generaDomanda();
 
 void processaRisposta(messaggio msg);
 
