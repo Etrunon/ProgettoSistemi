@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   parser.h
  * Author: etrunon
  *
@@ -9,13 +9,14 @@
 #define	PARSER_H
 
 #include <time.h>
+#include <stdbool.h>
 #include "CONST.h"
 
 /*
  * TODO:
  *  - Refactoring
  *  - Allocazione dimanica della string in invio
- *  - 
+ *  -
  */
 
 /**

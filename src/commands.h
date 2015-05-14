@@ -39,5 +39,7 @@ typedef struct data {
  */
 comando leggiInput(bool server, data* inputUtente);
 
+/*Fornisce un messaggio di spiegazione dei possibili comandi da impartire*/
+void printHelp(bool server);
 #endif	/* COMMANDS_H */
 

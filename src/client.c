@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "parser.h"
+#include "commands.h"
 #include <signal.h>
 
 int ascoltoDalServer;
@@ -16,7 +17,8 @@ int clientID;
  * rimaste aperte
  */
 void cleanupClient(int sig) {
-    printf("\n%30s\n", "Client disconnesso!");
+    printf("\r%30s", "Client disconnesso!");
+    fflush(stdout);
     close(ascoltoDalServer);
     unlink(clientFifo);
     exit(EXIT_SUCCESS);
@@ -24,8 +26,33 @@ void cleanupClient(int sig) {
 
 /*Gestisco la disconnesione del server*/
 void serverDisconnesso(int sig) {
-    printf("%30s\n", "Server disconnesso!");
+    printf("%30s\n", ANSI_COLOR_RED "Server disconnesso!" ANSI_COLOR_RESET);
     cleanupClient(0);
+}
+
+void * inputUtenteClient(void* arg) {
+    printHelp(false);
+    comando c;
+    data d;
+
+    do {
+        printf("%s", "Client:");
+        fflush(stdout);
+        c = leggiInput(true, &d);
+
+        switch (c) {
+            case HELP:
+            {
+                printHelp(false);
+                break;
+            }
+        }
+
+    } while (c != CHIUSURA);
+
+    cleanupClient(0);
+
+    return NULL;
 }
 
 /*Thread che rimane in attesa di messaggi dal server*/
@@ -49,7 +76,7 @@ int initClient() {
     int exist = access(SERVERPATH, F_OK);
 
     if (exist == -1) {
-        printf("%s\n", "Il server non è attivo!");
+        printf("%40s\n", ANSI_COLOR_RED "Il server non è attivo!" ANSI_COLOR_RESET);
         return -1;
     }
 
@@ -58,30 +85,33 @@ int initClient() {
     sprintf(clientFifo, "%s%i", CLIENTFIFO, getpid());
     ascoltoDalServer = creaFifoLettura(clientFifo);
     if (ascoltoDalServer == -1) {
-        printf("%s\n", "Errore nell'apertura del client");
+        printf("%s\n", ANSI_COLOR_RED "Errore nell'apertura del client" ANSI_COLOR_RESET);
         cleanupClient(0);
         exit(EXIT_FAILURE);
     }
 
-    /*Faccio partire l'ascoltatore di messaggi dal server*/
+    /*Faccio partire l'ascoltatore di messaggi da terminale*/
     pthread_t threadID;
-    pthread_create(&threadID, NULL, &ascoltaServer, NULL);
+    pthread_create(&threadID, NULL, &inputUtenteClient, NULL);
+
 
     /*Apro la FIFO per contattare il server*/
     scriviAlServer = apriFiFoScrittura(SERVERPATH);
     if (scriviAlServer == -1) {
-        printf("%s\n", "Errore nell'apertura del client");
+        printf("%s\n", ANSI_COLOR_RED "Errore nell'apertura del client" ANSI_COLOR_RESET);
         cleanupClient(0);
     }
 
     /*test scrittura*/
-    while (true) {
-        messaggio x = messaggioConstructor();
-        crInvDatiRisp(x, 200);
-        inviaMessaggio(x.msg, scriviAlServer);
-        printf("Scritto messaggio\n");
-        sleep(10);
-    }
+    /*
+        while (true) {
+            messaggio x = messaggioConstructor();
+            crInvDatiRisp(x, 200);
+            inviaMessaggio(x.msg, scriviAlServer);
+            printf("Scritto messaggio\n");
+            sleep(10);
+        }
+     */
     pthread_join(threadID, NULL);
 
     cleanupClient(0);

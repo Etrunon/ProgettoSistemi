@@ -8,6 +8,8 @@
 #ifndef CLIENT_H
 #define	CLIENT_H
 
+#include "logica.h"
+
 int initClient();
 
 #endif	/* CLIENT_H */

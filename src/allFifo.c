@@ -5,18 +5,16 @@
  * refactoring con funzioni coerenti
  */
 
-
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/types.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 #include "allFifo.h"
 #include "CONST.h"
-#include "parser.h"
 
 /**
  * Funzione che crea una fifo da LETTURA al path specificato, aprendola in READ and WRITE

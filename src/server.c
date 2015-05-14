@@ -5,7 +5,6 @@
 #include "allFifo.h"
 #include "server.h"
 #include "CONST.h"
-#include "allFifo.h"
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,30 +15,45 @@ int maxClients;
 int maxWin;
 int ascoltoDaiClient;
 
-pthread_mutex_t mutex;
-int a = 0;
+pthread_mutex_t MutexGiocatori;
 
 /*Chiude la FIFO ed eventuali altre risorse
  * rimaste aperte
  */
 void cleanupServer(int sig) {
-    printf("\n%30s\n", "Server disattivato");
+    printf("\r%30s", "Server disattivato");
+    fflush(stdout);
     close(ascoltoDaiClient);
     unlink(SERVERPATH);
     exit(errno);
 }
 
 void * inputUtente(void* arg) {
+    printHelp(true);
     comando c;
-    data* d = (data*) malloc(sizeof (data));
-
     do {
-        c = leggiInput(true, d);
-        printf("%s\n", d->nome);
+        printf("%s", "Server:");
+        fflush(stdout);
+        c = leggiInput(true, NULL);
+
+        if (c == HELP)
+            printHelp(true);
 
     } while (c != CHIUSURA);
 
+    cleanupServer(0);
+
     return NULL;
+}
+
+/*Rimane in ascolto di comunicazioni dai client*/
+void ascoltaClients() {
+    while (1) {
+        messaggio* msg = messaggioConstructor();
+        leggiMessaggio(ascoltoDaiClient, msg);
+
+        messaggioDestructor(msg);
+    }
 }
 
 int initServer(int Clients, int Win) {
@@ -51,7 +65,7 @@ int initServer(int Clients, int Win) {
     /*Controllo se esiste già un server*/
     int exist = access(SERVERPATH, F_OK);
     if (exist == 0) {
-        printf("Il server è gia attivo!\n");
+        printf("%s\n", ANSI_COLOR_RED "Il server è gia attivo!" ANSI_COLOR_RESET);
         return -1;
     }
     maxClients = Clients;
@@ -60,40 +74,24 @@ int initServer(int Clients, int Win) {
     /* Creo la FIFO per ascoltare i client*/
     ascoltoDaiClient = creaFifoLettura(SERVERPATH);
     if (ascoltoDaiClient == -1) {
-        printf("%s\n", "Errore nell'apertura del server");
+        printf("%s\n", ANSI_COLOR_RED "Errore nell'apertura del server" ANSI_COLOR_RESET);
         cleanupServer(0);
         exit(EXIT_FAILURE);
     }
 
     /*Messaggio di benvenuto*/
-    printf("%30s\n%-40s%i\n%-40s%i\n", "Server avviato!",
-            "Numero massimo di giocatori:", maxClients,
-            "Punteggio necessario per la vittoria:", maxWin);
+    printf("%40s\n%-40s%s%i%s\n%-40s%s%i%s\n", ANSI_COLOR_BLUE "Server avviato!" ANSI_COLOR_RESET,
+            "Numero massimo di giocatori:", ANSI_COLOR_YELLOW, maxClients, ANSI_COLOR_RESET,
+            "Punteggio necessario per la vittoria:", ANSI_COLOR_YELLOW, maxWin, ANSI_COLOR_RESET);
 
     /*Avvio thread per interazione da terminale*/
     pthread_t threadID;
     pthread_create(&threadID, NULL, &inputUtente, NULL);
 
-    //Test lettura
-    /*
-        while (1) {
-            //printf("%s\n", "In attesa di messaggi!");
-
-            //messaggio msg = messaggioConstructor();
-            //leggiMessaggio(ascoltoDaiClient, &msg);
-            //printf("Messaggio: %s", msg.msg);
-            sleep(2);
-            printf("\r%-30s", "Un messaggio!");
-            fflush(stdout);
-            sleep(2);
-            printf("\r%-30s", "Un altro messaggio!");
-            fflush(stdout);
-            //leggiComm(msg, msg.msg);
-        }
-     */
-
+    ascoltaClients();
 
     pthread_join(threadID, NULL);
+
     cleanupServer(0);
 
     return 0;
