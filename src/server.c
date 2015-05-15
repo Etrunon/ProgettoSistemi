@@ -45,13 +45,31 @@ void * inputUtente(void* arg) {
     return NULL;
 }
 
+void aggiungiGiocatore(messaggio* msg) {
+    int numeroGiocatore;
+    numeroGiocatore = serverAggiungiGiocatore(msg->nomeClient, msg->pathFifo);
+    //TODO GESTIONE IMPOSSIBILE AGGIUNGERE
+}
+
 /*Rimane in ascolto di comunicazioni dai client*/
 void ascoltaClients() {
     while (1) {
         messaggio* msg = messaggioConstructor();
 
         leggiMessaggio(ascoltoDaiClient, msg);
+        switch (msg->codiceMsg) {
+            case 1:
+            {
 
+                break;
+
+            }
+            case 2:
+            {
+                aggiungiGiocatore(msg);
+                break;
+            }
+        }
         messaggioDestructor(msg);
     }
 }
@@ -62,6 +80,7 @@ int initServer(int Clients, int Win) {
     signal(SIGINT, cleanupServer);
     signal(SIGSEGV, cleanupServer);
     signal(SIGABRT, cleanupServer);
+    signal(SIGHUP, cleanupServer);
 
     /*Controllo se esiste già un server*/
     int exist = access(SERVERPATH, F_OK);
