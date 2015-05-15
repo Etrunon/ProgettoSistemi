@@ -32,3 +32,19 @@ Togliere il file delle cose da fare;
 
 #CLASSIFICA
     INvio di messaggi a tutti per ogni singolo aggiornamento di punteggio
+
+#PROTOCOLLO
+    ##HEADER: int IDMittente, int timestamp, int codiceMessaggio
+
+    - 1: Invia risposta (int risposta)
+    - 2: Richiesta partecipazione (char* pathFIFO, char* nome, int PID)
+    - 3: Invia Informazione Logout Al Server ()
+    - 4: Accetta Client ()
+    - 5: Rifiuta Client ()
+    - 6: Nuovo Giocatore Entrato In Gioco (char* nome, int ID, int punti)
+    - 7: Giocatore Uscito Dal Gioco (int ID)
+    - 8: Aumenta/Riduci Punto (int ID, int punti)
+    - 9: Risposta Corretta/Sbagliata (bool giusto)
+    - 10: Invia Domanda (int num1, int num2)
+    - 11: Server Spegnimento()
+
