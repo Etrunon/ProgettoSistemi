@@ -7,6 +7,7 @@
 #include "parser.h"
 #include "commands.h"
 #include <signal.h>
+#include <string.h>
 
 int ascoltoDalServer;
 int scriviAlServer;
@@ -92,6 +93,8 @@ bool richiestaPartecipazione() {
 
     m->codiceMsg = 2;
     sprintf(m->pathFifo, "%s%c", clientFifo, '\0');
+    //int n = strlen(d.nome);
+    sprintf(m->nomeClient, "%s", d.nome);
 
     inviaMessaggio(scriviAlServer, m);
     messaggioDestructor(m);
@@ -103,6 +106,9 @@ int initClient() {
     /*Gestisco segnali di chiusura improvvisa dell'applicazione*/
     signal(SIGTERM, cleanupClient);
     signal(SIGINT, cleanupClient);
+    signal(SIGSEGV, cleanupClient);
+    signal(SIGABRT, cleanupClient);
+    signal(SIGHUP, cleanupClient);
 
     /*Segnali di chiusura FIFO, se perdo collegamento con il server brutalmente*/
     signal(SIGPIPE, serverDisconnesso);

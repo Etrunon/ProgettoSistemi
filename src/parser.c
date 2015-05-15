@@ -92,11 +92,13 @@ bool crRichPartec(messaggio *x) {
     int spazioDisponibile = MSG_SIZE - strlen(x->msg);
     char* tmp = (char*) malloc(spazioDisponibile * sizeof (char));
 
-    sprintf(tmp, "!2!%s", x->pathFifo);
+    sprintf(tmp, "!2!%s!%s!", x->pathFifo, x->nomeClient);
 
-    if (strlen(tmp) >= spazioDisponibile) {
-        return NULL;
-    }
+    /*
+        if (strlen(tmp) >= spazioDisponibile) {
+            return NULL;
+        }
+     */
     strcat(x->msg, tmp);
 
     free(tmp);
@@ -248,15 +250,28 @@ bool decRichPartec(messaggio *x) {
 
     int lgMax = MSG_SIZE - 26 - strlen(tmp), lgPath = strlen(tmp);
 
-    if (lgMax <= 0) {
-        //printf("Sono nell'if che controlla la lunghezza");
-        return false;
-    }
+    /*
+        if (lgMax <= 0) {
+            //printf("Sono nell'if che controlla la lunghezza");
+            return false;
+        }
+     */
 
-    x->pathFifo = (char*) malloc(lgPath * (sizeof (char)));
+    //x->pathFifo = (char*) malloc(lgPath * (sizeof (char)));
 
-    sprintf(x->pathFifo, "%s%c", tmp, '\0');
-    x->pathFifo[(lgPath + 1)] = '\0';
+    char *indice = strchr(tmp, '!');
+    memcpy(x->pathFifo, tmp, indice - tmp);
+
+    x->pathFifo[indice - tmp + 1] = '\0';
+
+    tmp = indice + 1;
+
+    indice = strchr(tmp, '!');
+    memcpy(x->nomeClient, tmp, indice - tmp);
+
+    x->nomeClient[indice - tmp + 1] = '\0';
+
+    //x->pathFifo[(lgPath + 1)] = '\0';
 
     return true;
 }
