@@ -8,16 +8,7 @@
 #ifndef LOGICA_H
 #define	LOGICA_H
 
-
 #include "parser.h"
-
-/*
- logica della partita
- * servono le strutture
- * servono le funzioni
- *
- *
- */
 
 typedef struct domanda {
     int numero1;
@@ -25,14 +16,15 @@ typedef struct domanda {
 } domanda;
 
 typedef struct giocatore {
+    int occupato;
     char* FIFO;
     char* name;
     int punteggio;
 } giocatore;
 
 static int maxClients;
-static int currentClients;
 static int maxWin;
+static int currentClients;
 static domanda domandaCorrente;
 static giocatore giocatoriCorrenti[10];
 
@@ -55,7 +47,7 @@ bool serverAggiornaPunti(int ID, int punti);
 
 char* serverFIFOGiocatore(int ID);
 
-void togliGiocatore(int ID);
+bool togliGiocatore(int ID);
 
 /*LATO CLIENT*/
 /*Setta un utente all'interno del client ai punti attuali*/
