@@ -19,7 +19,7 @@ bool connesso = false;
  * rimaste aperte
  */
 void cleanupClient(int sig) {
-    printf("\r%30s\n", "Client disconnesso!");
+    printf("\r%40s\n", ANSI_COLOR_CYAN "Client disattivato" ANSI_COLOR_RESET);
     fflush(stdout);
     close(ascoltoDalServer);
     unlink(clientFifo);
@@ -28,7 +28,7 @@ void cleanupClient(int sig) {
 
 /*Gestisco la disconnesione del server*/
 void serverDisconnesso(int sig) {
-    printf("%30s\n", ANSI_COLOR_RED "Server disconnesso!" ANSI_COLOR_RESET);
+    printf("%40s\n", ANSI_COLOR_RED "Server disconnesso!" ANSI_COLOR_RESET);
     cleanupClient(0);
 }
 
@@ -74,8 +74,20 @@ void * inputUtenteClient(void* arg) {
 /*Rimane in attesa di messaggi dal server*/
 void ascoltaServer() {
     while (1) {
-        messaggio* m = (messaggio*) malloc(sizeof (messaggio));
-        leggiMessaggio(ascoltoDalServer, m);
+        messaggio* msg = messaggioConstructor();
+        leggiMessaggio(ascoltoDalServer, msg);
+        switch (msg->codiceMsg) {
+            case 6:
+            {
+                printf("%s\n", ANSI_COLOR_RED"Il server non ha posti disponibili!"ANSI_COLOR_RESET);
+                cleanupClient(0);
+                break;
+            }
+            default: break;
+
+        }
+
+        messaggioDestructor(msg);
     }
 }
 
@@ -83,6 +95,7 @@ bool richiestaPartecipazione() {
     comando c;
     data d;
 
+    printf("%40s\n", ANSI_COLOR_BLUE "Client avviato" ANSI_COLOR_RESET);
     do {
         printf("%s", "Inserisci il nome:");
         c = leggiInput(false, &d);
@@ -93,7 +106,6 @@ bool richiestaPartecipazione() {
 
     m->codiceMsg = 2;
     sprintf(m->pathFifo, "%s%c", clientFifo, '\0');
-    //int n = strlen(d.nome);
     sprintf(m->nomeClient, "%s", d.nome);
 
     inviaMessaggio(scriviAlServer, m);
@@ -141,7 +153,7 @@ int initClient() {
     /*Richiedo la partecipazione al gioco*/
     richiestaPartecipazione();
 
-
+    ascoltaServer();
 
     /*Faccio partire l'ascoltatore di messaggi da terminale*/
     pthread_t threadID;

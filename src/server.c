@@ -14,12 +14,25 @@
 
 int ascoltoDaiClient;
 
-pthread_mutex_t MutexGiocatori;
+void AvvisaSpegnimentoServer() {
+    int i = 0;
+    for (i = 0; i < maxClients; i++) {
+        if (giocatoriCorrenti[i].occupato) {
+            messaggio* msg = messaggioConstructor();
+            msg->codiceMsg = 11;
+            inviaMessaggio(giocatoriCorrenti[i].handlerFIFO, msg);
+            messaggioDestructor(msg);
+        }
+    }
+}
 
 /*Chiude la FIFO ed eventuali altre risorse
  * rimaste aperte
  */
 void cleanupServer(int sig) {
+    if (currentClients > 0) {
+        AvvisaSpegnimentoServer();
+    }
     printf("\r%40s\n", ANSI_COLOR_CYAN "Server disattivato" ANSI_COLOR_RESET);
     fflush(stdout);
     close(ascoltoDaiClient);
@@ -46,8 +59,26 @@ void * inputUtente(void* arg) {
 }
 
 void aggiungiGiocatore(messaggio* msg) {
+    int handlerFIFO = creaFiFoScrittura(msg->pathFifo);
+
+    if (handlerFIFO == -1) {
+#ifdef DEBUGFIFO
+        printf("%s %s\n", "FIFO errata:", msg->pathFifo);
+        perror("");
+#endif
+        return;
+    }
     int numeroGiocatore;
-    numeroGiocatore = serverAggiungiGiocatore(msg->nomeClient, msg->pathFifo);
+    numeroGiocatore = serverAggiungiGiocatore(msg->nomeClient, handlerFIFO);
+
+    //if (numeroGiocatore == -1) {
+    messaggio* rifiutato = messaggioConstructor();
+    rifiutato->codiceMsg = 6;
+    inviaMessaggio(handlerFIFO, rifiutato);
+    messaggioDestructor(rifiutato);
+    close(handlerFIFO);
+    //}
+
     //TODO GESTIONE IMPOSSIBILE AGGIUNGERE
 }
 
@@ -81,6 +112,9 @@ int initServer(int Clients, int Win) {
     signal(SIGSEGV, cleanupServer);
     signal(SIGABRT, cleanupServer);
     signal(SIGHUP, cleanupServer);
+
+    /*Ignoro la scrittura in una fifo rotta, gestendolo tramite la write()*/
+    signal(SIGPIPE, SIG_IGN);
 
     /*Controllo se esiste già un server*/
     int exist = access(SERVERPATH, F_OK);

@@ -112,7 +112,7 @@ bool leggiMessaggio(int handlerFifo, messaggio *msg) {
 
     letti = read(handlerFifo, msg->msg, MSG_SIZE + 1);
 #ifdef DEBUGFIFO
-    printf("\rMessaggio ricevuto: %s\n", msg->msg);
+    printf("\rLetti: %i \t%s\n", letti, msg->msg);
 #endif
     traduciComm(msg);
 
@@ -124,5 +124,9 @@ bool inviaMessaggio(int handlerFifo, messaggio *msg) {
     creaMessaggio(msg);
     int written = write(handlerFifo, msg->msg, MSG_SIZE + 1);
 
-    return true;
+    /*L'altro lato della FIFO si è disconnesso*/
+    if (written == -1)
+        return false;
+    else
+        return true;
 }

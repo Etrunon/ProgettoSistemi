@@ -13,7 +13,7 @@
 #define SERVERPATH "/tmp/serverFIFO"
 #define CLIENTFIFO "/tmp/gameClient"
 #define MAX_FIFONAME 30
-#define MSG_SIZE 50
+#define MSG_SIZE 80
 #define MAXLINE 50
 #define MAXCOMMAND 14
 #define MAXNAME 14
