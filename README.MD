@@ -31,7 +31,7 @@ Togliere il file delle cose da fare;
         Server/client distrugge messaggio
 
 #CLASSIFICA
-    INvio di messaggi a tutti per ogni singolo aggiornamento di punteggio
+    Invio di messaggi a tutti per ogni singolo aggiornamento di punteggio
 
 #PROTOCOLLO
     ##HEADER: int IDMittente, int timestamp, int codiceMessaggio

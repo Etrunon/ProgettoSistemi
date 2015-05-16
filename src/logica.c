@@ -41,21 +41,21 @@ void serverGeneraClassifica(int* IDclients, int* punteggi) {
     }
 }
 
-int serverAggiungiGiocatore(char* nome, char* FIFO) {
+int serverAggiungiGiocatore(char* nome, int handlerFIFO) {
 
     int indice = cercaSlotVuoto();
     if (indice == -1)
         return -1;
     else {
         giocatoriCorrenti[indice].occupato = 1;
-
+        giocatoriCorrenti[indice].punteggio = maxClients - currentClients;
+        giocatoriCorrenti[indice].handlerFIFO = handlerFIFO;
         giocatoriCorrenti[indice].name = (char*) malloc(MAXNAME * (sizeof (char)));
         strcat(giocatoriCorrenti[indice].name, nome);
+        currentClients++;
 
-        giocatoriCorrenti[indice].FIFO = malloc(MAX_FIFONAME * (sizeof (char)));
-        strcat(giocatoriCorrenti[indice].FIFO, FIFO);
+        return indice;
     }
-    return;
 }
 
 bool serverAggiornaPunti(int ID, int punti) {
@@ -68,23 +68,22 @@ bool serverAggiornaPunti(int ID, int punti) {
     return false;
 }
 
-char* serverFIFOGiocatore(int ID) {
+int serverFIFOGiocatore(int ID) {
 
     if (giocatoriCorrenti[ID].occupato == 1) {
-        return giocatoriCorrenti[ID].FIFO;
+        return giocatoriCorrenti[ID].handlerFIFO;
     }
-    return NULL;
+    return -1;
 }
 
 bool togliGiocatore(int ID) {
 
     if (giocatoriCorrenti[ID].occupato == 1) {
 
-        memset(giocatoriCorrenti[ID].FIFO, 0, MAX_FIFONAME);
-        memset(giocatoriCorrenti[ID].name, 0, ID);
+        free(giocatoriCorrenti[ID].name);
         giocatoriCorrenti[ID].occupato = 0;
         giocatoriCorrenti[ID].punteggio = 0;
-
+        currentClients--;
         return true;
     }
     return false;
@@ -95,13 +94,13 @@ void clientAggiornaPunti(int ID, int punti) {
     giocatoriCorrenti[ID].punteggio = punti;
 }
 
-void clientNuovoGiocatore(char* nome, int ID, int punti) {
+void clientAggiungiGiocatore(char* nome, int ID, int punteggio) {
 
     if (giocatoriCorrenti[ID].occupato == 0) {
 
         giocatoriCorrenti[ID].occupato = 1;
-
-        giocatoriCorrenti[ID].name = (char*) malloc(ID * (sizeof (char)));
+        giocatoriCorrenti[ID].punteggio = punteggio;
+        giocatoriCorrenti[ID].name = (char*) malloc(MAXNAME * (sizeof (char)));
         strcat(giocatoriCorrenti[ID].name, nome);
     }
 

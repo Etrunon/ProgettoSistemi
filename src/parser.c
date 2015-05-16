@@ -262,7 +262,7 @@ bool decRichPartec(messaggio *x) {
     char *indice = strchr(tmp, '!');
     memcpy(x->pathFifo, tmp, indice - tmp);
 
-    x->pathFifo[indice - tmp + 1] = '\0';
+    x->pathFifo[indice - tmp] = '\0';
 
     tmp = indice + 1;
 

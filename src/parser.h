@@ -22,6 +22,21 @@
 /**
  Struct contente tutti i dati logici dei messaggi inviati tramite le FIFO
  */
+typedef enum tipoMessaggio {
+    INVIA_RISPOSTA,
+    RICHIESTA_PARTECIPAZIONE,
+    LOGOUT_AL_SERVER,
+    ACCETTA_CLIENT,
+    RIFIUTA_CLIENT,
+    NUOVO_GIOCATORE_ENTRATO,
+    GIOCATORE_USCITO,
+    MODIFICA_PUNTEGGIO_GIOCATORE,
+    CORREZIONE_RISPOSTA,
+    INVIA_DOMANDA,
+    SERVER_SPEGNIMENTO
+
+} tipoMessaggio;
+
 typedef struct messaggioTag {
     int pidMit;
     int codiceMsg;

@@ -16,8 +16,8 @@ typedef struct domanda {
 } domanda;
 
 typedef struct giocatore {
+    int handlerFIFO;
     int occupato;
-    char* FIFO;
     char* name;
     int punteggio;
 } giocatore;
@@ -40,20 +40,26 @@ void serverGeneraClassifica(int* IDclients, int* punteggi);
 /*Aggiunge un giocatore, ritorna il suo ID
  * Se non c'è spazio, ritorna -1
  */
-int serverAggiungiGiocatore(char* nome, char* FIFO);
+int serverAggiungiGiocatore(char* nome, int handlerFIFO);
 
-/*torna true se il giocatore ha vinto*/
+/* aggiunge +1 o -1 punto
+ * torna true se il giocatore ha vinto*/
 bool serverAggiornaPunti(int ID, int punti);
 
-char* serverFIFOGiocatore(int ID);
-
-bool togliGiocatore(int ID);
+/*Ritorna handler del giocatore*/
+int serverFIFOGiocatore(int ID);
 
 /*LATO CLIENT*/
-/*Setta un utente all'interno del client ai punti attuali*/
+/*Aggiorna +1 o -1 punti al giocatore indicato in ID*/
 void clientAggiornaPunti(int ID, int punti);
 
-void clientNuovoGiocatore(char* nome, int ID, int punti);
+void clientAggiungiGiocatore(char* nome, int ID, int punteggio);
+
+
+
+/*METODI COMUNI*/
+bool togliGiocatore(int ID);
+
 
 #endif	/* LOGICA_H */
 
