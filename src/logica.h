@@ -22,11 +22,11 @@ typedef struct giocatore {
     int punteggio;
 } giocatore;
 
-static int maxClients;
-static int maxWin;
-static int currentClients;
-static domanda domandaCorrente;
-static giocatore giocatoriCorrenti[10];
+extern int maxClients;
+extern int maxWin;
+extern int currentClients;
+extern domanda domandaCorrente;
+extern giocatore giocatoriCorrenti[10];
 
 /*INIZIALIZZAZIONE*/
 void initLogica();

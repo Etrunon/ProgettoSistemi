@@ -15,6 +15,8 @@ typedef enum comando {
     CHIUSURA,
     CLASSIFICA,
     HELP,
+    LOG_SHOW,
+    LOG_EXIT,
     RISPOSTA,
     NOME,
     ERRORE

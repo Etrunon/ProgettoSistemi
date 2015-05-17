@@ -1,5 +1,5 @@
 #lista delle librerie necessarie
-OBJ = main.o server.o client.o allFifo.o parser.o commands.o logica.o gui.o
+OBJ = main.o server.o client.o allFifo.o parser.o commands.o logica.o gui.o guiMessages.o
 #lista delle librerie da testare
 OBJTEST = allFifo.o parser.o mainBoss.o logica.o
 
@@ -15,7 +15,7 @@ SRCDIR = src
 #nome e posizione dell'eseguibile
 BUILDNAME = main
 BUILDIR = bin
-CFLAGS = -c -g -DDEBUGFIFO
+CFLAGS = -c -g -DDEBUGFIFO #-std=c99
 
 all:
 	@printf "%s\n" "Target Make disponibili:"
