@@ -31,6 +31,7 @@
 /build/
 /dist/
 /bin/
+/assets/
 
 #File strani
 *.dep.inc

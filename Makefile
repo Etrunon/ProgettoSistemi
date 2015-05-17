@@ -3,8 +3,9 @@ OBJ = main.o server.o client.o allFifo.o commands.o logica.o gui.o guiMessages.o
 #lista delle librerie da testare
 OBJTEST = allFifo.o riparser.o logica.o gui.o guiMessages.o mainBoss.o
 
+NUMBERS = 0 1 2 3
 #Definiamo quali direttive non producono file
-.PHONY: clean
+.PHONY: clean test
 
 #path in cui cercare i file sorgenti e binari per verificare che siano presenti
 VPATH = bin:src
@@ -28,12 +29,18 @@ bin: checkDir $(BUILDNAME)
 
 clean:
 	-@rm -rf $(BUILDIR)
+	-@rm -rf assets
 
 assets:
-	#complia il file sorgente dedicato alla creazione di assets, lo esegue e lo cancella
+	@#compila il file sorgente dedicato alla creazione di assets, lo esegue e lo cancella
+	@-mkdir -p assets
+	@gcc $(SRCDIR)/assetsGenerator.c -o assets/assetsGenerator -g
+	@./assets/assetsGenerator 4
+	@-rm -rf assets/assetsGenerator
 
 test: assets bin
-	#fa partire il testing
+	@#fa partire il testing
+	@#$(foreach var,$(NUMBERS),./$(BUILDIR)/$(BUILDNAME) --client --nogui < ./assets/ClientFile$(var).txt;)
 
 checkDir:
 	-@mkdir -p $(BUILDIR)
