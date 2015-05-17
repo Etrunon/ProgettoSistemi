@@ -11,8 +11,12 @@
 #include <signal.h>
 #include "commands.h"
 #include "logica.h"
+#include "gui.h"
+#include "guiMessages.h"
 
 int ascoltoDaiClient;
+
+char tmpMessage [BUFFMESSAGGIO];
 
 void AvvisaSpegnimentoServer() {
     int i = 0;
@@ -33,8 +37,11 @@ void cleanupServer(int sig) {
     if (currentClients > 0) {
         AvvisaSpegnimentoServer();
     }
-    printf("\r%40s\n", ANSI_COLOR_CYAN "Server disattivato" ANSI_COLOR_RESET);
-    fflush(stdout);
+    sprintf(tmpMessage, "%s\n", "Server disattivato");
+    aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_CYAN);
+    SetGUIMode(EXIT_SERVER);
+    updateScreen();
+
     close(ascoltoDaiClient);
     unlink(SERVERPATH);
     exit(errno);
@@ -42,15 +49,24 @@ void cleanupServer(int sig) {
 
 void * inputUtente(void* arg) {
     printHelp(true);
+    updateScreen();
     comando c;
     do {
-        printf("%s", "Server:");
-        fflush(stdout);
         c = leggiInput(true, NULL);
 
-        if (c == HELP)
-            printHelp(true);
-
+        switch (c) {
+            case LOG_EXIT:
+            {
+                SetGUIMode(STANDARD_SERVER);
+                break;
+            }
+            case HELP:
+            {
+                printHelp(true);
+                break;
+            }
+        }
+        updateScreen();
     } while (c != CHIUSURA);
 
     cleanupServer(0);
@@ -89,12 +105,6 @@ void ascoltaClients() {
 
         leggiMessaggio(ascoltoDaiClient, msg);
         switch (msg->codiceMsg) {
-            case 1:
-            {
-
-                break;
-
-            }
             case 2:
             {
                 aggiungiGiocatore(msg);
@@ -106,49 +116,65 @@ void ascoltaClients() {
 }
 
 int initServer(int Clients, int Win) {
+    maxClients = Clients;
+    maxWin = Win;
+
+    /*Inizializza le strutture dati relative al gioco*/
+    initLogica();
+
     /*Segnali di chiusura*/
-    signal(SIGTERM, cleanupServer);
-    signal(SIGINT, cleanupServer);
     signal(SIGSEGV, cleanupServer);
     signal(SIGABRT, cleanupServer);
+    /*Chiusura terminale*/
     signal(SIGHUP, cleanupServer);
+    signal(SIGTERM, cleanupServer);
+    /*Ctrl-C*/
+    signal(SIGINT, cleanupServer);
+    /*Ctrl-Z*/
+    signal(SIGTSTP, cleanupServer);
+    signal(SIGSTOP, cleanupServer);
+    /*Ctrl-\*/
+    signal(SIGQUIT, cleanupServer);
 
     /*Ignoro la scrittura in una fifo rotta, gestendolo tramite la write()*/
     signal(SIGPIPE, SIG_IGN);
 
+    /*Avvio interfaccia grafica*/
+    SetGUIMode(STANDARD_SERVER);
+    updateScreen();
+
     /*Controllo se esiste già un server*/
     int exist = access(SERVERPATH, F_OK);
     if (exist == 0) {
-        printf("%s\n", ANSI_COLOR_RED "Il server è gia attivo!" ANSI_COLOR_RESET);
+        sprintf(tmpMessage, "%s\n", "Il server è gia attivo!");
+        aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_RED);
+        SetGUIMode(EXIT_SERVER);
+        updateScreen();
         return -1;
     }
-    maxClients = Clients;
-    maxWin = Win;
 
     /* Creo la FIFO per ascoltare i client*/
     ascoltoDaiClient = creaFifoLettura(SERVERPATH);
     if (ascoltoDaiClient == -1) {
-        printf("%s\n", ANSI_COLOR_RED "Errore nell'apertura del server" ANSI_COLOR_RESET);
+        sprintf(tmpMessage, "%s\n", "Errore nell'apertura del server");
+        aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_RED);
+        SetGUIMode(EXIT_SERVER);
+        updateScreen();
         cleanupServer(0);
         exit(EXIT_FAILURE);
     }
-
-    /*Messaggio di benvenuto*/
-    printf("%40s\n%-40s%s%i%s\n%-40s%s%i%s\n", ANSI_COLOR_BLUE "Server avviato" ANSI_COLOR_RESET,
-            "Numero massimo di giocatori:", ANSI_COLOR_YELLOW, maxClients, ANSI_COLOR_RESET,
-            "Punteggio necessario per la vittoria:", ANSI_COLOR_YELLOW, maxWin, ANSI_COLOR_RESET);
-
-    /*Inizializza le strutture dati relative al gioco*/
-    initLogica();
 
     /*Avvio thread per interazione da terminale*/
     pthread_t threadID;
     pthread_create(&threadID, NULL, &inputUtente, NULL);
 
+
     /*Mi metto in ascolto dei client sulla FIFO*/
     ascoltaClients();
 
-    pthread_join(threadID, NULL);
+    //testGUI(true);
+
+    //pthread_join(threadID, NULL);
 
     cleanupServer(0);
 

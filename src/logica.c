@@ -4,6 +4,12 @@
 
 #include "logica.h"
 
+int maxClients;
+int maxWin;
+int currentClients = 0;
+domanda domandaCorrente = {};
+giocatore giocatoriCorrenti[10] = {};
+
 void serverCambiaDomanda() {
     domandaCorrente.numero1 = rand() % 99;
     domandaCorrente.numero2 = rand() % 99;
@@ -47,12 +53,12 @@ int serverAggiungiGiocatore(char* nome, int handlerFIFO) {
     if (indice == -1)
         return -1;
     else {
+        currentClients++;
         giocatoriCorrenti[indice].occupato = 1;
         giocatoriCorrenti[indice].punteggio = maxClients - currentClients;
         giocatoriCorrenti[indice].handlerFIFO = handlerFIFO;
         giocatoriCorrenti[indice].name = (char*) malloc(MAXNAME * (sizeof (char)));
         strcat(giocatoriCorrenti[indice].name, nome);
-        currentClients++;
 
         return indice;
     }

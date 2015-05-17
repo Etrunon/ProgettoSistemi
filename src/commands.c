@@ -5,6 +5,8 @@
 #include <string.h>
 #include "commands.h"
 #include "logica.h"
+#include "guiMessages.h"
+#include "gui.h"
 
 /*Cerca di analizzare l'input
  * L'utente può aver inserito o un numero come risposta
@@ -17,7 +19,9 @@ comando analizzaInput(data* output, char* input) {
     //se ho un numero, controllo se è nel range ammissibile per essere inviato al server
     if (*carattereErrore == '\0') {
         if (numero > 999999 || numero < -99999) {
-            printf("%s", ANSI_COLOR_RED "Risposta non ammissibile" ANSI_COLOR_RESET);
+            char msg [BUFFMESSAGGIO];
+            sprintf(msg, "%s\n", "Risposta non ammissibile");
+            aggiungiMessaggio(msg, true, ANSI_COLOR_RED);
             return ERRORE;
         }
         output->risposta = numero;
@@ -41,7 +45,9 @@ comando leggiInput(bool server, data* inputUtente) {
     commands[read - 1] = '\0';
     /*Considero solo il primo comando inviato nell'intera linea*/
     if (strlen(commands) > MAXCOMMAND) {
-        printf("%s\n", ANSI_COLOR_RED "Input non valido" ANSI_COLOR_RESET);
+        char msg [BUFFMESSAGGIO];
+        sprintf(msg, "%s\n", "Input non valido");
+        aggiungiMessaggio(msg, true, ANSI_COLOR_RED);
         return ERRORE;
     }
     sscanf(commands, "%s", command);
@@ -58,6 +64,13 @@ comando leggiInput(bool server, data* inputUtente) {
     if ((strcasecmp(command, "help")) == 0) {
         return HELP;
     }
+    if ((strcasecmp(command, "log")) == 0) {
+        SetGUIMode(LOG);
+        return LOG_SHOW;
+    }
+    if ((strcasecmp(command, "q")) == 0) {
+        return LOG_EXIT;
+    }
     /*Se sono interessato ad input numerici o testuali, chiamo la funzione apposita*/
     if (inputUtente != NULL)
         return analizzaInput(inputUtente, command);
@@ -66,14 +79,21 @@ comando leggiInput(bool server, data* inputUtente) {
 }
 
 void printHelp(bool server) {
-    printf(ANSI_COLOR_GREEN);
-    printf("%45s", "----------------------------------------");
-    printf("\n%30s\n", "Comandi disponibili");
-    printf("%-15s%s\n", "help", "Visualizza questo messaggio");
-    printf("%-15s%s\n", "exit", "Esci dalla partita");
+    char msg [BUFFMESSAGGIO];
+    sprintf(msg, "%s\n", "Comandi disponibili");
+    aggiungiMessaggio(msg, true, ANSI_COLOR_GREEN);
+
+    sprintf(msg, "%-15s%s\n", "help", "Visualizza questo messaggio");
+    aggiungiMessaggio(msg, false, ANSI_COLOR_GREEN);
+
+    sprintf(msg, "%-15s%s\n", "log", "Mostra lo storico dei messaggi");
+    aggiungiMessaggio(msg, false, ANSI_COLOR_GREEN);
+
+    sprintf(msg, "%-15s%s\n", "exit", "Esci dalla partita");
+    aggiungiMessaggio(msg, false, ANSI_COLOR_GREEN);
+
     if (!server) {
-        printf("%-15s%s\n", "classifica", "Stampa la classifica di giocatori");
+        sprintf(msg, "%-15s%s\n", "classifica", "Stampa la classifica di giocatori");
+        aggiungiMessaggio(msg, false, ANSI_COLOR_GREEN);
     }
-    printf("%45s\n", "----------------------------------------");
-    printf(ANSI_COLOR_RESET);
 }

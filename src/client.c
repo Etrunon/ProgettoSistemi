@@ -6,6 +6,9 @@
 #include <unistd.h>
 #include "parser.h"
 #include "commands.h"
+#include "gui.h"
+#include "logica.h"
+#include "guiMessages.h"
 #include <signal.h>
 #include <string.h>
 
@@ -15,12 +18,16 @@ char clientFifo [MAX_FIFONAME];
 int clientID;
 bool connesso = false;
 
+char msgTmp [BUFFMESSAGGIO];
+
 /*Chiude la FIFO ed eventuali altre risorse
  * rimaste aperte
  */
 void cleanupClient(int sig) {
-    printf("\r%40s\n", ANSI_COLOR_CYAN "Client disattivato" ANSI_COLOR_RESET);
-    fflush(stdout);
+    sprintf(msgTmp, "%s\n", "Client disattivato");
+    aggiungiMessaggio(msgTmp, true, ANSI_COLOR_CYAN);
+    SetGUIMode(EXIT_CLIENT);
+    updateScreen();
     close(ascoltoDalServer);
     unlink(clientFifo);
     exit(EXIT_SUCCESS);
@@ -28,22 +35,20 @@ void cleanupClient(int sig) {
 
 /*Gestisco la disconnesione del server*/
 void serverDisconnesso(int sig) {
-    printf("%40s\n", ANSI_COLOR_RED "Server disconnesso!" ANSI_COLOR_RESET);
+
+    sprintf(msgTmp, "%s\n", "Server disconnesso!");
+    aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
     cleanupClient(0);
 }
 
-void prompt() {
-    printf("%s", "Client:");
-    fflush(stdout);
-}
-
 void * inputUtenteClient(void* arg) {
+
     printHelp(false);
+    updateScreen();
     comando c;
     data d;
 
     do {
-        prompt();
         c = leggiInput(true, &d);
 
         switch (c) {
@@ -55,15 +60,36 @@ void * inputUtenteClient(void* arg) {
                 inviaMessaggio(scriviAlServer, msg);
                 break;
             }
+            case LOG_EXIT:
+            {
+                if (connesso)
+                    SetGUIMode(STANDARD_CLIENT);
+                else
+                    SetGUIMode(LOGIN_CLIENT);
+                break;
+            }
             case HELP:
             {
                 printHelp(false);
+                break;
+            }
+            case NOME:
+            {
+                if (!connesso) {
+                    messaggio* m = messaggioConstructor();
+                    m->codiceMsg = 2;
+                    sprintf(m->pathFifo, "%s%c", clientFifo, '\0');
+                    sprintf(m->nomeClient, "%s", d.nome);
+                    inviaMessaggio(scriviAlServer, m);
+                    messaggioDestructor(m);
+                }
                 break;
             }
             default:
                 break;
         }
 
+        updateScreen();
     } while (c != CHIUSURA);
 
     cleanupClient(0);
@@ -79,7 +105,8 @@ void ascoltaServer() {
         switch (msg->codiceMsg) {
             case 6:
             {
-                printf("%s\n", ANSI_COLOR_RED"Il server non ha posti disponibili!"ANSI_COLOR_RESET);
+                sprintf(msgTmp, "%s\n", "Il server non ha posti disponibili!");
+                aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
                 cleanupClient(0);
                 break;
             }
@@ -95,9 +122,9 @@ bool richiestaPartecipazione() {
     comando c;
     data d;
 
-    printf("%40s\n", ANSI_COLOR_BLUE "Client avviato" ANSI_COLOR_RESET);
+    //printf("%40s\n", ANSI_COLOR_BLUE "Client avviato" ANSI_COLOR_RESET);
     do {
-        printf("%s", "Inserisci il nome:");
+        printf("\r%s", "Inserisci il nome:");
         c = leggiInput(false, &d);
 
     } while (c != NOME);
@@ -115,6 +142,7 @@ bool richiestaPartecipazione() {
 }
 
 int initClient() {
+
     /*Gestisco segnali di chiusura improvvisa dell'applicazione*/
     signal(SIGTERM, cleanupClient);
     signal(SIGINT, cleanupClient);
@@ -125,11 +153,21 @@ int initClient() {
     /*Segnali di chiusura FIFO, se perdo collegamento con il server brutalmente*/
     signal(SIGPIPE, serverDisconnesso);
 
-    /*Controllo se esiste un server*/
+    /*Inizializza logica di gioco*/
+    initLogica();
+
+    /*Inizializzo GUI*/
+    SetGUIMode(LOGIN_CLIENT);
+    updateScreen();
+
+    /*Controllo se esiste un server*/;
     int exist = access(SERVERPATH, F_OK);
 
     if (exist == -1) {
-        printf("%40s\n", ANSI_COLOR_RED "Il server non è attivo!" ANSI_COLOR_RESET);
+        SetGUIMode(EXIT_CLIENT);
+        sprintf(msgTmp, "%s\n", "Il server non è attivo!");
+        aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
+        updateScreen();
         return -1;
     }
 
@@ -138,7 +176,8 @@ int initClient() {
     sprintf(clientFifo, "%s%i", CLIENTFIFO, getpid());
     ascoltoDalServer = creaFifoLettura(clientFifo);
     if (ascoltoDalServer == -1) {
-        printf("%s\n", ANSI_COLOR_RED "Errore nell'apertura del client" ANSI_COLOR_RESET);
+        sprintf(msgTmp, "%s\n", "Errore nell'apertura del client");
+        aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
         cleanupClient(0);
         exit(EXIT_FAILURE);
     }
@@ -146,19 +185,24 @@ int initClient() {
     /*Apro la FIFO per contattare il server*/
     scriviAlServer = creaFiFoScrittura(SERVERPATH);
     if (scriviAlServer == -1) {
-        printf("%s\n", ANSI_COLOR_RED "Errore nell'apertura del client" ANSI_COLOR_RESET);
+        sprintf(msgTmp, "%s\n", "Errore nell'apertura del client");
+        aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
         cleanupClient(0);
     }
 
-    /*Richiedo la partecipazione al gioco*/
-    richiestaPartecipazione();
 
-    ascoltaServer();
+    /*Richiedo la partecipazione al gioco*/
+    //richiestaPartecipazione();
 
     /*Faccio partire l'ascoltatore di messaggi da terminale*/
     pthread_t threadID;
-    //pthread_create(&threadID, NULL, &inputUtenteClient, NULL);
-    //pthread_join(threadID, NULL);
+    pthread_create(&threadID, NULL, &inputUtenteClient, NULL);
+    pthread_join(threadID, NULL);
+
+    /*Ascolto FIFO server*/
+    ascoltaServer();
+
+
 
     cleanupClient(0);
     return 0;
