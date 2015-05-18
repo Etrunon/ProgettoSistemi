@@ -63,7 +63,7 @@ void clientAggiungiGiocatore(char* nome, int ID, int punteggio);
 /*METODI COMUNI*/
 bool togliGiocatore(int ID);
 
-char* getNomeGiocatore(int ID);
+void getNomeGiocatore(int ID, char* riempi);
 
 int getPuntiGiocatore(int ID);
 #endif	/* LOGICA_H */

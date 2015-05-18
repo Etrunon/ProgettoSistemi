@@ -77,8 +77,9 @@ void * inputUtenteClient(void* arg) {
             {
                 if (!connesso) {
                     messaggio* m = messaggioConstructor();
-                    m->codiceMsg = 2;
-                    sprintf(m->pathFifo, "%s%c", clientFifo, '\0');
+                    m->clientID = -5;
+                    m->codiceMsg = RICHIESTA_PARTECIPAZIONE;
+                    sprintf(m->pathFifo, "%s", clientFifo);
                     sprintf(m->nomeClient, "%s", d.nome);
                     inviaMessaggio(scriviAlServer, m);
                     messaggioDestructor(m);
@@ -103,12 +104,20 @@ void ascoltaServer() {
         messaggio* msg = messaggioConstructor();
         leggiMessaggio(ascoltoDalServer, msg);
         switch (msg->codiceMsg) {
-            case 6:
+            case RIFIUTA_CLIENT:
             {
                 sprintf(msgTmp, "%s\n", "Il server non ha posti disponibili!");
                 aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
+                updateScreen();
                 cleanupClient(0);
+            }
                 break;
+            case ACCETTA_CLIENT:
+            {
+                SetGUIMode(STANDARD_CLIENT);
+                sprintf(msgTmp, "%s\t%i\n", "Benvenuto,giocatore!", msg->IDOggetto);
+                aggiungiMessaggio(msgTmp, true, ANSI_COLOR_GREEN);
+                updateScreen();
             }
             default: break;
 
@@ -197,11 +206,11 @@ int initClient() {
     /*Faccio partire l'ascoltatore di messaggi da terminale*/
     pthread_t threadID;
     pthread_create(&threadID, NULL, &inputUtenteClient, NULL);
-    pthread_join(threadID, NULL);
 
     /*Ascolto FIFO server*/
     ascoltaServer();
 
+    pthread_join(threadID, NULL);
 
 
     cleanupClient(0);

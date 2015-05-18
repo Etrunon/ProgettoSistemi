@@ -108,8 +108,7 @@ void clientAggiungiGiocatore(char* nome, int ID, int punteggio) {
 
 }
 
-char* getNomeGiocatore(int ID) {
-    return NULL;
+void getNomeGiocatore(int ID, char* riempi) {
 }
 
 int getPuntiGiocatore(int ID) {

@@ -108,14 +108,14 @@ void aggiungiGiocatore(messaggio * msg) {
         return;
     } else {
         messaggio* accettato = messaggioConstructor();
-        accettato->codiceMsg = 4;
+        accettato->codiceMsg = ACCETTA_CLIENT;
         accettato->IDOggetto = IDGiocatore;
         inviaMessaggio(handlerFIFO, accettato);
         messaggioDestructor(accettato);
 
         messaggio* nuovoGiocatore = messaggioConstructor();
         nuovoGiocatore->codiceMsg = 6;
-        nuovoGiocatore->nomeClient = msg->nomeClient;
+        strcpy(nuovoGiocatore->nomeClient, msg->nomeClient);
         nuovoGiocatore->IDOggetto = IDGiocatore;
         nuovoGiocatore->clientPunti = getPuntiGiocatore(IDGiocatore);
         /*Avviso altri giocatori del nuovo arrivato*/
@@ -131,7 +131,9 @@ void checkRisposta(messaggio * msg) {
 
     bool vittoria;
     if (risultato == risposta) {
-        sprintf(tmpMessage, "%s%s\n", getNomeGiocatore(msg->clientID), " ha risposto correttamente!");
+        char name [MAXNAME];
+        getNomeGiocatore(msg->clientID, name);
+        sprintf(tmpMessage, "%s%s\n", name, " ha risposto correttamente!");
         aggiungiMessaggio(tmpMessage, false, NULL);
         vittoria = serverAggiornaPunti(msg->clientID, 1);
         updateScreen();
@@ -156,7 +158,9 @@ void checkRisposta(messaggio * msg) {
         messaggioDestructor(risposta);
 
     } else /*Risposta errata*/ {
-        sprintf(tmpMessage, "%s%s\n", getNomeGiocatore(msg->clientID), " ha sbagliato risposta!");
+        char name [MAXNAME];
+        getNomeGiocatore(msg->clientID, name);
+        sprintf(tmpMessage, "%s%s\n", name, " ha sbagliato risposta!");
         aggiungiMessaggio(tmpMessage, false, NULL);
         updateScreen();
 
@@ -179,7 +183,9 @@ void checkRisposta(messaggio * msg) {
 }
 
 void rimuoviGiocatore(messaggio* msg) {
-    sprintf(tmpMessage, "%s%s\n", getNomeGiocatore(msg->clientID), " si è disconnesso");
+    char name [MAXNAME];
+    getNomeGiocatore(msg->clientID, name);
+    sprintf(tmpMessage, "%s%s\n", name, " si è disconnesso");
     aggiungiMessaggio(tmpMessage, false, NULL);
     updateScreen();
     messaggio* logout = messaggioConstructor();

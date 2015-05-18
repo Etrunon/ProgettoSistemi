@@ -7,6 +7,7 @@
 
 #include "riparser.h"
 #include "CONST.h"
+#include "commands.h"
 
 messaggio* messaggioConstructor() {
 
@@ -120,69 +121,70 @@ bool creaMessaggio(messaggio *mess) {
     //printf("%s\n", mess->msg);
 
     switch (mess->codiceMsg) {
-        case 1:
+        case INVIA_RISPOSTA:
         {
             concatInt(mess->msg, mess->valRisposta);
         };
             break;
-        case 2:
+        case RICHIESTA_PARTECIPAZIONE:
         {
             concatStr(mess->msg, mess->pathFifo);
             concatStr(mess->msg, mess->nomeClient);
             concatInt(mess->msg, getpid());
         };
             break;
-        case 3: //Invio informazione logout al server
+        case LOGOUT_AL_SERVER: //Invio informazione logout al server
             break;
-        case 4:
+        case ACCETTA_CLIENT:
         {
-            concatInt(mess->msg, mess->numeroClient);
-        }
-            break;
-        case 5: //Client rifiutato
-            break;
-        case 6:
-        {
-            concatStr(mess->msg, mess->pathFifo);
-            concatStr(mess->msg, mess->nomeClient);
-            /*
-             concatInt(mess->msg, mess->clientID);
-             TODO aggiungere ID soggetto
-             */
-        }
-            break;
-        case 7:
-        {
-            concatInt(mess->msg, mess->clientID);
-        }
-            break;
-        case 8:
-        {
-            concatInt(mess->msg, mess->clientID);
+            concatInt(mess->msg, mess->IDOggetto);
             concatInt(mess->msg, mess->clientPunti);
         }
             break;
-        case 9:
+        case RIFIUTA_CLIENT: //Client rifiutato
+            break;
+        case NUOVO_GIOCATORE_ENTRATO:
         {
-
+            concatStr(mess->msg, mess->nomeClient);
+            concatInt(mess->msg, mess->IDOggetto);
+            concatInt(mess->msg, mess->clientPunti);
+        }
+            break;
+        case GIOCATORE_USCITO:
+        {
+            concatInt(mess->msg, mess->IDOggetto);
+        }
+            break;
+        case MODIFICA_PUNTEGGIO_GIOCATORE:
+        {
+            concatInt(mess->msg, mess->IDOggetto);
+            concatInt(mess->msg, mess->clientPunti);
+        }
+            break;
+        case ESITO_RISPOSTA:
+        {
             if (mess->corretta == true)
                 concatInt(mess->msg, 1);
             else
                 concatInt(mess->msg, 0);
         }
             break;
-        case 10:
+        case INVIA_DOMANDA:
         {
             concatInt(mess->msg, mess->domandaNum1);
             concatInt(mess->msg, mess->domandaNum2);
         }
             break;
-        case 11: //Server in spegnimento
+        case SERVER_SPEGNIMENTO: //Server in spegnimento
             break;
-
+        case VITTORIA:
+        {
+            concatInt(mess->msg, mess->IDOggetto);
+        }
+            break;
     }
 
-    testStampaMessaggio(mess, "Alla fine del crea");
+    //testStampaMessaggio(mess, "Alla fine del crea");
 
     return true;
 }
@@ -252,17 +254,17 @@ void traduciComm(messaggio *msg) {
     int *x = (int*) malloc(1 * (sizeof (int)));
 
     switch (msg->codiceMsg) {
-        case 1:
+        case INVIA_RISPOSTA:
         {
             decatInt(&lettaFino, &x);
             msg->valRisposta = *x;
         };
             break;
-        case 2:
+        case RICHIESTA_PARTECIPAZIONE:
         {
-            testStampaMessaggio(msg, "Dentro lo switch");
             decatStr(&lettaFino, &tmp);
             strcpy(msg->pathFifo, tmp);
+            memset(tmp, 0, MSG_SIZE);
 
             decatStr(&lettaFino, &tmp);
             strcpy(msg->nomeClient, tmp);
@@ -271,57 +273,69 @@ void traduciComm(messaggio *msg) {
             msg->pidMit = *x;
         };
             break;
-        case 3: //Invio informazione logout al server
+        case LOGOUT_AL_SERVER: //Invio informazione logout al server
             break;
-        case 4:
+        case ACCETTA_CLIENT:
         {
-            /*
-             * TODO aggiungere il numero client
-             decatInt(&lettaFino, &tmp);
-             strcpy(msg->pidMit, &x);
-             msg->numeroClient = *x;
+            decatInt(&lettaFino, &x);
+            msg->IDOggetto = *x;
+            decatInt(&lettaFino, &x);
+            msg->clientPunti = *x;
+        }
+            break;
+        case RIFIUTA_CLIENT: //Client rifiutato
+            break;
+        case NUOVO_GIOCATORE_ENTRATO:
+        {
+            decatStr(&lettaFino, &tmp);
+            strcpy(msg->nomeClient, tmp);
+            memset(tmp, 0, MSG_SIZE);
+            decatInt(&lettaFino, &x);
+            msg->IDOggetto = *x;
+            decatInt(&lettaFino, &x);
+            msg->clientPunti = *x;
+        }
+            break;
+        case GIOCATORE_USCITO:
+        {
+            decatInt(&lettaFino, &x);
+            msg->IDOggetto = *x;
+        }
+            break;
+        case MODIFICA_PUNTEGGIO_GIOCATORE:
+        {
+            decatInt(&lettaFino, &x);
+            msg->IDOggetto = *x;
+            decatInt(&lettaFino, &x);
+            msg->clientPunti = *x;
+        }
+            break;
+        case ESITO_RISPOSTA:
+        {
+            decatInt(&lettaFino, &x);
+            if (*x == 1) {
 
-             */
+                msg->corretta = true;
+            } else
+                msg->corretta = false;
         }
             break;
-        case 5: //Client rifiutato
-            break;
-        case 6:
+        case INVIA_DOMANDA:
         {
-            concatStr(msg->msg, msg->pathFifo);
-            concatStr(msg->msg, msg->nomeClient);
-            concatInt(msg->msg, msg->valRisposta);
+            decatInt(&lettaFino, &x);
+            msg->domandaNum1 = *x;
+            decatInt(&lettaFino, &x);
+            msg->domandaNum2 = *x;
         }
             break;
-        case 7:
+        case SERVER_SPEGNIMENTO: //Server in spegnimento
+            break;
+        case VITTORIA:
         {
-            concatInt(msg->msg, msg->clientID);
+            decatInt(&lettaFino, &x);
+            msg->IDOggetto = *x;
         }
-            break;
-        case 8:
-        {
-            concatInt(msg->msg, msg->clientID);
-            concatInt(msg->msg, msg->clientPunti);
-        }
-            break;
-        case 9:
-        {
-
-            if (msg->corretta == true)
-                concatInt(msg->msg, 1);
-            else
-                concatInt(msg->msg, 0);
-        }
-            break;
-        case 10:
-        {
-            concatInt(msg->msg, msg->domandaNum1);
-            concatInt(msg->msg, msg->domandaNum2);
-        }
-            break;
-        case 11: //Server in spegnimento
-            break;
-
+        break;
 
     }
 

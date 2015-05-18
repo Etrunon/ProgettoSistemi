@@ -39,7 +39,7 @@ Togliere il file delle cose da fare;
     - 1: Invia risposta (int risposta)
     - 2: Richiesta partecipazione (char* pathFIFO, char* nome, int PID)
     - 3: Invia Informazione Logout Al Server ()
-    - 4: Accetta Client (int ID)
+    - 4: Accetta Client (int ID, int punti)
     - 5: Rifiuta Client ()
     - 6: Nuovo Giocatore Entrato In Gioco (char* nome, int ID, int punti)
     - 7: Giocatore Uscito Dal Gioco (int ID)
@@ -50,4 +50,4 @@ Togliere il file delle cose da fare;
     - 12: Vittoria(int ID)
 
 
-TODO, settare l'ID del server a 0 o valore importante! 
+TODO, settare l'ID del server a 0 o valore importante!
