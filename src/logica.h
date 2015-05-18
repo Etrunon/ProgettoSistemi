@@ -1,3 +1,4 @@
+
 /*
  * File:   Logica.h
  * Author: etrunon
@@ -16,6 +17,7 @@ typedef struct domanda {
 } domanda;
 
 typedef struct giocatore {
+    int IDGiocatore;
     int handlerFIFO;
     int occupato;
     char* name;
@@ -26,7 +28,7 @@ extern int maxClients;
 extern int maxWin;
 extern int currentClients;
 extern domanda domandaCorrente;
-extern giocatore giocatoriCorrenti[10];
+extern giocatore* giocatoriCorrenti[10];
 
 /*INIZIALIZZAZIONE*/
 void initLogica();
@@ -60,6 +62,8 @@ void clientAggiungiGiocatore(char* nome, int ID, int punteggio);
 /*METODI COMUNI*/
 bool togliGiocatore(int ID);
 
+char* getNomeGiocatore(int ID);
 
+int getPuntiGiocatore(int ID);
 #endif	/* LOGICA_H */
 

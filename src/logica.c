@@ -8,7 +8,7 @@ int maxClients;
 int maxWin;
 int currentClients = 0;
 domanda domandaCorrente = {};
-giocatore giocatoriCorrenti[10] = {};
+giocatore* giocatoriCorrenti[10] = {};
 
 void serverCambiaDomanda() {
     domandaCorrente.numero1 = rand() % 99;
@@ -23,15 +23,10 @@ void initLogica() {
 
 int cercaSlotVuoto() {
 
-    int i = 0;
-
-    for (i; i < maxClients; i++) {
-        if (giocatoriCorrenti[i].occupato == 0) {
-            return i;
-        }
-    }
-
-    return -1;
+    if (currentClients < maxClients) {
+        return currentClients;
+    } else
+        return -1;
 }
 
 void serverGeneraClassifica(int* IDclients, int* punteggi) {
@@ -40,9 +35,9 @@ void serverGeneraClassifica(int* IDclients, int* punteggi) {
 
     for (i; i < maxClients; i++) {
 
-        if (giocatoriCorrenti[i].occupato == 1) {
+        if (giocatoriCorrenti[i] == NULL) {
             IDclients[i] = i;
-            punteggi[i] = giocatoriCorrenti[i].punteggio;
+            punteggi[i] = giocatoriCorrenti[i]->punteggio;
         }
     }
 }
@@ -54,11 +49,12 @@ int serverAggiungiGiocatore(char* nome, int handlerFIFO) {
         return -1;
     else {
         currentClients++;
-        giocatoriCorrenti[indice].occupato = 1;
-        giocatoriCorrenti[indice].punteggio = maxClients - currentClients;
-        giocatoriCorrenti[indice].handlerFIFO = handlerFIFO;
-        giocatoriCorrenti[indice].name = (char*) malloc(MAXNAME * (sizeof (char)));
-        strcat(giocatoriCorrenti[indice].name, nome);
+        giocatoriCorrenti[indice] = (giocatore*) malloc(sizeof (giocatore));
+        giocatoriCorrenti[indice]->occupato = 1;
+        giocatoriCorrenti[indice]->punteggio = maxClients - currentClients;
+        giocatoriCorrenti[indice]->handlerFIFO = handlerFIFO;
+        giocatoriCorrenti[indice]->name = (char*) malloc(MAXNAME * (sizeof (char)));
+        strcat(giocatoriCorrenti[indice]->name, nome);
 
         return indice;
     }
@@ -66,8 +62,8 @@ int serverAggiungiGiocatore(char* nome, int handlerFIFO) {
 
 bool serverAggiornaPunti(int ID, int punti) {
 
-    if (giocatoriCorrenti[ID].occupato == 1) {
-        giocatoriCorrenti[ID].punteggio = punti;
+    if (giocatoriCorrenti[ID]->occupato == 1) {
+        giocatoriCorrenti[ID]->punteggio = punti;
 
         return true;
     }
@@ -76,19 +72,19 @@ bool serverAggiornaPunti(int ID, int punti) {
 
 int serverFIFOGiocatore(int ID) {
 
-    if (giocatoriCorrenti[ID].occupato == 1) {
-        return giocatoriCorrenti[ID].handlerFIFO;
+    if (giocatoriCorrenti[ID]->occupato == 1) {
+        return giocatoriCorrenti[ID]->handlerFIFO;
     }
     return -1;
 }
 
 bool togliGiocatore(int ID) {
 
-    if (giocatoriCorrenti[ID].occupato == 1) {
+    if (giocatoriCorrenti[ID]->occupato == 1) {
 
-        free(giocatoriCorrenti[ID].name);
-        giocatoriCorrenti[ID].occupato = 0;
-        giocatoriCorrenti[ID].punteggio = 0;
+        free(giocatoriCorrenti[ID]->name);
+        giocatoriCorrenti[ID]->occupato = 0;
+        giocatoriCorrenti[ID]->punteggio = 0;
         currentClients--;
         return true;
     }
@@ -97,17 +93,25 @@ bool togliGiocatore(int ID) {
 
 void clientAggiornaPunti(int ID, int punti) {
 
-    giocatoriCorrenti[ID].punteggio = punti;
+    giocatoriCorrenti[ID]->punteggio = punti;
 }
 
 void clientAggiungiGiocatore(char* nome, int ID, int punteggio) {
 
-    if (giocatoriCorrenti[ID].occupato == 0) {
+    if (giocatoriCorrenti[ID]->occupato == 0) {
 
-        giocatoriCorrenti[ID].occupato = 1;
-        giocatoriCorrenti[ID].punteggio = punteggio;
-        giocatoriCorrenti[ID].name = (char*) malloc(MAXNAME * (sizeof (char)));
-        strcat(giocatoriCorrenti[ID].name, nome);
+        giocatoriCorrenti[ID]->occupato = 1;
+        giocatoriCorrenti[ID]->punteggio = punteggio;
+        giocatoriCorrenti[ID]->name = (char*) malloc(MAXNAME * (sizeof (char)));
+        strcat(giocatoriCorrenti[ID]->name, nome);
     }
 
 }
+
+char* getNomeGiocatore(int ID) {
+    return NULL;
+}
+
+int getPuntiGiocatore(int ID) {
+    return -1;
+};

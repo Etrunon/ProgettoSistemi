@@ -31,15 +31,15 @@ typedef enum tipoMessaggio {
     NUOVO_GIOCATORE_ENTRATO,
     GIOCATORE_USCITO,
     MODIFICA_PUNTEGGIO_GIOCATORE,
-    CORREZIONE_RISPOSTA,
+    ESITO_RISPOSTA,
     INVIA_DOMANDA,
-    SERVER_SPEGNIMENTO
-
+    SERVER_SPEGNIMENTO,
+    VITTORIA
 } tipoMessaggio;
 
 typedef struct messaggioTag {
     int pidMit;
-    int codiceMsg;
+    tipoMessaggio codiceMsg;
     char* timestring;
     char* msg;
     char* pathFifo;
@@ -50,6 +50,8 @@ typedef struct messaggioTag {
     int clientPunti;
     int domandaNum1;
     int domandaNum2;
+    int IDOggetto;
+    bool corretta;
 
 } messaggio;
 
