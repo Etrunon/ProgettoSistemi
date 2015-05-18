@@ -94,6 +94,16 @@ void punteggiGiocatori() {
         printf(format, i + 1);
     }
     printf("\n");
+
+
+    /*TODO: Stampa punteggio e nome*/
+    sprintf(format, "%c%i%c", '%', -(larghezzaAutomatica - currentClients) + 2, 's');
+    printf(format, "");
+    sprintf(format, "%c%i%c", '%', -(larghezzaAutomatica - currentClients), 's');
+    for (i = 0; i < currentClients; i++) {
+        printf(format, "aaa");
+    }
+    printf("\n");
 }
 
 void players() {
@@ -157,6 +167,7 @@ void updateScreen() {
             players();
             infoServer();
             messagges(MESSAGGI_A_SCHERMO);
+            printDomanda();
             printf("\r%s", "Server:");
             break;
         }
