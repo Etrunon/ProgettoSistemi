@@ -241,7 +241,7 @@ void ascoltaServer() {
     }
 }
 
-int initClient() {
+int initClient(bool testMode) {
 
     /*Gestisco segnali di chiusura improvvisa dell'applicazione*/
     signal(SIGTERM, cleanupClient);
@@ -257,7 +257,12 @@ int initClient() {
     initLogica();
 
     /*Inizializzo GUI*/
-    SetGUIMode(LOGIN_CLIENT);
+    if (testMode) {
+        SetGUIMode(TESTING_CLIENT);
+    } else {
+        SetGUIMode(LOGIN_CLIENT);
+
+    }
     updateScreen();
 
     /*Controllo se esiste un server*/;

@@ -3,6 +3,7 @@
 #include <getopt.h>
 #include "server.h"
 #include "client.h"
+#include "gui.h"
 
 void explainParameters() {
     printf("Per avviare il server, usare l'opzione --server, con argomenti --max <numero massimo giocatori> e --win <punteggio per vittoria>\n");
@@ -15,6 +16,7 @@ void explainParameters() {
 int main(int argc, char** argv) {
 
     int server = 0;
+    int testing = 0;
     int maxClients = 1;
     int winPoints = 10;
 
@@ -30,6 +32,7 @@ int main(int argc, char** argv) {
         {"win", required_argument, NULL, 'w'},
         {"server", no_argument, &server, 1},
         {"client", no_argument, &server, 0},
+        {"testing", no_argument, &testing, 1},
         {NULL, 0, NULL, 0}
     };
 
@@ -70,9 +73,9 @@ int main(int argc, char** argv) {
     }
 
     if (server) {
-        initServer(maxClients, winPoints);
+        initServer(maxClients, winPoints, testing);
     } else {
-        initClient();
+        initClient(testing);
     }
     return (EXIT_SUCCESS);
 }

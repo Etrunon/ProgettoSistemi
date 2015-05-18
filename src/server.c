@@ -314,7 +314,7 @@ void ascoltaClients() {
     }
 }
 
-int initServer(int Clients, int Win) {
+int initServer(int Clients, int Win, bool TestMode) {
     maxClients = Clients;
     maxWin = Win;
 
@@ -339,7 +339,12 @@ int initServer(int Clients, int Win) {
     signal(SIGPIPE, SIG_IGN);
 
     /*Avvio interfaccia grafica*/
-    SetGUIMode(STANDARD_SERVER);
+    if (TestMode) {
+        SetGUIMode(TESTING_SERVER);
+    } else {
+        SetGUIMode(STANDARD_SERVER);
+
+    }
     updateScreen();
 
     /*Controllo se esiste già un server*/
@@ -362,8 +367,11 @@ int initServer(int Clients, int Win) {
     }
 
     /*Avvio thread per interazione da terminale*/
-    pthread_t threadID;
-    pthread_create(&threadID, NULL, &inputUtente, NULL);
+    if (!TestMode) {
+        pthread_t threadID;
+        pthread_create(&threadID, NULL, &inputUtente, NULL);
+    }
+
 
     /*Mi metto in ascolto dei client sulla FIFO*/
     ascoltaClients();

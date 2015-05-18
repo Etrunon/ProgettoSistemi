@@ -3,7 +3,7 @@ OBJ = main.o server.o client.o allFifo.o commands.o logica.o gui.o guiMessages.o
 #lista delle librerie da testare
 OBJTEST = allFifo.o riparser.o logica.o gui.o guiMessages.o mainBoss.o
 
-NUMBERS = 0 1 2 3
+NUMBERS = 0 1 2
 #Definiamo quali direttive non producono file
 .PHONY: clean test
 
@@ -40,7 +40,8 @@ assets:
 
 test: assets bin
 	@#fa partire il testing
-	@#$(foreach var,$(NUMBERS),./$(BUILDIR)/$(BUILDNAME) --client --nogui < ./assets/ClientFile$(var).txt;)
+	@(./$(BUILDIR)/$(BUILDNAME) --server --testing &)
+	@$(foreach var,$(NUMBERS),./$(BUILDIR)/$(BUILDNAME) --client --testing < ./assets/ClientFile$(var).txt &)
 
 checkDir:
 	-@mkdir -p $(BUILDIR)

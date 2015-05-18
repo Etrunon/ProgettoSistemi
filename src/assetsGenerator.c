@@ -54,6 +54,7 @@ void printRisposte() {
             fprintf(client, "%s\n", "exit");
         }
     }
+    fprintf(client, "%s\n", "exit");
 }
 
 void assetClient() {
