@@ -20,13 +20,12 @@ char tmpMessage [BUFFMESSAGGIO];
 
 void AvvisaSpegnimentoServer() {
     int i = 0;
-    for (i = 0; i < maxClients; i++) {
-        if (giocatoriCorrenti[i].occupato) {
-            messaggio* msg = messaggioConstructor();
-            msg->codiceMsg = 11;
-            inviaMessaggio(giocatoriCorrenti[i].handlerFIFO, msg);
-            messaggioDestructor(msg);
-        }
+    for (i = 0; i < currentClients; i++) {
+        int fifo = (giocatoriCorrenti[i])->handlerFIFO;
+        messaggio* msg = messaggioConstructor();
+        msg->domandaNum1 = 11;
+        inviaMessaggio(fifo, msg);
+        messaggioDestructor(msg);
     }
 }
 
@@ -74,9 +73,21 @@ void * inputUtente(void* arg) {
     return NULL;
 }
 
-void aggiungiGiocatore(messaggio* msg) {
+void avvisaAltriClient(int IDNonAvvisare, messaggio* msg) {
+    int i = 0;
+    for (i; i < currentClients; i++) {
+        giocatore* player = giocatoriCorrenti[i];
+        if (player->IDGiocatore != IDNonAvvisare) {
+            int fifo = player->handlerFIFO;
+            inviaMessaggio(fifo, msg);
+        }
+    }
+}
+
+void aggiungiGiocatore(messaggio * msg) {
     int handlerFIFO = creaFiFoScrittura(msg->pathFifo);
 
+    /*Errore apertura FIFO client*/
     if (handlerFIFO == -1) {
 #ifdef DEBUGFIFO
         printf("%s %s\n", "FIFO errata:", msg->pathFifo);
@@ -84,18 +95,98 @@ void aggiungiGiocatore(messaggio* msg) {
 #endif
         return;
     }
-    int numeroGiocatore;
-    numeroGiocatore = serverAggiungiGiocatore(msg->nomeClient, handlerFIFO);
+    int IDGiocatore;
+    IDGiocatore = serverAggiungiGiocatore(msg->nomeClient, handlerFIFO);
 
-    //if (numeroGiocatore == -1) {
-    messaggio* rifiutato = messaggioConstructor();
-    rifiutato->codiceMsg = 6;
-    inviaMessaggio(handlerFIFO, rifiutato);
-    messaggioDestructor(rifiutato);
-    close(handlerFIFO);
-    //}
+    /*Non c'è spazio nel server*/
+    if (IDGiocatore == -1) {
+        messaggio* rifiutato = messaggioConstructor();
+        rifiutato->codiceMsg = 5;
+        inviaMessaggio(handlerFIFO, rifiutato);
+        messaggioDestructor(rifiutato);
+        close(handlerFIFO);
+        return;
+    } else {
+        messaggio* accettato = messaggioConstructor();
+        accettato->codiceMsg = 4;
+        accettato->IDOggetto = IDGiocatore;
+        inviaMessaggio(handlerFIFO, accettato);
+        messaggioDestructor(accettato);
 
-    //TODO GESTIONE IMPOSSIBILE AGGIUNGERE
+        messaggio* nuovoGiocatore = messaggioConstructor();
+        nuovoGiocatore->codiceMsg = 6;
+        nuovoGiocatore->nomeClient = msg->nomeClient;
+        nuovoGiocatore->IDOggetto = IDGiocatore;
+        nuovoGiocatore->clientPunti = getPuntiGiocatore(IDGiocatore);
+        /*Avviso altri giocatori del nuovo arrivato*/
+        avvisaAltriClient(IDGiocatore, nuovoGiocatore);
+        messaggioDestructor(nuovoGiocatore);
+    }
+
+}
+
+void checkRisposta(messaggio * msg) {
+    int risultato = domandaCorrente.numero1 + domandaCorrente.numero2;
+    int risposta = domandaCorrente.numero1 + domandaCorrente.numero2;
+
+    bool vittoria;
+    if (risultato == risposta) {
+        sprintf(tmpMessage, "%s%s\n", getNomeGiocatore(msg->clientID), " ha risposto correttamente!");
+        aggiungiMessaggio(tmpMessage, false, NULL);
+        vittoria = serverAggiornaPunti(msg->clientID, 1);
+        updateScreen();
+        if (vittoria) {
+            messaggio* vittoria = messaggioConstructor();
+
+        }
+        /*Avviso client che ha risposto correttamente*/
+        messaggio* corretto = messaggioConstructor();
+        corretto->codiceMsg = ESITO_RISPOSTA;
+        corretto->corretta = true;
+        int fifo = serverFIFOGiocatore(msg->clientID);
+        inviaMessaggio(fifo, corretto);
+        messaggioDestructor(corretto);
+        /*TODO CHECK VITTORIA*/
+        /*Avviso altri client della risposta*/
+        messaggio* risposta = messaggioConstructor();
+        risposta->codiceMsg = MODIFICA_PUNTEGGIO_GIOCATORE;
+        risposta->IDOggetto = msg->clientID;
+        risposta->clientPunti = -1;
+        avvisaAltriClient(msg->clientID, risposta);
+        messaggioDestructor(risposta);
+
+    } else /*Risposta errata*/ {
+        sprintf(tmpMessage, "%s%s\n", getNomeGiocatore(msg->clientID), " ha sbagliato risposta!");
+        aggiungiMessaggio(tmpMessage, false, NULL);
+        updateScreen();
+
+        /*Avviso client della risposta sbagliata*/
+        messaggio* sbagliato = messaggioConstructor();
+        sbagliato->codiceMsg = ESITO_RISPOSTA;
+        sbagliato->corretta = false;
+        int fifo = serverFIFOGiocatore(msg->clientID);
+        inviaMessaggio(fifo, sbagliato);
+        messaggioDestructor(sbagliato);
+
+        /*Avviso altri client del punto sbagliato*/
+        messaggio* risposta = messaggioConstructor();
+        risposta->codiceMsg = MODIFICA_PUNTEGGIO_GIOCATORE;
+        risposta->IDOggetto = msg->clientID;
+        risposta->clientPunti = -1;
+        avvisaAltriClient(msg->clientID, risposta);
+        messaggioDestructor(risposta);
+    }
+}
+
+void rimuoviGiocatore(messaggio* msg) {
+    sprintf(tmpMessage, "%s%s\n", getNomeGiocatore(msg->clientID), " si è disconnesso");
+    aggiungiMessaggio(tmpMessage, false, NULL);
+    updateScreen();
+    messaggio* logout = messaggioConstructor();
+    logout->codiceMsg = GIOCATORE_USCITO;
+    logout->IDOggetto = msg->clientID;
+    avvisaAltriClient(msg->clientID, logout);
+    messaggioDestructor(logout);
 }
 
 /*Rimane in ascolto di comunicazioni dai client*/
@@ -105,9 +196,19 @@ void ascoltaClients() {
 
         leggiMessaggio(ascoltoDaiClient, msg);
         switch (msg->codiceMsg) {
-            case 2:
+            case RISPOSTA:
+            {
+                checkRisposta(msg);
+                break;
+            }
+            case RICHIESTA_PARTECIPAZIONE:
             {
                 aggiungiGiocatore(msg);
+                break;
+            }
+            case LOGOUT_AL_SERVER:
+            {
+                rimuoviGiocatore(msg);
                 break;
             }
         }

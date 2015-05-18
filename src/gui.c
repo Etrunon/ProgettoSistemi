@@ -80,7 +80,7 @@ void punteggiGiocatori() {
         if (ultimoPuntoStampato > (ALTEZZAPUNTI / 4) * 3)
             printf(ANSI_COLOR_RED);
         for (i = 0; i < currentClients; i++) {
-            int puntoNorm = puntoNormalizzato(giocatoriCorrenti[i].punteggio);
+            int puntoNorm = puntoNormalizzato(giocatoriCorrenti[i]->punteggio);
             if (ultimoPuntoStampato <= puntoNorm) {
                 printf(format, "#");
             }
