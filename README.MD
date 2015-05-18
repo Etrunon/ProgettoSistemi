@@ -48,3 +48,5 @@ Togliere il file delle cose da fare;
     - 10: Invia Domanda (int num1, int num2)
     - 11: Server Spegnimento()
 
+
+TODO, settare l'ID del server a 0 o valore importante! 
