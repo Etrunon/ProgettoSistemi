@@ -9,6 +9,7 @@
 #define	GUIMESSAGES_H
 
 #include "CONST.h"
+#include <stdbool.h>
 
 typedef struct codaTag {
     int numMessaggi;

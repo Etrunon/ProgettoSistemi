@@ -1,5 +1,5 @@
 #lista delle librerie necessarie
-OBJ = main.o server.o client.o allFifo.o parser.o commands.o logica.o gui.o guiMessages.o
+OBJ = main.o server.o client.o allFifo.o commands.o logica.o gui.o guiMessages.o riparser.o
 #lista delle librerie da testare
 OBJTEST = allFifo.o parser.o TestGui.o logica.o gui.o guiMessages.o
 

@@ -18,8 +18,6 @@
 #include <string.h>
 
 #include "allFifo.h"
-#include "CONST.h"
-#include "parser.h"
 
 /**
  * Funzione che crea una fifo da LETTURA al path specificato, aprendola in READ and WRITE

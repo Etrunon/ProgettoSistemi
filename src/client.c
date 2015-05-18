@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include "parser.h"
+#include "riparser.h"
 #include "commands.h"
 #include "gui.h"
 #include "logica.h"

@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "parser.h"
-
 /**
  * Costruttore della struct messaggio. Inizializza tutti i campi int a -1 e tutti i puntatori a NULL
  * @return puntatore al messaggio creato

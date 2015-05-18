@@ -8,9 +8,9 @@
 #include "riparser.h"
 #include "CONST.h"
 
-messaggio2* messaggio2Constructor() {
+messaggio* messaggioConstructor() {
 
-    messaggio2 *msg = (messaggio2*) malloc(sizeof (messaggio2));
+    messaggio *msg = (messaggio*) malloc(sizeof (messaggio));
 
     msg->pidMit = -1;
     msg->codiceMsg = -1;
@@ -29,7 +29,7 @@ messaggio2* messaggio2Constructor() {
     return msg;
 }
 
-void messaggio2Destructor(messaggio2 *x) {
+void messaggioDestructor(messaggio *x) {
 
     if (x->timestring != NULL) {
         free(x->timestring);
@@ -46,7 +46,7 @@ void messaggio2Destructor(messaggio2 *x) {
     free(x);
 }
 
-void testStampaMessaggio(messaggio2 *msg, char* testo) {
+void testStampaMessaggio(messaggio *msg, char* testo) {
     /*
      * TODO creare la stampa "formattata" per fare debrugging
      */
@@ -103,7 +103,7 @@ void timestamp(char* s) {
 
 }
 
-void header(messaggio2 *msg) {
+void headerMsg(messaggio *msg) {
 
     concatInt(msg->msg, msg->clientID);
 
@@ -114,9 +114,9 @@ void header(messaggio2 *msg) {
     concatInt(msg->msg, msg->codiceMsg);
 }
 
-bool creaMessaggio2(messaggio2 *mess) {
+bool creaMessaggio(messaggio *mess) {
 
-    header(mess);
+    headerMsg(mess);
     //printf("%s\n", mess->msg);
 
     switch (mess->codiceMsg) {
@@ -218,7 +218,7 @@ void decatInt(char **str, int **dest) {
     free(tmp);
 }
 
-void traduciHeader(messaggio2 *msg, char **lettaFino) {
+void traduciHeader(messaggio *msg, char **lettaFino) {
 
     char *tmp = (char*) malloc(MSG_SIZE * (sizeof (char)));
     memset(tmp, 0, MSG_SIZE);
@@ -241,7 +241,7 @@ void traduciHeader(messaggio2 *msg, char **lettaFino) {
 
 }
 
-void traduciComm2(messaggio2 *msg) {
+void traduciComm(messaggio *msg) {
 
     char *lettaFino = msg->msg;
     traduciHeader(msg, &lettaFino);
@@ -280,7 +280,7 @@ void traduciComm2(messaggio2 *msg) {
              decatInt(&lettaFino, &tmp);
              strcpy(msg->pidMit, &x);
              msg->numeroClient = *x;
-             
+
              */
         }
             break;

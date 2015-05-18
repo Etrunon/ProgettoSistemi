@@ -9,7 +9,8 @@
 #ifndef LOGICA_H
 #define	LOGICA_H
 
-#include "parser.h"
+#include "riparser.h"
+#include "CONST.h"
 
 typedef struct domanda {
     int numero1;
