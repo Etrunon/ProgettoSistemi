@@ -11,247 +11,70 @@
 
 #include "CONST.h"
 #include "riparser.h"
+#include "logica.h"
+#include "gui.h"
 
 void handler(int signo) {
     printf("Errore: %i\n", signo);
 }
 
-/*
- void superStampa(){
- printf("Msg: %s \t Nome client: %s \t PathFifo: %s \t Timestring: %s \t ClientID:%i \t ClientPunti: %i\n", msg->msg, msg->nomeClient, msg->pathFifo, msg->timestring, msg->clientID, msg->clientPunti);
- +        printf("CodiceMsg %i \t Dom.num1 %i \t DomNum2 %i \t NumClient %i \t Pid %i \t ValoreRisposta: %i \n", msg->codiceMsg, msg->domandaNum1, msg->domandaNum2, msg->numeroClient, msg->pidMit, msg->valRisposta);
- }
-
- void testPrintTuttiMessaggi() {
- int handler = 1;
- handler = creaFiFoScrittura("/tmp/miaFifo");
- messaggio *mittando = messaggioConstructor();
-
- //crInvDatiRisp(x, 200);
- mittando->codiceMsg = 1;
- mittando->valRisposta = 200;
- mittando->codiceMsg = 1;
-
- inviaMessaggio(handler, mittando);
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
-
- //crRichPartec(x, "/tmp/mioNom");
- mittando->codiceMsg = 2;
- mittando->pathFifo = (char*) malloc(40 * (sizeof (char)));
- sprintf(mittando->pathFifo, "%s", "/tmp/path");
-
- inviaMessaggio(handler, mittando);
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crAccettaClient(x);
- mittando->codiceMsg = 5;
-
- inviaMessaggio(handler, mittando);
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crBroadAggPunti(x, 8, 21);
- mittando->codiceMsg = 9;
- mittando->clientID = 5;
- mittando->clientPunti = 34;
-
- inviaMessaggio(handler, mittando);
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crBroadNuovoGiocatore(x, "Pippo", 8, 7);
- mittando->codiceMsg = 8;
- mittando->nomeClient = (char*) malloc(40 * (sizeof (char)));
- sprintf(mittando->nomeClient, "%s", "pippo");
-
- mittando->clientID = 3;
- mittando->clientPunti = 56;
-
- inviaMessaggio(handler, mittando);
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crInvDomanda(x, 33, 45);
- mittando->codiceMsg = 10;
- mittando->domandaNum1 = 87;
- mittando->domandaNum2 = 45;
-
- inviaMessaggio(handler, mittando);
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crInvLogOut(x);
- mittando->codiceMsg = 3;
-
- inviaMessaggio(handler, mittando);
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crMesgCorrotto(x);
- mittando->codiceMsg = 4;
-
- inviaMessaggio(handler, mittando);
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crRifiutaClient(x);
- mittando->codiceMsg = 6;
-
- inviaMessaggio(handler, mittando);
- messaggioDestructor(mittando);
-
- }
-
- void testInviaMessaggiAlServer() {
-
- int handler = 1, imax = 1;
- handler = creaFiFoScrittura(SERVERPATH);
-
- messaggio *mittando = messaggioConstructor();
-
- //crInvDatiRisp(x, 200);
- mittando->codiceMsg = 1;
- mittando->valRisposta = 200;
- mittando->codiceMsg = 1;
-
- int i = 0;
- for (i; i < imax; i++) {
- inviaMessaggio(handler, mittando);
- sleep(1);
- }
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
-
- //crRichPartec(x, "/tmp/mioNom");
- mittando->codiceMsg = 2;
- mittando->pathFifo = (char*) malloc(40 * (sizeof (char)));
- sprintf(mittando->pathFifo, "%s", "/tmp/path");
-
- i = 0;
- for (i; i < imax; i++) {
- inviaMessaggio(handler, mittando);
- sleep(1);
- }
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crAccettaClient(x);
- mittando->codiceMsg = 5;
-
- i = 0;
- for (i; i < imax; i++) {
- inviaMessaggio(handler, mittando);
- sleep(1);
- }
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crBroadAggPunti(x, 8, 21);
- mittando->codiceMsg = 9;
- mittando->clientID = 5;
- mittando->clientPunti = 34;
-
- i = 0;
- for (i; i < imax; i++) {
- inviaMessaggio(handler, mittando);
- sleep(1);
- }
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crBroadNuovoGiocatore(x, "Pippo", 8, 7);
-
- mittando->codiceMsg = 8;
- sprintf(mittando->nomeClient, "%s", "pippo");
-
- mittando->clientID = 3;
- mittando->clientPunti = 56;
-
- i = 0;
- for (i; i < imax; i++) {
- inviaMessaggio(handler, mittando);
- sleep(1);
- }
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crInvDomanda(x, 33, 45);
- mittando->codiceMsg = 10;
- mittando->domandaNum1 = 87;
- mittando->domandaNum2 = 45;
-
- i = 0;
- for (i; i < imax; i++) {
- inviaMessaggio(handler, mittando);
- sleep(1);
- }
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crInvLogOut(x);
- mittando->codiceMsg = 3;
-
- i = 0;
- for (i; i < imax; i++) {
- inviaMessaggio(handler, mittando);
- sleep(1);
- }
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crMesgCorrotto(x);
- mittando->codiceMsg = 4;
-
- i = 0;
- for (i; i < imax; i++) {
- inviaMessaggio(handler, mittando);
- sleep(1);
- }
- messaggioDestructor(mittando);
- mittando = messaggioConstructor();
-
- //crRifiutaClient(x);
- mittando->codiceMsg = 6;
-
- i = 0;
- for (i; i < imax; i++) {
- inviaMessaggio(handler, mittando);
- sleep(1);
- }
- messaggioDestructor(mittando);
-
- }
- */
-
 int main(int argc, char** argv) {
+    maxWin = 20;
+    maxClients = 10;
 
-    messaggio2 *msg = messaggio2Constructor();
+    initLogica();
+    SetGUIMode(STANDARD_SERVER);
+    updateScreen();
 
-    msg->clientID = 5;
-    msg->codiceMsg = 2;
-    msg->valRisposta = 546;
-    msg->pathFifo = "/tmp/ciaoNonna";
-    msg->nomeClient = "zap";
-    msg->pidMit = getpid();
+    giocatore *g = giocatoreConstructor();
+    g->punteggio = 5;
+    strcpy(g->name, "ciao");
+    g->handlerFIFO = 7;
+    g->IDGiocatore = 25;
+
+    testStampaGiocatore(g);
+
+    serverAggiungiGiocatore("Stefano", g->handlerFIFO);
+    serverAggiungiGiocatore("Davide", g->handlerFIFO);
+    serverAggiungiGiocatore("Samuel", g->handlerFIFO);
+    serverAggiungiGiocatore("Matteo", g->handlerFIFO);
+    serverAggiungiGiocatore("Alessandro", g->handlerFIFO);
+    serverAggiungiGiocatore("Carlo", g->handlerFIFO);
+
+    updateScreen();
+    sleep(WAIT_TIME);
+    testStampaClassifica("Con due player");
 
 
-    testStampaMessaggio(msg, "Prima del crea");
+    serverAggiornaPunti(3, 1);
+    serverAggiornaPunti(3, 1);
+    serverAggiornaPunti(3, 1);
 
-    creaMessaggio2(msg);
+    updateScreen();
+    sleep(WAIT_TIME);
 
-    testStampaMessaggio(msg, "Dopo il crea");
+    testStampaClassifica("Dopo aumento punti Samuel");
 
-    messaggio2 *rice = messaggio2Constructor();
-    strcpy(rice->msg, msg->msg);
+    serverAggiornaPunti(2, -1);
+    serverAggiornaPunti(2, -1);
+    serverAggiornaPunti(2, -1);
 
-    testStampaMessaggio(rice, "Prima della traduzione");
-    traduciComm2(rice);
+    updateScreen();
+    sleep(WAIT_TIME);
 
-    testStampaMessaggio(rice, "Dopo la traduzione");
+    testStampaClassifica("Dopo toglimento punti ");
+
+    togliGiocatore(6);
+
+    testStampaClassifica("Tolto sam");
+
+    serverAggiungiGiocatore("Luca", g->handlerFIFO);
+
+    testStampaClassifica("Dopo tolto riaggiungo");
+
+
+    //updateScreen();
+    //sleep(WAIT_TIME);
 
     return (0);
 }

@@ -17,10 +17,9 @@ typedef struct domanda {
     int numero2;
 } domanda;
 
-typedef struct giocatore {
+typedef struct giocatoreTag {
     int IDGiocatore;
     int handlerFIFO;
-    int occupato;
     char* name;
     int punteggio;
 } giocatore;

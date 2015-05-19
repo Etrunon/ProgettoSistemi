@@ -19,6 +19,7 @@
 #define MAXNAME 14
 #define MAXANSWER 5
 #define NUM_CLIENT 10
+#define WAIT_TIME 0.1
 
 
 #define LARGHEZZASCHERMO 40
