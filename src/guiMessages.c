@@ -4,6 +4,7 @@
 #include <pthread.h>
 
 #include "guiMessages.h"
+#include "gui.h"
 
 pthread_mutex_t aggiungiMessaggioMutex;
 
@@ -73,6 +74,7 @@ void aggiungiMessaggio(char* msg, bool centrato, char* colore) {
     codaMessaggi.tail = (codaMessaggi.tail + 1) % BUFFERMESSAGGI;
 
     pthread_mutex_unlock(&aggiungiMessaggioMutex);
+    updateScreen();
 };
 
 void svuotaMessaggi() {

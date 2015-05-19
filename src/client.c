@@ -25,9 +25,8 @@ char msgTmp [BUFFMESSAGGIO];
  */
 void cleanupClient(int sig) {
     sprintf(msgTmp, "%s\n", "Client disattivato");
-    aggiungiMessaggio(msgTmp, true, ANSI_COLOR_CYAN);
     SetGUIMode(EXIT_CLIENT);
-    updateScreen();
+    aggiungiMessaggio(msgTmp, true, ANSI_COLOR_CYAN);
     close(ascoltoDalServer);
     unlink(clientFifo);
     exit(EXIT_SUCCESS);
@@ -58,21 +57,21 @@ void * inputUtenteClient(void* arg) {
                 msg->codiceMsg = 1;
                 msg->risposta = d.risposta;
                 inviaMessaggio(scriviAlServer, msg);
-                break;
             }
+                break;
             case LOG_EXIT:
             {
                 if (connesso)
                     SetGUIMode(STANDARD_CLIENT);
                 else
                     SetGUIMode(LOGIN_CLIENT);
-                break;
             }
+                break;
             case HELP:
             {
                 printHelp(false);
-                break;
             }
+                break;
             case NOME:
             {
                 if (!connesso) {
@@ -84,8 +83,8 @@ void * inputUtenteClient(void* arg) {
                     inviaMessaggio(scriviAlServer, m);
                     messaggioDestructor(m);
                 }
-                break;
             }
+                break;
             default:
                 break;
         }
@@ -108,7 +107,6 @@ void ascoltaServer() {
             {
                 sprintf(msgTmp, "%s\n", "Il server non ha posti disponibili!");
                 aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
-                updateScreen();
                 cleanupClient(0);
             }
                 break;
@@ -117,7 +115,6 @@ void ascoltaServer() {
                 SetGUIMode(STANDARD_CLIENT);
                 sprintf(msgTmp, "%s\t%i\n", "Benvenuto,giocatore!", msg->IDOggetto);
                 aggiungiMessaggio(msgTmp, true, ANSI_COLOR_GREEN);
-                updateScreen();
             }
             default: break;
 
@@ -176,7 +173,6 @@ int initClient() {
         SetGUIMode(EXIT_CLIENT);
         sprintf(msgTmp, "%s\n", "Il server non è attivo!");
         aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
-        updateScreen();
         return -1;
     }
 
