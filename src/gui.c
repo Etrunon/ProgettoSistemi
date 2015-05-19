@@ -36,7 +36,7 @@ void print_image(FILE *fptr) {
 
 void header() {
 
-    char *filename = "src/art.txt";
+    char *filename = "/tmp/art.txt";
     FILE *fptr = NULL;
 
     if ((fptr = fopen(filename, "r")) != NULL) {

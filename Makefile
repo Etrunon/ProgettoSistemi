@@ -45,7 +45,8 @@ checkDir:
 $(BUILDNAME): $(OBJ)
 	@#linking finale
 	@gcc -pthread $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$@
-	@-rm $(addprefix $(BUILDIR)/,$(^F))
+	@-cp src/art.txt /tmp/art.txt
+	@#-rm $(addprefix $(BUILDIR)/,$(^F))
 
 
 BUILDTESTLIB: checkDir buildtest
@@ -53,4 +54,4 @@ BUILDTESTLIB: checkDir buildtest
 buildtest: $(OBJTEST)
 	@#linking finale
 	@gcc -pthread $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$(BUILDNAME)
-	@-rm $(addprefix $(BUILDIR)/,$(^F))
+	@#-rm $(addprefix $(BUILDIR)/,$(^F))
