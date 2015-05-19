@@ -23,7 +23,7 @@ void AvvisaSpegnimentoServer() {
     for (i = 0; i < currentClients; i++) {
         int fifo = (giocatoriCorrenti[i])->handlerFIFO;
         messaggio* msg = messaggioConstructor();
-        msg->domandaNum1 = 11;
+        msg->domanda1 = 11;
         inviaMessaggio(fifo, msg);
         messaggioDestructor(msg);
     }
@@ -117,7 +117,7 @@ void aggiungiGiocatore(messaggio * msg) {
         nuovoGiocatore->codiceMsg = 6;
         strcpy(nuovoGiocatore->nomeClient, msg->nomeClient);
         nuovoGiocatore->IDOggetto = IDGiocatore;
-        nuovoGiocatore->clientPunti = getPuntiGiocatore(IDGiocatore);
+        nuovoGiocatore->punti = getPuntiGiocatore(IDGiocatore);
         /*Avviso altri giocatori del nuovo arrivato*/
         avvisaAltriClient(IDGiocatore, nuovoGiocatore);
         messaggioDestructor(nuovoGiocatore);
@@ -132,10 +132,10 @@ void checkRisposta(messaggio * msg) {
     bool vittoria;
     if (risultato == risposta) {
         char name [MAXNAME];
-        getNomeGiocatore(msg->clientID, name);
+        getNomeGiocatore(msg->IDMittente, name);
         sprintf(tmpMessage, "%s%s\n", name, " ha risposto correttamente!");
         aggiungiMessaggio(tmpMessage, false, NULL);
-        vittoria = serverAggiornaPunti(msg->clientID, 1);
+        vittoria = serverAggiornaPunti(msg->IDMittente, 1);
         updateScreen();
         if (vittoria) {
             messaggio* vittoria = messaggioConstructor();
@@ -145,21 +145,21 @@ void checkRisposta(messaggio * msg) {
         messaggio* corretto = messaggioConstructor();
         corretto->codiceMsg = ESITO_RISPOSTA;
         corretto->corretta = true;
-        int fifo = serverFIFOGiocatore(msg->clientID);
+        int fifo = serverFIFOGiocatore(msg->IDMittente);
         inviaMessaggio(fifo, corretto);
         messaggioDestructor(corretto);
         /*TODO CHECK VITTORIA*/
         /*Avviso altri client della risposta*/
         messaggio* risposta = messaggioConstructor();
         risposta->codiceMsg = MODIFICA_PUNTEGGIO_GIOCATORE;
-        risposta->IDOggetto = msg->clientID;
-        risposta->clientPunti = -1;
-        avvisaAltriClient(msg->clientID, risposta);
+        risposta->IDOggetto = msg->IDMittente;
+        risposta->punti = -1;
+        avvisaAltriClient(msg->IDMittente, risposta);
         messaggioDestructor(risposta);
 
     } else /*Risposta errata*/ {
         char name [MAXNAME];
-        getNomeGiocatore(msg->clientID, name);
+        getNomeGiocatore(msg->IDMittente, name);
         sprintf(tmpMessage, "%s%s\n", name, " ha sbagliato risposta!");
         aggiungiMessaggio(tmpMessage, false, NULL);
         updateScreen();
@@ -168,30 +168,30 @@ void checkRisposta(messaggio * msg) {
         messaggio* sbagliato = messaggioConstructor();
         sbagliato->codiceMsg = ESITO_RISPOSTA;
         sbagliato->corretta = false;
-        int fifo = serverFIFOGiocatore(msg->clientID);
+        int fifo = serverFIFOGiocatore(msg->IDMittente);
         inviaMessaggio(fifo, sbagliato);
         messaggioDestructor(sbagliato);
 
         /*Avviso altri client del punto sbagliato*/
         messaggio* risposta = messaggioConstructor();
         risposta->codiceMsg = MODIFICA_PUNTEGGIO_GIOCATORE;
-        risposta->IDOggetto = msg->clientID;
-        risposta->clientPunti = -1;
-        avvisaAltriClient(msg->clientID, risposta);
+        risposta->IDOggetto = msg->IDMittente;
+        risposta->punti = -1;
+        avvisaAltriClient(msg->IDMittente, risposta);
         messaggioDestructor(risposta);
     }
 }
 
 void rimuoviGiocatore(messaggio* msg) {
     char name [MAXNAME];
-    getNomeGiocatore(msg->clientID, name);
+    getNomeGiocatore(msg->IDMittente, name);
     sprintf(tmpMessage, "%s%s\n", name, " si è disconnesso");
     aggiungiMessaggio(tmpMessage, false, NULL);
     updateScreen();
     messaggio* logout = messaggioConstructor();
     logout->codiceMsg = GIOCATORE_USCITO;
-    logout->IDOggetto = msg->clientID;
-    avvisaAltriClient(msg->clientID, logout);
+    logout->IDOggetto = msg->IDMittente;
+    avvisaAltriClient(msg->IDMittente, logout);
     messaggioDestructor(logout);
 }
 

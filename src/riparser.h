@@ -26,19 +26,18 @@ typedef enum tipoMessaggio {
 } tipoMessaggio;
 
 typedef struct messaggioTag {
-    int pidMit;
+    int PIDMittente;
     //int codiceMsg;
     tipoMessaggio codiceMsg;
     char* timestring;
     char* msg;
     char* pathFifo;
     char* nomeClient;
-    int numeroClient;
-    int valRisposta;
-    int clientID;
-    int clientPunti;
-    int domandaNum1;
-    int domandaNum2;
+    int risposta;
+    int IDMittente;
+    int punti;
+    int domanda1;
+    int domanda2;
     bool corretta;
     int IDOggetto;
 

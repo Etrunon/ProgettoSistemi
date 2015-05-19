@@ -56,7 +56,7 @@ void * inputUtenteClient(void* arg) {
             {
                 messaggio* msg = messaggioConstructor();
                 msg->codiceMsg = 1;
-                msg->valRisposta = d.risposta;
+                msg->risposta = d.risposta;
                 inviaMessaggio(scriviAlServer, msg);
                 break;
             }
@@ -77,7 +77,7 @@ void * inputUtenteClient(void* arg) {
             {
                 if (!connesso) {
                     messaggio* m = messaggioConstructor();
-                    m->clientID = -5;
+                    m->IDMittente = -5;
                     m->codiceMsg = RICHIESTA_PARTECIPAZIONE;
                     sprintf(m->pathFifo, "%s", clientFifo);
                     sprintf(m->nomeClient, "%s", d.nome);
