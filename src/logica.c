@@ -254,13 +254,24 @@ int serverFIFOGiocatore(int ID) {
 
 /*FUNZIONI DA USARE LATO CLIENT*/
 
-/*Aggiorna +1 o -1 punti al giocatore indicato in ID*/
+/**
+ * Funzione che TODO
+ * @param ID del giocatore bersaglio
+ * @param punti da modificare
+ */
 void clientAggiornaPunti(int ID, int punti) {
 
     int i = cercaGiocatore(ID);
     giocatoriCorrenti[i]->punteggio = punti;
 }
 
+/**
+ * Funzione che aggiunge il giocatore specificato alla lista di quelli presenti nella partita insieme al client
+ * Vengono settati il nome, l'ID e i punti (non come delta ma come set bruto)
+ * @param nome
+ * @param ID
+ * @param punteggio
+ */
 void clientAggiungiGiocatore(char* nome, int ID, int punteggio) {
 
     //Creo un giocatore e lo riempio coi dati in input
@@ -277,27 +288,45 @@ void clientAggiungiGiocatore(char* nome, int ID, int punteggio) {
 
 }
 
-/*METODI COMUNI*/
-bool togliGiocatore(int ID) {
+/*METODI COMUNI AL SERVER E AL CLIENT*/
 
+/**
+ * Metodo che toglie il giocatore specificato dalla lista di quelli presenti a seguito per esempio di un
+ * logout. Riordina la lista di giocatori presenti.
+ * @param ID
+ */
+void togliGiocatore(int ID) {
+
+    //Prendo l'indice nell'array del giocatore
     int i = cercaGiocatore(ID);
+    //Gli setto il punteggio a -1 per farlo scalare nell'ultima posizione
     giocatoriCorrenti[i]->punteggio = -1;
+    //Applico l'ordinamento
     swap(i);
-
+    //Decremento i client collegati
     currentClients--;
-
+    //Tolgo il giocatore dall'array e lo distruggo col metodo apposito
     giocatore *p = giocatoriCorrenti[currentClients];
     giocatoriCorrenti[currentClients] = NULL;
     giocatoreDestructor(p);
-
 }
 
+/**
+ * Getter del nome del giocatore. Riempie una stringa sufficientemente lunga passata per puntatore.
+ * @param ID
+ * @param riempi
+ */
 void getNomeGiocatore(int ID, char* riempi) {
 
     int i = cercaGiocatore(ID);
     strcpy(riempi, giocatoriCorrenti[i]->name);
 }
 
+/**
+ * Getter dei punti del giocatore con ID. 
+ * @param ID
+ * @return punti 
+ */
 int getPuntiGiocatore(int ID) {
 
     int i = cercaGiocatore(ID);

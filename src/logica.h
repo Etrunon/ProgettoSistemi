@@ -24,46 +24,106 @@ typedef struct giocatoreTag {
     int punteggio;
 } giocatore;
 
+//Costante col limite massimo di giocatori
 extern int maxClients;
+//Costante col limite massimo di punti alla vittoria
 extern int maxWin;
+//Variabile con il numero di client presenti al momento nel gioco
 extern int currentClients;
+//Inizializzazione della domanda in corso
 extern domanda domandaCorrente;
+//Inizializzazione a null dell'array dei giocatori correnti
 extern giocatore* giocatoriCorrenti[10];
+//Variabile contenente il prossimo ID da assegnare a un client
+int prossimoID;
 
 /*INIZIALIZZAZIONE*/
+/**
+ * Funzione che inizializza la parte logica del SERVER
+ */
 void initLogica();
 
 /*SERVER*/
-/*Modifica la domanda attuale*/
+
+/**
+ * Funzione che cambia la domanda corrente con una nuova
+ */
 void serverCambiaDomanda();
 
+/**
+ * Funzione che riempie gli array passati per parametro con i punteggi dei giocatori presenti.
+ * Assume che la classifica sia già correttamente ordinata.
+ * @param IDclients array con gli id 
+ * @param punteggi  array con i punti
+ */
 void serverGeneraClassifica(int* IDclients, int* punteggi);
 
-/*Aggiunge un giocatore, ritorna il suo ID
+/**
+ * Aggiunge un giocatore, ritorna il suo ID
  * Se non c'è spazio, ritorna -1
+ * @param nome stringa col nome del client da aggiungere
+ * @param handlerFIFO handler del nuovo giocatore
+ * @return ID del client aggiunto
  */
 int serverAggiungiGiocatore(char* nome, int handlerFIFO);
 
-/* aggiunge +1 o -1 punto
- * torna true se il giocatore ha vinto*/
+/**
+ * Funzione che aggiunge o toglie UN punto solo. Lancia automaticamente un ordinamento della classifica
+ * Ritorna true se il giocatore in questione ha vinto
+ * @param ID
+ * @param punti
+ * @return 
+ */
 bool serverAggiornaPunti(int ID, int punti);
 
-/*Ritorna handler del giocatore*/
+/**
+ * Funzione che dato un ID ritorna l'handler della sua FIFO
+ * @param ID bersaglio
+ * @return handler della FIFO
+ */
 int serverFIFOGiocatore(int ID);
 
 /*LATO CLIENT*/
-/*Aggiorna +1 o -1 punti al giocatore indicato in ID*/
+
+/**
+ * Funzione che TODO
+ * @param ID del giocatore bersaglio
+ * @param punti da modificare
+ */
 void clientAggiornaPunti(int ID, int punti);
 
+/**
+ * Funzione che aggiunge il giocatore specificato alla lista di quelli presenti nella partita insieme al client
+ * Vengono settati il nome, l'ID e i punti (non come delta ma come set bruto)
+ * @param nome
+ * @param ID
+ * @param punteggio
+ */
 void clientAggiungiGiocatore(char* nome, int ID, int punteggio);
 
 
 
 /*METODI COMUNI*/
-bool togliGiocatore(int ID);
 
+/**
+ * Metodo che toglie il giocatore specificato dalla lista di quelli presenti a seguito per esempio di un
+ * logout. Riordina la lista di giocatori presenti.
+ * @param ID
+ */
+void togliGiocatore(int ID);
+
+/**
+ * Getter del nome del giocatore. Riempie una stringa sufficientemente lunga passata per puntatore.
+ * @param ID
+ * @param riempi
+ */
 void getNomeGiocatore(int ID, char* riempi);
 
+/**
+ * Getter dei punti del giocatore con ID. 
+ * @param ID
+ * @return punti 
+ */
 int getPuntiGiocatore(int ID);
 #endif	/* LOGICA_H */
 
