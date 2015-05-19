@@ -5,13 +5,25 @@
 
 #include "logica.h"
 
+//Costante col limite massimo di giocatori
 int maxClients;
+//Costante col limite massimo di punti alla vittoria
 int maxWin;
+//Variabile con il numero di client presenti al momento nel gioco
 int currentClients = 0;
+//Inizializzazione della domanda in corso
 domanda domandaCorrente = {};
+//Inizializzazione a null dell'array dei giocatori correnti
 giocatore* giocatoriCorrenti[10] = {};
+//Variabile contenente il prossimo ID da assegnare a un client
 int prossimoID = 1;
 
+/**
+ * Funzione costruttore che restituisce un puntatore a struct allocato dinamicamente e con tutti i
+ * campi allocati vuoti e pronti da usare.
+ * Ricordarsi di distruggere il giocatore finita la sua responsabilità
+ * @return 
+ */
 giocatore* giocatoreConstructor() {
 
     giocatore *g = (giocatore*) malloc(1 * (sizeof (giocatore)));
@@ -19,12 +31,22 @@ giocatore* giocatoreConstructor() {
     return g;
 }
 
+/**
+ * Funzione che distrugge un giocatore, passato per puntatore parametro, deallocando tutti i campi
+ * dinamici. 
+ * @param g
+ */
 void giocatoreDestructor(giocatore *g) {
     free(g->name);
     free(g);
 }
 
-char* testStampaGiocatore(giocatore *g) {
+/**
+ * Funzione di DEBUG che permette di stampare un giocatore con una formattazione leggibile e 
+ * mettendo in risalto i campi interni.
+ * @param g puntatore al giocatore da stampare
+ */
+void* testStampaGiocatore(giocatore *g) {
 
 
     printf("Ecco il giocatore %s\n", g->name);
@@ -32,6 +54,11 @@ char* testStampaGiocatore(giocatore *g) {
     printf("\n");
 }
 
+/**
+ * Funzione di DEBUG che stampa l'intera classifica dei giocatori presenti, stampando bene ogni
+ * giocatore con la funzione testStampaGiocatore()
+ * @param str
+ */
 void testStampaClassifica(char* str) {
 
     printf("%s\n", str);
@@ -45,11 +72,17 @@ void testStampaClassifica(char* str) {
     printf("\tFine classifica\n\n");
 }
 
+/**
+ * Funzione che cambia la domanda corrente con una nuova
+ */
 void serverCambiaDomanda() {
     domandaCorrente.numero1 = rand() % 99;
     domandaCorrente.numero2 = rand() % 99;
 }
 
+/**
+ * Funzione che inizializza la parte logica del SERVER
+ */
 void initLogica() {
 
     srand(time(NULL));
@@ -57,51 +90,73 @@ void initLogica() {
 }
 
 /**
- * Funzione che swappa i giocatori nel caso in cui i punteggi siano maggiori l'uno dell'altro.
- * @param indicePartenza
+ * Funzione che si assicura che la classifica sia ordinata per punteggio. Controlla se i punteggi
+ * sono disordinati sia a destra che a sinistra (non va in loop per assunzioni sulla composizione 
+ * della classifica e sulla sua gestione). Dato un index di partenza (possibile punto di sbilanciamento)
+ * vengono controllati i suoi vicini fino a quando 
+ *  -Non viene fatta nessuna modifica
+ *  -Si arriva a uno dei due limite degli array
+ * @param indicePartenza indice del punto di sbilanciamento
  * @return 
  */
 void swap(int index) {
 
+    //puntatore di servizio
     giocatore *tmp;
+    //variabile di uscita dal ciclo
     bool mosso;
 
+    //Se c'è un client solo sarà sempre ordinato
     if (currentClients == 1)
         return;
 
+    // In caso di più client comincia a controllare
     do {
 
+        //inizializzata a falso per uscire subito nel caso di situazione bilanciata
         mosso = false;
-        //Blocco che checka gli estremi e swappa nel caso.
 
+        //Se il giocatore index e il suo vicino di destra esiste
         if (giocatoriCorrenti[index] != NULL && giocatoriCorrenti[index + 1] != NULL) {
+
+            //E se i punti di index sono minori dei punti del vicino di destra e NON sono sul limite destro dell'array 
             if (giocatoriCorrenti[index]->punteggio < giocatoriCorrenti[index + 1]->punteggio && index < currentClients) {
+
+                //Allora swappo i due giocatori usando anche tmp
                 tmp = giocatoriCorrenti[index];
                 giocatoriCorrenti[index] = giocatoriCorrenti[index + 1];
                 giocatoriCorrenti[index + 1] = tmp;
+                //Ho applicato una modifica quindi devo ricontrollare
                 mosso = true;
+                //Aggiorno l'index per tenere controllato il punto di sbilanciamento
                 index++;
             }
         }
 
+        //Se il giocatore index e il suo vicino di sinistra esiste
         if (giocatoriCorrenti[index] != NULL && giocatoriCorrenti[index - 1] != NULL) {
+            //E se i punti di index sono maggiori dei punti del vicino di sinistra e NON sono sul limite sinistro dell'array 
             if (index != 0 && giocatoriCorrenti[index - 1]->punteggio < giocatoriCorrenti[index]->punteggio) {
+
+                //Allora swappo i due giocatori usando anche tmp
                 tmp = giocatoriCorrenti[index];
                 giocatoriCorrenti[index] = giocatoriCorrenti[index - 1];
                 giocatoriCorrenti[index - 1] = tmp;
+                //Ho applicato una modifica quindi devo ricontrollare
                 mosso = true;
+                //Aggiorno l'index per tenere controllato il punto di sbilanciamento
                 index--;
             }
         }
-
+        //Controllo se ho applicato modifiche, potrei ancora essere sbilanciato    
     } while (mosso == true);
 }
 
 /**
  * Funzione che riempie gli array passati per parametro con i punteggi dei giocatori presenti.
  * Assume che la classifica sia già correttamente ordinata.
- * @param IDclients
- * @param punteggi
+ * @param IDclients array con gli id 
+ * @param punteggi  array con i punti
  */
 void serverGeneraClassifica(int* IDclients, int* punteggi) {
 
@@ -114,8 +169,12 @@ void serverGeneraClassifica(int* IDclients, int* punteggi) {
     }
 }
 
-/*Aggiunge un giocatore, ritorna il suo ID
+/**
+ * Aggiunge un giocatore, ritorna il suo ID
  * Se non c'è spazio, ritorna -1
+ * @param nome stringa col nome del client da aggiungere
+ * @param handlerFIFO handler del nuovo giocatore
+ * @return ID del client aggiunto
  */
 int serverAggiungiGiocatore(char* nome, int handlerFIFO) {
 
@@ -139,9 +198,9 @@ int serverAggiungiGiocatore(char* nome, int handlerFIFO) {
 
 /**
  * Funzione che dato un ID di un giocatore lo cerca dentro la struttura dati.
- * Ritorna -1 se non lo trova
+ * Ritorna -1 se non lo trova, altrimenti il suo indice all'interno dell'array
  * @param ID
- * @return 
+ * @return  indice nell'array
  */
 int cercaGiocatore(int ID) {
 
@@ -165,28 +224,35 @@ bool serverAggiornaPunti(int ID, int punti) {
 
     int index = cercaGiocatore(ID);
 
+    //Se il giocatore va sotto zero, lo riporto a zero
     if (giocatoriCorrenti[index]->punteggio + punti <= -1) {
         giocatoriCorrenti[index]->punteggio = 0;
-
     } else
+        //Il giocatore non è andato sotto quindi...
         giocatoriCorrenti[index]->punteggio += punti;
 
+    //Controllo se devo riordinare la classifica
     swap(index);
 
+    //Se il giocatore ha vinto allora ritorno true, altrimenti false
     if (giocatoriCorrenti[index]->punteggio >= maxWin)
         return true;
     else
         return true;
 }
 
-/*Ritorna handler del giocatore*/
+/**
+ * Funzione che dato un ID ritorna l'handler della sua FIFO
+ * @param ID bersaglio
+ * @return handler della FIFO
+ */
 int serverFIFOGiocatore(int ID) {
 
     int i = cercaGiocatore(ID);
     return giocatoriCorrenti[i]->handlerFIFO;
 }
 
-/*LATO CLIENT*/
+/*FUNZIONI DA USARE LATO CLIENT*/
 
 /*Aggiorna +1 o -1 punti al giocatore indicato in ID*/
 void clientAggiornaPunti(int ID, int punti) {
