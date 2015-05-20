@@ -27,7 +27,6 @@ typedef enum tipoMessaggio {
 
 typedef struct messaggioTag {
     int PIDMittente;
-    //int codiceMsg;
     tipoMessaggio codiceMsg;
     char* timestring;
     char* msg;
@@ -40,10 +39,11 @@ typedef struct messaggioTag {
     int domanda2;
     bool corretta;
     int IDOggetto;
+    int maxWin;
 
 } messaggio;
 
-messaggio* messaggioConstructor();
+messaggio* messaggioConstructor(int IDMittente, tipoMessaggio tipoMsg);
 
 void messaggioDestructor(messaggio *x);
 

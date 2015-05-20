@@ -229,29 +229,5 @@ void handler(int signo) {
 
 int main(int argc, char** argv) {
 
-    messaggio2 *msg = messaggio2Constructor();
-
-    msg->clientID = 5;
-    msg->codiceMsg = 2;
-    msg->valRisposta = 546;
-    msg->pathFifo = "/tmp/ciaoNonna";
-    msg->nomeClient = "zap";
-    msg->pidMit = getpid();
-
-
-    testStampaMessaggio(msg, "Prima del crea");
-
-    creaMessaggio2(msg);
-
-    testStampaMessaggio(msg, "Dopo il crea");
-
-    messaggio2 *rice = messaggio2Constructor();
-    strcpy(rice->msg, msg->msg);
-
-    testStampaMessaggio(rice, "Prima della traduzione");
-    traduciComm2(rice);
-
-    testStampaMessaggio(rice, "Dopo la traduzione");
-
     return (0);
 }
