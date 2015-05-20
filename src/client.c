@@ -136,28 +136,70 @@ void ascoltaServer() {
                 connesso = true;
                 SetGUIMode(STANDARD_CLIENT);
                 clientID = msg->IDOggetto;
+                maxWin = msg->maxWin;
+                clientAggiungiGiocatore(name, clientID, msg->punti);
                 sprintf(msgTmp, "%s%s%s\n", "Benvenuto nel gioco, ", name, "!");
                 aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
             }
                 break;
             case NUOVO_GIOCATORE_ENTRATO:
             {
-                if (msg->IDOggetto != clientID) {
-                    sprintf(msgTmp, "%s%s\n", msg->nomeClient, "si è unito al gioco");
-                    aggiungiMessaggio(msgTmp, false, NULL);
-                    clientAggiungiGiocatore(name, msg->IDOggetto, msg->punti);
-                } else
-                    clientAggiungiGiocatore(name, msg->IDOggetto, msg->punti);
+                clientAggiungiGiocatore(name, msg->IDOggetto, msg->punti);
+                sprintf(msgTmp, "%s%s\n", msg->nomeClient, " si è unito al gioco");
+                aggiungiMessaggio(msgTmp, false, NULL);
+
+            }
+                break;
+            case GIOCATORE_USCITO:
+            {
+                togliGiocatore(msg->IDOggetto);
+                sprintf(msgTmp, "%s%s\n", msg->nomeClient, " è uscito dal gioco");
+                aggiungiMessaggio(msgTmp, false, NULL);
             }
                 break;
             case ESITO_RISPOSTA:
             {
+                clientAggiornaPunti(clientID, msg->punti);
                 if (msg->corretta) {
                     sprintf(msgTmp, "%s\n", "Risposta corretta!");
                 } else {
                     sprintf(msgTmp, "%s\n", "Risposta sbagliata!");
                 }
                 aggiungiMessaggio(msgTmp, false, NULL);
+            }
+                break;
+            case MODIFICA_PUNTEGGIO_GIOCATORE:
+            {
+                clientAggiornaPunti(msg->IDOggetto, msg->punti);
+                if (msg->corretta) {
+                    char tmp [MAXNAME];
+                    getNomeGiocatore(msg->IDOggetto, tmp);
+                    sprintf(msgTmp, "%s%s\n", tmp, " ha risposto correttamente!");
+                    aggiungiMessaggio(msgTmp, false, NULL);
+                }
+                updateScreen();
+            }
+                break;
+            case INVIA_DOMANDA:
+            {
+                domandaCorrente.numero1 = msg->domanda1;
+                domandaCorrente.numero2 = msg->domanda2;
+                sprintf(msgTmp, "%s\n", "Domanda modificata");
+                aggiungiMessaggio(msgTmp, false, NULL);
+            }
+                break;
+            case VITTORIA:
+            {
+                if (msg->IDOggetto == clientID) {
+                    sprintf(msgTmp, "%s\n", " Hai vinto!");
+                    aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
+                } else {
+                    char tmp [MAXNAME];
+                    getNomeGiocatore(msg->IDOggetto, tmp);
+                    sprintf(msgTmp, "%s%s\n", tmp, " ha vinto!");
+                    aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
+                }
+                cleanupClient(0);
             }
                 break;
             case SERVER_SPEGNIMENTO:

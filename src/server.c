@@ -15,7 +15,7 @@
 #include "guiMessages.h"
 
 int ascoltoDaiClient;
-
+int IDServer = 0;
 char tmpMessage [BUFFMESSAGGIO];
 
 void broadcast(messaggio* msg) {
@@ -153,6 +153,8 @@ void aggiungiGiocatore(messaggio * msg) {
         messaggio* accettato = messaggioConstructor();
         accettato->codiceMsg = ACCETTA_CLIENT;
         accettato->IDOggetto = IDGiocatore;
+        accettato->punti = getPuntiGiocatore(IDGiocatore);
+        accettato->maxWin = maxWin;
         inviaMessaggio(handlerFIFO, accettato);
         messaggioDestructor(accettato);
 
@@ -162,7 +164,7 @@ void aggiungiGiocatore(messaggio * msg) {
         strcpy(nuovoGiocatore->nomeClient, msg->nomeClient);
         nuovoGiocatore->IDOggetto = IDGiocatore;
         nuovoGiocatore->punti = getPuntiGiocatore(IDGiocatore);
-        broadcast(nuovoGiocatore);
+        avvisaAltriClient(IDGiocatore, nuovoGiocatore);
         messaggioDestructor(nuovoGiocatore);
 
         /*Avviso nuovo giocatore della partita corrente*/
