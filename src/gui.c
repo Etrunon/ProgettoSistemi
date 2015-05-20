@@ -10,13 +10,20 @@
 #include <wchar.h>
 #include <unistd.h>
 
+GUIMode modalitaGUI;
+
 void clearScreen() {
-    int i;
-    for (i = 0; i < 50; i++) {
-        printf("\n");
-    }
+    /*
+        int i;
+        for (i = 0; i < 50; i++) {
+            printf("\n");
+        }
+     */
+    printf("%c[2J\n", 27);
+    //printf("ciao\n");
 }
 
+/*Stampa la linea di separazione nell'interfaccia grafica*/
 void HorizontalLine() {
     int i;
     char line [LARGHEZZASCHERMO * 7] = {};
@@ -27,30 +34,24 @@ void HorizontalLine() {
     printf("%*s\n", LARGHEZZASCHERMO + (int) strlen(line) / 2, line);
 }
 
-void print_image(FILE *fptr) {
-    char read_string[128];
-    while (fgets(read_string, sizeof (read_string), fptr) != NULL)
-        printf("%s", read_string);
-    printf("\n");
-}
-
+/*Stampa il logo del gioco*/
 void header() {
 
     char *filename = "/tmp/art.txt";
     FILE *fptr = NULL;
 
     if ((fptr = fopen(filename, "r")) != NULL) {
-        //fprintf(stderr, "error opening %s\n", filename);
-        print_image(fptr);
+        /*Se riesce ad aprire il file con il logo*/
+        char read_string[128];
+        while (fgets(read_string, sizeof (read_string), fptr) != NULL)
+            printf("%s", read_string);
+        printf("\n");
         fclose(fptr);
+        HorizontalLine();
     }
-    //char title [200] = ANSI_COLOR_BLUE "MULTIPLAYER GAME" ANSI_COLOR_RESET;
-    //printf("%*s%*s\n", LARGHEZZASCHERMO + (int) strlen(title) / 2, title, LARGHEZZASCHERMO - (int) strlen(title) / 2, "");
-    //strcpy(title, ANSI_COLOR_BLUE "GuessTheNumber GAME!" ANSI_COLOR_RESET);
-    //printf("%*s%*s\n", LARGHEZZASCHERMO + (int) strlen(title) / 2, title, LARGHEZZASCHERMO - (int) strlen(title) / 2, "");
-    HorizontalLine();
 }
 
+/*Calcola l'altezza della colonna dei punti da stampare*/
 int puntoNormalizzato(int punto) {
     /*
         if (punto == 1)
@@ -60,7 +61,12 @@ int puntoNormalizzato(int punto) {
     return punteggio;
 }
 
-void punteggiGiocatori() {
+/*Stampa la classifica dei giocatori*/
+void players() {
+    if (currentClients == 0) {
+        /*Non ho giocatori, non stampo classifica*/
+        return;
+    }
     int ultimoPuntoStampato = ALTEZZAPUNTI;
     int i;
     char format [5];
@@ -70,8 +76,11 @@ void punteggiGiocatori() {
     if (currentClients < 3)
         larghezzaAutomatica = 25;
 
+    /*Calcola dinamicamente lo spazio per centrare la classifica in base al numero di giocatori*/
     sprintf(format, "%c%i%c", '%', larghezzaAutomatica - currentClients, 's');
+
     for (ultimoPuntoStampato; ultimoPuntoStampato > 0; ultimoPuntoStampato--) {
+        /*Cicla stampando dal punteggio più alto al più basso*/
         printf(ANSI_COLOR_BLUE);
         if (ultimoPuntoStampato > ALTEZZAPUNTI / 4)
             printf(ANSI_COLOR_GREEN);
@@ -80,6 +89,7 @@ void punteggiGiocatori() {
         if (ultimoPuntoStampato > (ALTEZZAPUNTI / 4) * 3)
             printf(ANSI_COLOR_RED);
         for (i = 0; i < currentClients; i++) {
+            /*Controlla se il punteggio di ogni giocatore è tale che deve essere stampato nella riga attuale*/
             int puntoNorm = puntoNormalizzato(giocatoriCorrenti[i]->punteggio);
             if (ultimoPuntoStampato <= puntoNorm) {
                 printf(format, "#");
@@ -89,6 +99,7 @@ void punteggiGiocatori() {
         printf("\n");
     }
 
+    /*Stampa l'ID del giocatore*/
     sprintf(format, "%c%i%c", '%', larghezzaAutomatica - currentClients, 'i');
     for (i = 0; i < currentClients; i++) {
         printf(format, getPuntiGiocatore(giocatoriCorrenti[i]->IDGiocatore));
@@ -106,15 +117,10 @@ void punteggiGiocatori() {
         printf(format, tmp);
     }
     printf("\n");
+    HorizontalLine();
 }
 
-void players() {
-    if (currentClients > 0) {
-        punteggiGiocatori();
-        HorizontalLine();
-    }
-}
-
+/*Stampa la domanda*/
 void printDomanda() {
     char line [200];
     sprintf(line, "%s%s%i%s%s%s%i%s%s", "Quanto fa ",
@@ -125,11 +131,14 @@ void printDomanda() {
     printf("%*s\n", LARGHEZZASCHERMO + (int) strlen(line) / 2 + 5, line);
 }
 
+/*Stampa la lista dei messaggi più recenti,
+ * tanti quanti il paramentro number*/
 void messagges(int number) {
     stampaMessaggi(number);
     HorizontalLine();
 }
 
+/*Informazioni di gioco mostrate sul server*/
 void infoServer() {
 
     /*Messaggio di benvenuto*/
@@ -190,6 +199,7 @@ void updateScreen() {
     fflush(stdout);
 }
 
+/*Wrapper per settare la modalità di visualizzazione della GUI*/
 void SetGUIMode(GUIMode mode) {
     modalitaGUI = mode;
 }

@@ -11,6 +11,7 @@
 #include "guiMessages.h"
 #include <signal.h>
 #include <string.h>
+#include <pthread.h>
 
 int ascoltoDalServer;
 int scriviAlServer;

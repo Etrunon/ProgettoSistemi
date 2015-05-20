@@ -1,16 +1,18 @@
 #include "CONST.h"
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <strings.h>
 #include "commands.h"
 #include "logica.h"
 #include "guiMessages.h"
 #include "gui.h"
 
-/*Cerca di analizzare l'input
- * L'utente può aver inserito o un numero come risposta
- * Oppure il suo nome, per presentarsi al server
+/*Cerca di analizzare l'input come risposta numerico o stringa
+ * L'utente può aver inserito un numero come risposta
+ * L'utente può aver inserito il suo nome per loggarsi al server
  */
 comando analizzaInput(data* output, char* input) {
     char* carattereErrore = NULL;
@@ -37,23 +39,27 @@ comando leggiInput(bool server, data* inputUtente) {
     char* commands = NULL;
     size_t size;
     char command [MAXCOMMAND];
+    char msgAschermo [BUFFMESSAGGIO];
 
-    /*Leggo l'intera linea*/
+    /*Leggo l'intera linea da terminale*/
     fflush(stdin);
     int read = getline(&commands, &size, stdin);
 
+    /*Chiudo la stringa letta da terminale con \0*/
     commands[read - 1] = '\0';
-    /*Considero solo il primo comando inviato nell'intera linea*/
+
+    /*Conrollo che non abbia stringhe troppo lunghe in input*/
     if (strlen(commands) > MAXCOMMAND) {
-        char msg [BUFFMESSAGGIO];
-        sprintf(msg, "%s\n", "Input non valido");
-        aggiungiMessaggio(msg, true, ANSI_COLOR_RED);
+        sprintf(msgAschermo, "%s\n", "Input non valido");
+        aggiungiMessaggio(msgAschermo, true, ANSI_COLOR_RED);
         return ERRORE;
     }
+
+    /*Considero solo la prima parola inviata nell'intera linea*/
     sscanf(commands, "%s", command);
     free(commands);
 
-    /*Conrollo che non abbia stringhe troppo lunghe in input*/
+    /*Controllo se l'input è un comando da eseguire*/
 
     if ((strcasecmp(command, "exit")) == 0) {
         return CHIUSURA;
@@ -71,13 +77,15 @@ comando leggiInput(bool server, data* inputUtente) {
     if ((strcasecmp(command, "q")) == 0) {
         return LOG_EXIT;
     }
-    /*Se sono interessato ad input numerici o testuali, chiamo la funzione apposita*/
+
+    /*Se sono interessato ad input numerici o testuali, chiamo la funzione per decodificarli*/
     if (inputUtente != NULL)
         return analizzaInput(inputUtente, command);
     else
         return ERRORE;
 }
 
+/*Stampa il messaggio di help, diverso tra client e server*/
 void printHelp(bool server) {
     char msg [BUFFMESSAGGIO];
     sprintf(msg, "%s\n", "Comandi disponibili");

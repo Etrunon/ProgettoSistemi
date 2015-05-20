@@ -32,7 +32,7 @@ typedef struct data {
 /** Interpreta l'input dell'utente, spiegando i comandi possibili
  * e gestendo i casi di input errato
  * @param server
- * Se sto leggendo input dal server o dal client
+ * Se sto leggendo input dal server o dal client, per interpretarli correttamente
  * @param inputUtente
  * Mettere NULL se non si è interessati alla risposta alla domanda
  * o al nome dell'utente
