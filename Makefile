@@ -15,7 +15,7 @@ SRCDIR = src
 #nome e posizione dell'eseguibile
 BUILDNAME = main
 BUILDIR = bin
-CFLAGS = -c -g -DDEBUGFIFO #-std=c99
+CFLAGS = -c -g #-DDEBUGFIFO #-std=c99
 
 all:
 	@printf "%s\n" "Target Make disponibili:"

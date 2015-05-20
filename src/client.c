@@ -15,10 +15,20 @@
 int ascoltoDalServer;
 int scriviAlServer;
 char clientFifo [MAX_FIFONAME];
+
 int clientID;
+char name[MAXNAME];
+
 bool connesso = false;
 
 char msgTmp [BUFFMESSAGGIO];
+
+void avvisaServer() {
+    messaggio* logout = messaggioConstructor();
+    logout->codiceMsg = LOGOUT_AL_SERVER;
+    inviaMessaggio(scriviAlServer, logout);
+    messaggioDestructor(logout);
+}
 
 /*Chiude la FIFO ed eventuali altre risorse
  * rimaste aperte
@@ -27,6 +37,12 @@ void cleanupClient(int sig) {
     sprintf(msgTmp, "%s\n", "Client disattivato");
     SetGUIMode(EXIT_CLIENT);
     aggiungiMessaggio(msgTmp, true, ANSI_COLOR_CYAN);
+
+    if (connesso) {
+        /*Avviso che me ne sto andando*/
+        avvisaServer();
+    }
+
     close(ascoltoDalServer);
     unlink(clientFifo);
     exit(EXIT_SUCCESS);
@@ -53,10 +69,14 @@ void * inputUtenteClient(void* arg) {
         switch (c) {
             case RISPOSTA:
             {
-                messaggio* msg = messaggioConstructor();
-                msg->codiceMsg = 1;
-                msg->risposta = d.risposta;
-                inviaMessaggio(scriviAlServer, msg);
+                if (connesso) {
+                    messaggio* msg = messaggioConstructor();
+                    msg->codiceMsg = INVIA_RISPOSTA;
+                    msg->risposta = d.risposta;
+                    inviaMessaggio(scriviAlServer, msg);
+
+                    messaggioDestructor(msg);
+                }
             }
                 break;
             case LOG_EXIT:
@@ -75,8 +95,9 @@ void * inputUtenteClient(void* arg) {
             case NOME:
             {
                 if (!connesso) {
+                    strcpy(name, d.nome);
+
                     messaggio* m = messaggioConstructor();
-                    m->IDMittente = -5;
                     m->codiceMsg = RICHIESTA_PARTECIPAZIONE;
                     sprintf(m->pathFifo, "%s", clientFifo);
                     sprintf(m->nomeClient, "%s", d.nome);
@@ -112,39 +133,46 @@ void ascoltaServer() {
                 break;
             case ACCETTA_CLIENT:
             {
+                connesso = true;
                 SetGUIMode(STANDARD_CLIENT);
-                sprintf(msgTmp, "%s\t%i\n", "Benvenuto,giocatore!", msg->IDOggetto);
-                aggiungiMessaggio(msgTmp, true, ANSI_COLOR_GREEN);
+                clientID = msg->IDOggetto;
+                sprintf(msgTmp, "%s%s%s\n", "Benvenuto nel gioco, ", name, "!");
+                aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
             }
+                break;
+            case NUOVO_GIOCATORE_ENTRATO:
+            {
+                if (msg->IDOggetto != clientID) {
+                    sprintf(msgTmp, "%s%s\n", msg->nomeClient, "si è unito al gioco");
+                    aggiungiMessaggio(msgTmp, false, NULL);
+                    clientAggiungiGiocatore(name, msg->IDOggetto, msg->punti);
+                } else
+                    clientAggiungiGiocatore(name, msg->IDOggetto, msg->punti);
+            }
+                break;
+            case ESITO_RISPOSTA:
+            {
+                if (msg->corretta) {
+                    sprintf(msgTmp, "%s\n", "Risposta corretta!");
+                } else {
+                    sprintf(msgTmp, "%s\n", "Risposta sbagliata!");
+                }
+                aggiungiMessaggio(msgTmp, false, NULL);
+            }
+                break;
+            case SERVER_SPEGNIMENTO:
+            {
+                sprintf(msgTmp, "%s\n", "Il server si è disconnesso!");
+                aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
+                cleanupClient(0);
+            }
+                break;
             default: break;
 
         }
 
         messaggioDestructor(msg);
     }
-}
-
-bool richiestaPartecipazione() {
-    comando c;
-    data d;
-
-    //printf("%40s\n", ANSI_COLOR_BLUE "Client avviato" ANSI_COLOR_RESET);
-    do {
-        printf("\r%s", "Inserisci il nome:");
-        c = leggiInput(false, &d);
-
-    } while (c != NOME);
-
-    messaggio* m = messaggioConstructor();
-
-    m->codiceMsg = 2;
-    sprintf(m->pathFifo, "%s%c", clientFifo, '\0');
-    sprintf(m->nomeClient, "%s", d.nome);
-
-    inviaMessaggio(scriviAlServer, m);
-    messaggioDestructor(m);
-    return true;
-
 }
 
 int initClient() {
