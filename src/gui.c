@@ -218,6 +218,8 @@ void updateScreen() {
             break;
         case TESTING_CLIENT:
         {
+
+        }
             break;
         case EXIT_CLIENT:
         {
@@ -242,7 +244,7 @@ void updateScreen() {
             clearScreen();
             messagges(BUFFERMESSAGGI);
         }
-            break;    
+            break;
         case EXIT_SERVER:
         {
             clearScreen();
