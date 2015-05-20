@@ -64,16 +64,16 @@ void * inputUtenteClient(void* arg) {
     data d;
 
     do {
-        c = leggiInput(true, &d);
+        c = leggiInput(&d);
 
         switch (c) {
             case RISPOSTA:
             {
+                //Se l'input è una risposta E sono connesso a una partita, allora cerco di inviarla
                 if (connesso) {
                     messaggio* msg = messaggioConstructor(clientID, INVIA_RISPOSTA);
                     msg->risposta = d.risposta;
                     inviaMessaggio(scriviAlServer, msg);
-
                     messaggioDestructor(msg);
                 }
             }
@@ -119,11 +119,16 @@ void * inputUtenteClient(void* arg) {
 /*Rimane in attesa di messaggi dal server*/
 void ascoltaServer() {
     while (1) {
+
+        //Creo il messaggio vuoto da riempire con l'ascolto
         messaggio* msg = messaggioConstructor(0, 0);
         leggiMessaggio(ascoltoDalServer, msg);
+
+        //A seconda del codice del msg eseguo l'azione correlata
         switch (msg->codiceMsg) {
             case RIFIUTA_CLIENT:
             {
+                //Il server ha rifiutato il login
                 sprintf(msgTmp, "%s\n", "Il server non ha posti disponibili!");
                 aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
                 cleanupClient(0);
@@ -131,17 +136,23 @@ void ascoltaServer() {
                 break;
             case ACCETTA_CLIENT:
             {
+                //Il server ci ha accettato il login
                 connesso = true;
+                //Si cambia l'interfaccia
                 SetGUIMode(STANDARD_CLIENT);
+                //Aggiungo l'ID assegnatomi dal server alle mie variabili globali
                 clientID = msg->IDOggetto;
                 maxWin = msg->maxWin;
+                //Mi aggiungo ai giocatori presenti nella partita
                 clientAggiungiGiocatore(name, clientID, msg->punti);
+                //Stampo messaggio di benvenuto
                 sprintf(msgTmp, "%s%s%s\n", "Benvenuto nel gioco, ", name, "!");
                 aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
             }
                 break;
             case NUOVO_GIOCATORE_ENTRATO:
             {
+                //E' arrivato un nuovo giocatore nella partita. Si aggiungono i suoi dati alla classifica
                 clientAggiungiGiocatore(name, msg->IDOggetto, msg->punti);
                 sprintf(msgTmp, "%s%s\n", msg->nomeClient, " si è unito al gioco");
                 aggiungiMessaggio(msgTmp, false, NULL);
@@ -150,6 +161,7 @@ void ascoltaServer() {
                 break;
             case GIOCATORE_USCITO:
             {
+                //Un giocatore è uscito dalla partita e devo toglierlo dalla struttura
                 togliGiocatore(msg->IDOggetto);
                 sprintf(msgTmp, "%s%s\n", msg->nomeClient, " è uscito dal gioco");
                 aggiungiMessaggio(msgTmp, false, NULL);
@@ -157,6 +169,7 @@ void ascoltaServer() {
                 break;
             case ESITO_RISPOSTA:
             {
+                //Dopo aver mandato una risposta il server mi ha mandato l'esito
                 clientAggiornaPunti(clientID, msg->punti);
                 if (msg->corretta) {
                     sprintf(msgTmp, "%s\n", "Risposta corretta!");
@@ -168,6 +181,7 @@ void ascoltaServer() {
                 break;
             case MODIFICA_PUNTEGGIO_GIOCATORE:
             {
+                //Il punteggio di qualcun altro è cambiato
                 clientAggiornaPunti(msg->IDOggetto, msg->punti);
                 if (msg->corretta) {
                     char tmp [MAXNAME];
@@ -180,6 +194,7 @@ void ascoltaServer() {
                 break;
             case INVIA_DOMANDA:
             {
+                //Il server mi ha inviato una nuova domanda 
                 domandaCorrente.numero1 = msg->domanda1;
                 domandaCorrente.numero2 = msg->domanda2;
                 sprintf(msgTmp, "%s\n", "Domanda modificata");
@@ -188,20 +203,25 @@ void ascoltaServer() {
                 break;
             case VITTORIA:
             {
+                //Qualcuno (anche io forse) ha vinto!
+                //Controllo se ho vinto io
                 if (msg->IDOggetto == clientID) {
                     sprintf(msgTmp, "%s\n", " Hai vinto!");
                     aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
                 } else {
+                    //Non ho vinto io :(
                     char tmp [MAXNAME];
                     getNomeGiocatore(msg->IDOggetto, tmp);
                     sprintf(msgTmp, "%s%s\n", tmp, " ha vinto!");
                     aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
                 }
+                //Saluto tutti e vado a casa
                 cleanupClient(0);
             }
                 break;
             case SERVER_SPEGNIMENTO:
             {
+                //Il server si è spento. Fine dei giochi
                 sprintf(msgTmp, "%s\n", "Il server si è disconnesso!");
                 aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
                 cleanupClient(0);
@@ -237,6 +257,7 @@ int initClient() {
     /*Controllo se esiste un server*/;
     int exist = access(SERVERPATH, F_OK);
 
+    //Se non esiste un server, lo notifico e chiudo
     if (exist == -1) {
         SetGUIMode(EXIT_CLIENT);
         sprintf(msgTmp, "%s\n", "Il server non è attivo!");
@@ -262,10 +283,6 @@ int initClient() {
         aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
         cleanupClient(0);
     }
-
-
-    /*Richiedo la partecipazione al gioco*/
-    //richiestaPartecipazione();
 
     /*Faccio partire l'ascoltatore di messaggi da terminale*/
     pthread_t threadID;

@@ -57,7 +57,7 @@ void * inputUtente(void* arg) {
     updateScreen();
     comando c;
     do {
-        c = leggiInput(true, NULL);
+        c = leggiInput(NULL);
 
         switch (c) {
             case LOG_EXIT:

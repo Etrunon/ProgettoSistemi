@@ -35,7 +35,7 @@ comando analizzaInput(data* output, char* input) {
     return ERRORE;
 }
 
-comando leggiInput(bool server, data* inputUtente) {
+comando leggiInput(data* inputUtente) {
     char* commands = NULL;
     size_t size;
     char command [MAXCOMMAND];
@@ -48,7 +48,7 @@ comando leggiInput(bool server, data* inputUtente) {
     /*Chiudo la stringa letta da terminale con \0*/
     commands[read - 1] = '\0';
 
-    /*Conrollo che non abbia stringhe troppo lunghe in input*/
+    /*Controllo di non avere stringhe troppo lunghe in input*/
     if (strlen(commands) > MAXCOMMAND) {
         sprintf(msgAschermo, "%s\n", "Input non valido");
         aggiungiMessaggio(msgAschermo, true, ANSI_COLOR_RED);

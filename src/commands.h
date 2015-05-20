@@ -39,7 +39,7 @@ typedef struct data {
  * @return
  * Il tipo di comando impartito dall'utente
  */
-comando leggiInput(bool server, data* inputUtente);
+comando leggiInput(data* inputUtente);
 
 /*Fornisce un messaggio di spiegazione dei possibili comandi da impartire*/
 void printHelp(bool server);
