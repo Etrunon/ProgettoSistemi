@@ -1,4 +1,4 @@
-
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include "logica.h"
@@ -9,6 +9,7 @@
 #include "guiMessages.h"
 #include <wchar.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 GUIMode modalitaGUI;
 
@@ -27,11 +28,11 @@ void clearScreen() {
 void HorizontalLine() {
     int i;
     char line [LARGHEZZASCHERMO * 7] = {};
-    for (i = 0; i < LARGHEZZASCHERMO * 2; i++) {
+    for (i = 0; i < LARGHEZZASCHERMO; i++) {
         strcat(line, "\u2501");
     }
 
-    printf("%*s\n", LARGHEZZASCHERMO + (int) strlen(line) / 2, line);
+    printf("%*s\n", LARGHEZZASCHERMO / 2 + (int) strlen(line) / 2, line);
 }
 
 /*Stampa il logo del gioco*/
@@ -42,10 +43,17 @@ void header() {
 
     if ((fptr = fopen(filename, "r")) != NULL) {
         /*Se riesce ad aprire il file con il logo*/
-        char read_string[128];
-        while (fgets(read_string, sizeof (read_string), fptr) != NULL)
-            printf("%s", read_string);
-        printf("\n");
+        char* read_string = (char*) malloc(sizeof (char)*250);
+        size_t size = sizeof (char) * 250;
+        int stampati, letti;
+        while ((letti = getline(&read_string, &size, fptr)) != -1) {
+            read_string[letti - 1 ] = '\0';
+            stampati = printf("%*s\n", LARGHEZZASCHERMO / 2 + (int) strlen(read_string) / 2, read_string);
+
+        }
+        //printf("\n");
+        free(read_string);
+
         fclose(fptr);
         HorizontalLine();
     }
@@ -70,14 +78,17 @@ void players() {
     int ultimoPuntoStampato = ALTEZZAPUNTI;
     int i;
     char format [5];
-    int larghezzaAutomatica = 17;
-    if (currentClients < 5)
-        larghezzaAutomatica = 20;
-    if (currentClients < 3)
-        larghezzaAutomatica = 25;
+
+    /* Vecchio metodo per calcolare larghezza grafico in base a num giocatori
+        int larghezzaAutomatica = 17;
+        if (currentClients < 5)
+            larghezzaAutomatica = 20;
+        if (currentClients < 3)
+            larghezzaAutomatica = 25;
+     */
 
     /*Calcola dinamicamente lo spazio per centrare la classifica in base al numero di giocatori*/
-    sprintf(format, "%c%i%c", '%', larghezzaAutomatica - currentClients, 's');
+    sprintf(format, "%c%i%c", '%', LARGHEZZASCHERMO / (currentClients + 1), 's');
 
     for (ultimoPuntoStampato; ultimoPuntoStampato > 0; ultimoPuntoStampato--) {
         /*Cicla stampando dal punteggio più alto al più basso*/
@@ -100,7 +111,7 @@ void players() {
     }
 
     /*Stampa l'ID del giocatore*/
-    sprintf(format, "%c%i%c", '%', larghezzaAutomatica - currentClients, 'i');
+    sprintf(format, "%c%i%c", '%', LARGHEZZASCHERMO / (currentClients + 1), 'i');
     for (i = 0; i < currentClients; i++) {
         printf(format, getPuntiGiocatore(giocatoriCorrenti[i]->IDGiocatore));
     }
@@ -108,13 +119,16 @@ void players() {
 
 
     /*TODO: Stampa punteggio e nome*/
-    sprintf(format, "%c%i%c", '%', -(larghezzaAutomatica - currentClients) + 2, 's');
+    sprintf(format, "%c%i%c", '%', -(LARGHEZZASCHERMO / (currentClients + 1)) + 2, 's');
     printf(format, "");
-    sprintf(format, "%c%i%c", '%', -(larghezzaAutomatica - currentClients), 's');
+    sprintf(format, "%c%i%c", '%', -(LARGHEZZASCHERMO / (currentClients + 1)), 's');
     for (i = 0; i < currentClients; i++) {
-        char tmp [MAXNAME];
+        char tmp [MAXNAME], nomeAbbreviato [4];
         getNomeGiocatore(giocatoriCorrenti[i]->IDGiocatore, tmp);
-        printf(format, tmp);
+
+        memccpy(&nomeAbbreviato, tmp, 0, 3);
+        nomeAbbreviato[3] = '\0';
+        printf(format, nomeAbbreviato);
     }
     printf("\n");
     HorizontalLine();
@@ -128,12 +142,15 @@ void printDomanda() {
             " + ",
             ANSI_COLOR_MAGENTA, domandaCorrente.numero2, ANSI_COLOR_RESET,
             "?");
-    printf("%*s\n", LARGHEZZASCHERMO + (int) strlen(line) / 2 + 5, line);
+
+    printf("%*s", LARGHEZZASCHERMO / 2 + ((int) strlen(line) / 2) + 5, line);
+    printf("\n");
 }
 
 /*Stampa la lista dei messaggi più recenti,
  * tanti quanti il paramentro number*/
 void messagges(int number) {
+
     stampaMessaggi(number);
     HorizontalLine();
 }
@@ -141,11 +158,26 @@ void messagges(int number) {
 /*Informazioni di gioco mostrate sul server*/
 void infoServer() {
 
-    /*Messaggio di benvenuto*/
-    printf("%-35s%s%-3i%s\u2503 %-35s%s%-3i%s\n%-35s%s%-3i%s\u2503\n",
-            "Max giocatori:", ANSI_COLOR_YELLOW, maxClients, ANSI_COLOR_RESET,
-            "Giocatori connessi:", ANSI_COLOR_YELLOW, currentClients, ANSI_COLOR_RESET,
-            "Punteggio per vittoria:", ANSI_COLOR_YELLOW, maxWin, ANSI_COLOR_RESET);
+    char informazione [BUFFMESSAGGIO];
+    int spazioRimanente;
+    int spazio = (LARGHEZZASCHERMO / 2) - 2;
+
+    strcpy(informazione, "Max giocatori:");
+    spazioRimanente = spazio - strlen(informazione);
+
+    printf("%s%s%*i%s", informazione, ANSI_COLOR_YELLOW, spazioRimanente, maxClients, ANSI_COLOR_RESET);
+    printf(" \u2503 ");
+
+    strcpy(informazione, "Giocatori connessi:");
+    spazioRimanente = spazio - strlen(informazione);
+    printf("%s%s%*i%s\n", informazione, ANSI_COLOR_YELLOW, spazioRimanente, currentClients, ANSI_COLOR_RESET);
+
+    strcpy(informazione, "Punteggio per vittoria:");
+    spazioRimanente = spazio - strlen(informazione);
+    printf("%s%s%*i%s", informazione, ANSI_COLOR_YELLOW, spazioRimanente, maxWin, ANSI_COLOR_RESET);
+    printf(" \u2503 ");
+
+    printf("\n");
     HorizontalLine();
 
 }
@@ -191,6 +223,7 @@ void updateScreen() {
             break;
         case LOG:
         {
+
             messagges(BUFFERMESSAGGI);
             printf("\r%s", "Q PER TORNARE INDIETRO:");
         }
