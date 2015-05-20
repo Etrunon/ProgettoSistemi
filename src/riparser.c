@@ -9,12 +9,12 @@
 #include "CONST.h"
 #include "commands.h"
 
-messaggio* messaggioConstructor() {
+messaggio* messaggioConstructor(int IDMittente, tipoMessaggio tipoMsg) {
 
     messaggio *msg = (messaggio*) malloc(sizeof (messaggio));
 
-    msg->PIDMittente = -1;
-    msg->codiceMsg = -1;
+    msg->PIDMittente = IDMittente;
+    msg->codiceMsg = tipoMsg;
     msg->timestring = (char*) malloc(25 * (sizeof (char)));
     msg->msg = (char*) malloc(MSG_SIZE * (sizeof (char)));
     msg->pathFifo = (char*) malloc(MAX_FIFONAME * (sizeof (char)));
@@ -138,6 +138,7 @@ bool creaMessaggio(messaggio *mess) {
         {
             concatInt(mess->msg, mess->IDOggetto);
             concatInt(mess->msg, mess->punti);
+            concatInt(mess->msg, mess->maxWin);
         }
             break;
         case RIFIUTA_CLIENT: //Client rifiutato
@@ -158,6 +159,7 @@ bool creaMessaggio(messaggio *mess) {
         {
             concatInt(mess->msg, mess->IDOggetto);
             concatInt(mess->msg, mess->punti);
+            concatInt(mess->msg, mess->corretta);
         }
             break;
         case ESITO_RISPOSTA:
@@ -166,6 +168,8 @@ bool creaMessaggio(messaggio *mess) {
                 concatInt(mess->msg, 1);
             else
                 concatInt(mess->msg, 0);
+
+            concatInt(mess->msg, mess->punti);
         }
             break;
         case INVIA_DOMANDA:
@@ -280,6 +284,8 @@ void traduciComm(messaggio *msg) {
             msg->IDOggetto = *x;
             decatInt(&lettaFino, &x);
             msg->punti = *x;
+            decatInt(&lettaFino, &x);
+            msg->maxWin = *x;
         }
             break;
         case RIFIUTA_CLIENT: //Client rifiutato
@@ -307,6 +313,8 @@ void traduciComm(messaggio *msg) {
             msg->IDOggetto = *x;
             decatInt(&lettaFino, &x);
             msg->punti = *x;
+            decatInt(&lettaFino, &x);
+            msg->corretta = *x;
         }
             break;
         case ESITO_RISPOSTA:
@@ -317,6 +325,9 @@ void traduciComm(messaggio *msg) {
                 msg->corretta = true;
             } else
                 msg->corretta = false;
+
+            decatInt(&lettaFino, &x);
+            msg->punti = *x;
         }
             break;
         case INVIA_DOMANDA:

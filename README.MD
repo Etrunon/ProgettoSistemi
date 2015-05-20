@@ -37,14 +37,14 @@ Togliere il file delle cose da fare;
     ##HEADER: int IDMittente, int timestamp, int codiceMessaggio
 
     - 1: Invia risposta (int risposta)
-    - 2: Richiesta partecipazione (char* pathFIFO, char* nome, int PID)
+    - 2: Richiesta partecipazione (char* pathFIFO, char* nome, int PID (preso dal riparser)
     - 3: Invia Informazione Logout Al Server ()
     - 4: Accetta Client (int ID, int punti, int maxWin)
     - 5: Rifiuta Client ()
     - 6: Nuovo Giocatore Entrato In Gioco (char* nome, int ID, int punti)
     - 7: Giocatore Uscito Dal Gioco (int ID)
-    - 8: Aumenta/Riduci Punto (int ID, int punti, bool giusto)
-    - 9: Risposta Corretta/Sbagliata (bool giusto, int punti)
+    - 8: Modifica Punti giocatore(int ID, int punti, bool giusto)
+    - 9: Esito Risposta (bool giusto, int punti)
     - 10: Invia Domanda (int num1, int num2)
     - 11: Server Spegnimento()
     - 12: Vittoria(int ID)
