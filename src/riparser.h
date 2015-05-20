@@ -47,7 +47,7 @@ messaggio* messaggioConstructor(int IDMittente, tipoMessaggio tipoMsg);
 
 void messaggioDestructor(messaggio *x);
 
-bool creaMessaggio2(messaggio *msg);
+bool creaMessaggio(messaggio *msg);
 
 void traduciComm(messaggio *msg);
 
