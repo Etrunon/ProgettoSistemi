@@ -15,19 +15,33 @@
 int ascoltoDalServer;
 int scriviAlServer;
 char clientFifo [MAX_FIFONAME];
+
 int clientID;
+char name[MAXNAME];
+
 bool connesso = false;
 
 char msgTmp [BUFFMESSAGGIO];
+
+void avvisaServer() {
+    messaggio* logout = messaggioConstructor(clientID, LOGOUT_AL_SERVER);
+    inviaMessaggio(scriviAlServer, logout);
+    messaggioDestructor(logout);
+}
 
 /*Chiude la FIFO ed eventuali altre risorse
  * rimaste aperte
  */
 void cleanupClient(int sig) {
     sprintf(msgTmp, "%s\n", "Client disattivato");
-    aggiungiMessaggio(msgTmp, true, ANSI_COLOR_CYAN);
     SetGUIMode(EXIT_CLIENT);
-    updateScreen();
+    aggiungiMessaggio(msgTmp, true, ANSI_COLOR_CYAN);
+
+    if (connesso) {
+        /*Avviso che me ne sto andando*/
+        avvisaServer();
+    }
+
     close(ascoltoDalServer);
     unlink(clientFifo);
     exit(EXIT_SUCCESS);
@@ -54,38 +68,41 @@ void * inputUtenteClient(void* arg) {
         switch (c) {
             case RISPOSTA:
             {
-                messaggio* msg = messaggioConstructor();
-                msg->codiceMsg = 1;
-                msg->valRisposta = d.risposta;
-                inviaMessaggio(scriviAlServer, msg);
-                break;
+                if (connesso) {
+                    messaggio* msg = messaggioConstructor(clientID, INVIA_RISPOSTA);
+                    msg->risposta = d.risposta;
+                    inviaMessaggio(scriviAlServer, msg);
+
+                    messaggioDestructor(msg);
+                }
             }
+                break;
             case LOG_EXIT:
             {
                 if (connesso)
                     SetGUIMode(STANDARD_CLIENT);
                 else
                     SetGUIMode(LOGIN_CLIENT);
-                break;
             }
+                break;
             case HELP:
             {
                 printHelp(false);
-                break;
             }
+                break;
             case NOME:
             {
                 if (!connesso) {
-                    messaggio* m = messaggioConstructor();
-                    m->clientID = -5;
-                    m->codiceMsg = RICHIESTA_PARTECIPAZIONE;
+                    strcpy(name, d.nome);
+
+                    messaggio* m = messaggioConstructor(clientID, RICHIESTA_PARTECIPAZIONE);
                     sprintf(m->pathFifo, "%s", clientFifo);
                     sprintf(m->nomeClient, "%s", d.nome);
                     inviaMessaggio(scriviAlServer, m);
                     messaggioDestructor(m);
                 }
-                break;
             }
+                break;
             default:
                 break;
         }
@@ -101,53 +118,100 @@ void * inputUtenteClient(void* arg) {
 /*Rimane in attesa di messaggi dal server*/
 void ascoltaServer() {
     while (1) {
-        messaggio* msg = messaggioConstructor();
+        messaggio* msg = messaggioConstructor(0, 0);
         leggiMessaggio(ascoltoDalServer, msg);
         switch (msg->codiceMsg) {
             case RIFIUTA_CLIENT:
             {
                 sprintf(msgTmp, "%s\n", "Il server non ha posti disponibili!");
                 aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
-                updateScreen();
                 cleanupClient(0);
             }
                 break;
             case ACCETTA_CLIENT:
             {
+                connesso = true;
                 SetGUIMode(STANDARD_CLIENT);
-                sprintf(msgTmp, "%s\t%i\n", "Benvenuto,giocatore!", msg->IDOggetto);
-                aggiungiMessaggio(msgTmp, true, ANSI_COLOR_GREEN);
+                clientID = msg->IDOggetto;
+                maxWin = msg->maxWin;
+                clientAggiungiGiocatore(name, clientID, msg->punti);
+                sprintf(msgTmp, "%s%s%s\n", "Benvenuto nel gioco, ", name, "!");
+                aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
+            }
+                break;
+            case NUOVO_GIOCATORE_ENTRATO:
+            {
+                clientAggiungiGiocatore(name, msg->IDOggetto, msg->punti);
+                sprintf(msgTmp, "%s%s\n", msg->nomeClient, " si è unito al gioco");
+                aggiungiMessaggio(msgTmp, false, NULL);
+
+            }
+                break;
+            case GIOCATORE_USCITO:
+            {
+                togliGiocatore(msg->IDOggetto);
+                sprintf(msgTmp, "%s%s\n", msg->nomeClient, " è uscito dal gioco");
+                aggiungiMessaggio(msgTmp, false, NULL);
+            }
+                break;
+            case ESITO_RISPOSTA:
+            {
+                clientAggiornaPunti(clientID, msg->punti);
+                if (msg->corretta) {
+                    sprintf(msgTmp, "%s\n", "Risposta corretta!");
+                } else {
+                    sprintf(msgTmp, "%s\n", "Risposta sbagliata!");
+                }
+                aggiungiMessaggio(msgTmp, false, NULL);
+            }
+                break;
+            case MODIFICA_PUNTEGGIO_GIOCATORE:
+            {
+                clientAggiornaPunti(msg->IDOggetto, msg->punti);
+                if (msg->corretta) {
+                    char tmp [MAXNAME];
+                    getNomeGiocatore(msg->IDOggetto, tmp);
+                    sprintf(msgTmp, "%s%s\n", tmp, " ha risposto correttamente!");
+                    aggiungiMessaggio(msgTmp, false, NULL);
+                }
                 updateScreen();
             }
+                break;
+            case INVIA_DOMANDA:
+            {
+                domandaCorrente.numero1 = msg->domanda1;
+                domandaCorrente.numero2 = msg->domanda2;
+                sprintf(msgTmp, "%s\n", "Domanda modificata");
+                aggiungiMessaggio(msgTmp, false, NULL);
+            }
+                break;
+            case VITTORIA:
+            {
+                if (msg->IDOggetto == clientID) {
+                    sprintf(msgTmp, "%s\n", " Hai vinto!");
+                    aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
+                } else {
+                    char tmp [MAXNAME];
+                    getNomeGiocatore(msg->IDOggetto, tmp);
+                    sprintf(msgTmp, "%s%s\n", tmp, " ha vinto!");
+                    aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
+                }
+                cleanupClient(0);
+            }
+                break;
+            case SERVER_SPEGNIMENTO:
+            {
+                sprintf(msgTmp, "%s\n", "Il server si è disconnesso!");
+                aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
+                cleanupClient(0);
+            }
+                break;
             default: break;
 
         }
 
         messaggioDestructor(msg);
     }
-}
-
-bool richiestaPartecipazione() {
-    comando c;
-    data d;
-
-    //printf("%40s\n", ANSI_COLOR_BLUE "Client avviato" ANSI_COLOR_RESET);
-    do {
-        printf("\r%s", "Inserisci il nome:");
-        c = leggiInput(false, &d);
-
-    } while (c != NOME);
-
-    messaggio* m = messaggioConstructor();
-
-    m->codiceMsg = 2;
-    sprintf(m->pathFifo, "%s%c", clientFifo, '\0');
-    sprintf(m->nomeClient, "%s", d.nome);
-
-    inviaMessaggio(scriviAlServer, m);
-    messaggioDestructor(m);
-    return true;
-
 }
 
 int initClient() {
@@ -176,7 +240,6 @@ int initClient() {
         SetGUIMode(EXIT_CLIENT);
         sprintf(msgTmp, "%s\n", "Il server non è attivo!");
         aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
-        updateScreen();
         return -1;
     }
 

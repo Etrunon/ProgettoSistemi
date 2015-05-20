@@ -36,7 +36,7 @@ void print_image(FILE *fptr) {
 
 void header() {
 
-    char *filename = "src/art.txt";
+    char *filename = "/tmp/art.txt";
     FILE *fptr = NULL;
 
     if ((fptr = fopen(filename, "r")) != NULL) {
@@ -91,7 +91,7 @@ void punteggiGiocatori() {
 
     sprintf(format, "%c%i%c", '%', larghezzaAutomatica - currentClients, 'i');
     for (i = 0; i < currentClients; i++) {
-        printf(format, i + 1);
+        printf(format, getPuntiGiocatore(giocatoriCorrenti[i]->IDGiocatore));
     }
     printf("\n");
 
@@ -101,7 +101,9 @@ void punteggiGiocatori() {
     printf(format, "");
     sprintf(format, "%c%i%c", '%', -(larghezzaAutomatica - currentClients), 's');
     for (i = 0; i < currentClients; i++) {
-        printf(format, "aaa");
+        char tmp [MAXNAME];
+        getNomeGiocatore(giocatoriCorrenti[i]->IDGiocatore, tmp);
+        printf(format, tmp);
     }
     printf("\n");
 }
@@ -147,21 +149,21 @@ void updateScreen() {
         {
             messagges(MESSAGGI_A_SCHERMO);
             printf("\r%s", "Inserisci il nome:");
-            break;
         }
+            break;
         case STANDARD_CLIENT:
         {
             players();
             messagges(MESSAGGI_A_SCHERMO);
             printDomanda();
             printf("\r%s", "Client:");
-            break;
         }
+            break;
         case EXIT_CLIENT:
         {
             messagges(MESSAGGI_A_SCHERMO);
-            break;
         }
+            break;
         case STANDARD_SERVER:
         {
             players();
@@ -169,21 +171,21 @@ void updateScreen() {
             messagges(MESSAGGI_A_SCHERMO);
             printDomanda();
             printf("\r%s", "Server:");
-            break;
         }
+            break;
         case EXIT_SERVER:
         {
             players();
             infoServer();
             messagges(MESSAGGI_A_SCHERMO);
-            break;
         }
+            break;
         case LOG:
         {
             messagges(BUFFERMESSAGGI);
             printf("\r%s", "Q PER TORNARE INDIETRO:");
-            break;
         }
+            break;
     }
     fflush(stdout);
 }

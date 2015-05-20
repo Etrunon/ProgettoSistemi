@@ -1,7 +1,7 @@
 #lista delle librerie necessarie
 OBJ = main.o server.o client.o allFifo.o commands.o logica.o gui.o guiMessages.o riparser.o
 #lista delle librerie da testare
-OBJTEST = allFifo.o parser.o TestGui.o logica.o gui.o guiMessages.o
+OBJTEST = allFifo.o riparser.o logica.o gui.o guiMessages.o mainBoss.o
 
 #Definiamo quali direttive non producono file
 .PHONY: clean
@@ -15,7 +15,7 @@ SRCDIR = src
 #nome e posizione dell'eseguibile
 BUILDNAME = main
 BUILDIR = bin
-CFLAGS = -c -g -DDEBUGFIFO #-std=c99
+CFLAGS = -c -g #-DDEBUGFIFO #-std=c99
 
 all:
 	@printf "%s\n" "Target Make disponibili:"
@@ -45,7 +45,8 @@ checkDir:
 $(BUILDNAME): $(OBJ)
 	@#linking finale
 	@gcc -pthread $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$@
-	@-rm $(addprefix $(BUILDIR)/,$(^F))
+	@-cp src/art.txt /tmp/art.txt
+	@#-rm $(addprefix $(BUILDIR)/,$(^F))
 
 
 BUILDTESTLIB: checkDir buildtest
@@ -53,4 +54,4 @@ BUILDTESTLIB: checkDir buildtest
 buildtest: $(OBJTEST)
 	@#linking finale
 	@gcc -pthread $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$(BUILDNAME)
-	@-rm $(addprefix $(BUILDIR)/,$(^F))
+	@#-rm $(addprefix $(BUILDIR)/,$(^F))

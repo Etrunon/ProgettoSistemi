@@ -46,8 +46,8 @@ int main(int argc, char** argv) {
                     exit(EXIT_FAILURE);
                 }
                 maxClients = value;
-                break;
             }
+                break;
             case 'w':
             {
                 int value = strtol(optarg, NULL, 10);
@@ -56,8 +56,8 @@ int main(int argc, char** argv) {
                     exit(EXIT_FAILURE);
                 }
                 winPoints = value;
-                break;
             }
+                break;
             case '?':
                 break;
             default:
@@ -65,6 +65,7 @@ int main(int argc, char** argv) {
                 explainParameters();
                 return (EXIT_FAILURE);
             }
+            break;
         }
     }
 
