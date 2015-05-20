@@ -36,18 +36,18 @@ Togliere il file delle cose da fare;
 #PROTOCOLLO
     ##HEADER: int IDMittente, int timestamp, int codiceMessaggio
 
-    - 1: Invia risposta (int risposta)
-    - 2: Richiesta partecipazione (char* pathFIFO, char* nome, int PID (preso dal riparser)
-    - 3: Invia Informazione Logout Al Server ()
-    - 4: Accetta Client (int ID, int punti, int maxWin)
-    - 5: Rifiuta Client ()
-    - 6: Nuovo Giocatore Entrato In Gioco (char* nome, int ID, int punti)
-    - 7: Giocatore Uscito Dal Gioco (int ID)
-    - 8: Modifica Punti giocatore(int ID, int punti, bool giusto)
-    - 9: Esito Risposta (bool giusto, int punti)
-    - 10: Invia Domanda (int num1, int num2)
-    - 11: Server Spegnimento()
-    - 12: Vittoria(int ID)
+    - 0: Invia risposta (int risposta)
+    - 1: Richiesta partecipazione (char* pathFIFO, char* nome, int PID (preso dal riparser)
+    - 2: Invia Informazione Logout Al Server ()
+    - 3: Accetta Client (int ID, int punti, int maxWin)
+    - 4: Rifiuta Client ()
+    - 5: Nuovo Giocatore Entrato In Gioco (char* nome, int ID, int punti)
+    - 6: Giocatore Uscito Dal Gioco (int ID)
+    - 7: Modifica Punti giocatore(int ID, int punti, bool giusto)
+    - 8: Esito Risposta (bool giusto, int punti)
+    - 9: Invia Domanda (int num1, int num2)
+    - 10: Server Spegnimento()
+    - 11: Vittoria(int ID)
 
 
 TODO, settare l'ID del server a 0 o valore importante!
