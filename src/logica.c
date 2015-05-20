@@ -22,7 +22,7 @@ int prossimoID = 1;
  * Funzione costruttore che restituisce un puntatore a struct allocato dinamicamente e con tutti i
  * campi allocati vuoti e pronti da usare.
  * Ricordarsi di distruggere il giocatore finita la sua responsabilità
- * @return 
+ * @return
  */
 giocatore* giocatoreConstructor() {
 
@@ -33,7 +33,7 @@ giocatore* giocatoreConstructor() {
 
 /**
  * Funzione che distrugge un giocatore, passato per puntatore parametro, deallocando tutti i campi
- * dinamici. 
+ * dinamici.
  * @param g
  */
 void giocatoreDestructor(giocatore *g) {
@@ -42,7 +42,7 @@ void giocatoreDestructor(giocatore *g) {
 }
 
 /**
- * Funzione di DEBUG che permette di stampare un giocatore con una formattazione leggibile e 
+ * Funzione di DEBUG che permette di stampare un giocatore con una formattazione leggibile e
  * mettendo in risalto i campi interni.
  * @param g puntatore al giocatore da stampare
  */
@@ -91,13 +91,13 @@ void initLogica() {
 
 /**
  * Funzione che si assicura che la classifica sia ordinata per punteggio. Controlla se i punteggi
- * sono disordinati sia a destra che a sinistra (non va in loop per assunzioni sulla composizione 
+ * sono disordinati sia a destra che a sinistra (non va in loop per assunzioni sulla composizione
  * della classifica e sulla sua gestione). Dato un index di partenza (possibile punto di sbilanciamento)
- * vengono controllati i suoi vicini fino a quando 
+ * vengono controllati i suoi vicini fino a quando
  *  -Non viene fatta nessuna modifica
  *  -Si arriva a uno dei due limite degli array
  * @param indicePartenza indice del punto di sbilanciamento
- * @return 
+ * @return
  */
 void swap(int index) {
 
@@ -119,7 +119,7 @@ void swap(int index) {
         //Se il giocatore index e il suo vicino di destra esiste
         if (giocatoriCorrenti[index] != NULL && giocatoriCorrenti[index + 1] != NULL) {
 
-            //E se i punti di index sono minori dei punti del vicino di destra e NON sono sul limite destro dell'array 
+            //E se i punti di index sono minori dei punti del vicino di destra e NON sono sul limite destro dell'array
             if (giocatoriCorrenti[index]->punteggio < giocatoriCorrenti[index + 1]->punteggio && index < currentClients) {
 
                 //Allora swappo i due giocatori usando anche tmp
@@ -135,7 +135,7 @@ void swap(int index) {
 
         //Se il giocatore index e il suo vicino di sinistra esiste
         if (giocatoriCorrenti[index] != NULL && giocatoriCorrenti[index - 1] != NULL) {
-            //E se i punti di index sono maggiori dei punti del vicino di sinistra e NON sono sul limite sinistro dell'array 
+            //E se i punti di index sono maggiori dei punti del vicino di sinistra e NON sono sul limite sinistro dell'array
             if (index != 0 && giocatoriCorrenti[index - 1]->punteggio < giocatoriCorrenti[index]->punteggio) {
 
                 //Allora swappo i due giocatori usando anche tmp
@@ -148,14 +148,14 @@ void swap(int index) {
                 index--;
             }
         }
-        //Controllo se ho applicato modifiche, potrei ancora essere sbilanciato    
+        //Controllo se ho applicato modifiche, potrei ancora essere sbilanciato
     } while (mosso == true);
 }
 
 /**
  * Funzione che riempie gli array passati per parametro con i punteggi dei giocatori presenti.
  * Assume che la classifica sia già correttamente ordinata.
- * @param IDclients array con gli id 
+ * @param IDclients array con gli id
  * @param punteggi  array con i punti
  */
 void serverGeneraClassifica(int* IDclients, int* punteggi) {
@@ -218,7 +218,7 @@ int cercaGiocatore(int ID) {
  * Ritorna true se il giocatore in questione ha vinto
  * @param ID
  * @param punti
- * @return 
+ * @return
  */
 bool serverAggiornaPunti(int ID, int punti) {
 
@@ -277,9 +277,8 @@ void clientAggiungiGiocatore(char* nome, int ID, int punteggio) {
     //Creo un giocatore e lo riempio coi dati in input
     giocatore* g = giocatoreConstructor();
     strcpy(g->name, nome);
-    g->IDGiocatore = prossimoID;
-    prossimoID++;
-    g->punteggio = maxClients - currentClients;
+    g->IDGiocatore = ID;
+    g->punteggio = punteggio;
 
     //Assegno il giocatore alla struttura dati
     giocatoriCorrenti[currentClients] = g;
@@ -323,9 +322,9 @@ void getNomeGiocatore(int ID, char* riempi) {
 }
 
 /**
- * Getter dei punti del giocatore con ID. 
+ * Getter dei punti del giocatore con ID.
  * @param ID
- * @return punti 
+ * @return punti
  */
 int getPuntiGiocatore(int ID) {
 

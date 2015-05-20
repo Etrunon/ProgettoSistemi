@@ -51,6 +51,9 @@ bool creaMessaggio(messaggio *msg);
 
 void traduciComm(messaggio *msg);
 
+#ifdef DEBUGFIFO
+void testStampaMessaggio(messaggio *msg, char* testo);
+#endif
 
 #endif	/* RIPARSER_H */
 

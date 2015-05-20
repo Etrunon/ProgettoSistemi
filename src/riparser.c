@@ -9,19 +9,20 @@
 #include "riparser.h"
 #include "CONST.h"
 #include "commands.h"
+#include "guiMessages.h"
 
 messaggio* messaggioConstructor(int IDMittente, tipoMessaggio tipoMsg) {
 
     messaggio *msg = (messaggio*) malloc(sizeof (messaggio));
 
-    msg->PIDMittente = IDMittente;
+    msg->PIDMittente = getpid();
     msg->codiceMsg = tipoMsg;
     msg->timestring = (char*) malloc(25 * (sizeof (char)));
     msg->msg = (char*) malloc(MSG_SIZE * (sizeof (char)));
     msg->pathFifo = (char*) malloc(MAX_FIFONAME * (sizeof (char)));
     msg->nomeClient = (char*) malloc(MAXNAME * (sizeof (char)));
     msg->risposta = -1;
-    msg->IDMittente = -1;
+    msg->IDMittente = IDMittente;
     msg->punti = -1;
     msg->domanda1 = -1;
     msg->domanda2 = -1;
@@ -51,13 +52,34 @@ void testStampaMessaggio(messaggio *msg, char* testo) {
     /*
      * TODO creare la stampa "formattata" per fare debrugging
      */
-    printf("Messaggio: \n %s \n\t ClientID %i\n", testo, msg->IDMittente);
-    printf("\t Codice msg: %i\n", msg->codiceMsg);
-    printf("\t StringaFin.: %s\n", msg->msg);
-    printf("\t Val. Risposta: %i\n", msg->risposta);
-    printf("\t Path Fifo: %s\n", msg->pathFifo);
-    printf("\t Nome Client: %s \n", msg->nomeClient);
-    printf("\t PID: %i\n", msg->PIDMittente);
+    char tmp [BUFFMESSAGGIO];
+
+    sprintf(tmp, "\n%s%s%s\n", "----------", testo, "----------");
+    aggiungiMessaggio(tmp, false, ANSI_COLOR_RED);
+
+    sprintf(tmp, "%s IDMittente:%i\n", testo, msg->IDMittente);
+    aggiungiMessaggio(tmp, false, NULL);
+
+    sprintf(tmp, "CodiceMessaggio:%i\n", msg->codiceMsg);
+    aggiungiMessaggio(tmp, false, NULL);
+
+    sprintf(tmp, "Stringa:%s\n", msg->msg);
+    aggiungiMessaggio(tmp, false, NULL);
+
+    sprintf(tmp, "Risposta:%i\n", msg->risposta);
+    aggiungiMessaggio(tmp, false, NULL);
+
+    sprintf(tmp, "Punti:%i\n", msg->punti);
+    aggiungiMessaggio(tmp, false, NULL);
+
+    sprintf(tmp, "IDOggetto:%i\n", msg->IDOggetto);
+    aggiungiMessaggio(tmp, false, NULL);
+
+    sprintf(tmp, "NomeClient:%s\n", msg->nomeClient);
+    aggiungiMessaggio(tmp, false, NULL);
+
+    sprintf(tmp, "-------------Fine Messaggio----------\n");
+    aggiungiMessaggio(tmp, false, ANSI_COLOR_BLUE);
 
 }
 
