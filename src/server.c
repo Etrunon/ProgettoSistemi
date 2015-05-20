@@ -28,8 +28,7 @@ void broadcast(messaggio* msg) {
 }
 
 void AvvisaSpegnimentoServer() {
-    messaggio* msg = messaggioConstructor();
-    msg->codiceMsg = SERVER_SPEGNIMENTO;
+    messaggio* msg = messaggioConstructor(IDServer, SERVER_SPEGNIMENTO);
     broadcast(msg);
 
     messaggioDestructor(msg);
@@ -103,8 +102,7 @@ void setupNuovoGiocatore(int idNuovoGiocatore, int fifo) {
             punti = getPuntiGiocatore(player->IDGiocatore);
             getNomeGiocatore(player->IDGiocatore, tmp);
 
-            messaggio* msg = messaggioConstructor();
-            msg->codiceMsg = NUOVO_GIOCATORE_ENTRATO;
+            messaggio* msg = messaggioConstructor(IDServer, NUOVO_GIOCATORE_ENTRATO);
             msg->IDOggetto = id;
             strcpy(msg->nomeClient, tmp);
             msg->punti = punti;
@@ -116,8 +114,7 @@ void setupNuovoGiocatore(int idNuovoGiocatore, int fifo) {
     }
 
     /*Invio domanda corrente*/
-    messaggio* domanda = messaggioConstructor();
-    domanda->codiceMsg = INVIA_DOMANDA;
+    messaggio* domanda = messaggioConstructor(IDServer, INVIA_DOMANDA);
     domanda->domanda1 = domandaCorrente.numero1;
     domanda->domanda2 = domandaCorrente.numero2;
 
@@ -142,16 +139,14 @@ void aggiungiGiocatore(messaggio * msg) {
 
     /*Non c'è spazio nel server*/
     if (IDGiocatore == -1) {
-        messaggio* rifiutato = messaggioConstructor();
-        rifiutato->codiceMsg = RIFIUTA_CLIENT;
+        messaggio* rifiutato = messaggioConstructor(IDServer, RIFIUTA_CLIENT);
         inviaMessaggio(handlerFIFO, rifiutato);
         messaggioDestructor(rifiutato);
         close(handlerFIFO);
         return;
     } else {
         /*Giocatore accettato*/
-        messaggio* accettato = messaggioConstructor();
-        accettato->codiceMsg = ACCETTA_CLIENT;
+        messaggio* accettato = messaggioConstructor(IDServer, ACCETTA_CLIENT);
         accettato->IDOggetto = IDGiocatore;
         accettato->punti = getPuntiGiocatore(IDGiocatore);
         accettato->maxWin = maxWin;
@@ -159,8 +154,7 @@ void aggiungiGiocatore(messaggio * msg) {
         messaggioDestructor(accettato);
 
         /*Avviso tutti del nuovo arrivato*/
-        messaggio* nuovoGiocatore = messaggioConstructor();
-        nuovoGiocatore->codiceMsg = NUOVO_GIOCATORE_ENTRATO;
+        messaggio* nuovoGiocatore = messaggioConstructor(IDServer, NUOVO_GIOCATORE_ENTRATO);
         strcpy(nuovoGiocatore->nomeClient, msg->nomeClient);
         nuovoGiocatore->IDOggetto = IDGiocatore;
         nuovoGiocatore->punti = getPuntiGiocatore(IDGiocatore);
@@ -177,8 +171,7 @@ void nuovaDomanda() {
     serverCambiaDomanda();
 
     int i;
-    messaggio* domanda = messaggioConstructor();
-    domanda->codiceMsg = INVIA_DOMANDA;
+    messaggio* domanda = messaggioConstructor(IDServer, INVIA_DOMANDA);
     domanda->domanda1 = domandaCorrente.numero1;
     domanda->domanda2 = domandaCorrente.numero2;
 
@@ -194,8 +187,7 @@ void vincitore(int ID) {
     sprintf(tmpMessage, "%s%s\n", nome, " ha vinto!");
     aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_YELLOW);
 
-    messaggio* vittoria = messaggioConstructor();
-    vittoria->codiceMsg = VITTORIA;
+    messaggio* vittoria = messaggioConstructor(IDServer, VITTORIA);
     vittoria->IDOggetto = ID;
 
     broadcast(vittoria);
@@ -230,8 +222,7 @@ void checkRisposta(messaggio * msg) {
             serverAggiornaPunti(msg->IDMittente, getPuntiGiocatore(msg->IDMittente) + 1);
 
             /*Avviso client che ha risposto correttamente*/
-            messaggio* corretto = messaggioConstructor();
-            corretto->codiceMsg = ESITO_RISPOSTA;
+            messaggio* corretto = messaggioConstructor(IDServer, ESITO_RISPOSTA);
             corretto->corretta = true;
             int fifo = serverFIFOGiocatore(msg->IDMittente);
             inviaMessaggio(fifo, corretto);
@@ -248,8 +239,7 @@ void checkRisposta(messaggio * msg) {
         serverAggiornaPunti(msg->IDMittente, getPuntiGiocatore(msg->IDMittente) - 1);
 
         /*Avviso client della risposta sbagliata*/
-        messaggio* sbagliato = messaggioConstructor();
-        sbagliato->codiceMsg = ESITO_RISPOSTA;
+        messaggio* sbagliato = messaggioConstructor(IDServer, ESITO_RISPOSTA);
         sbagliato->corretta = false;
         int fifo = serverFIFOGiocatore(msg->IDMittente);
         inviaMessaggio(fifo, sbagliato);
@@ -258,8 +248,7 @@ void checkRisposta(messaggio * msg) {
     }
 
     /*Avviso tutti i client della risposta*/
-    messaggio* risposta = messaggioConstructor();
-    risposta->codiceMsg = MODIFICA_PUNTEGGIO_GIOCATORE;
+    messaggio* risposta = messaggioConstructor(IDServer, MODIFICA_PUNTEGGIO_GIOCATORE);
     risposta->IDOggetto = msg->IDMittente;
     risposta->punti = getPuntiGiocatore(msg->IDMittente);
     broadcast(risposta);
@@ -277,8 +266,7 @@ void rimuoviGiocatore(messaggio* msg) {
 
 
     /*Avviso altri client dell'uscita del giocatore*/
-    messaggio* logout = messaggioConstructor();
-    logout->codiceMsg = GIOCATORE_USCITO;
+    messaggio* logout = messaggioConstructor(IDServer, GIOCATORE_USCITO);
     logout->IDOggetto = msg->IDMittente;
     broadcast(logout);
     messaggioDestructor(logout);
@@ -287,7 +275,7 @@ void rimuoviGiocatore(messaggio* msg) {
 /*Rimane in ascolto di comunicazioni dai client*/
 void ascoltaClients() {
     while (1) {
-        messaggio* msg = messaggioConstructor();
+        messaggio* msg = messaggioConstructor(0, 0);
 
         leggiMessaggio(ascoltoDaiClient, msg);
         switch (msg->codiceMsg) {

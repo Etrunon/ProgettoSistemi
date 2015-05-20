@@ -24,8 +24,7 @@ bool connesso = false;
 char msgTmp [BUFFMESSAGGIO];
 
 void avvisaServer() {
-    messaggio* logout = messaggioConstructor();
-    logout->codiceMsg = LOGOUT_AL_SERVER;
+    messaggio* logout = messaggioConstructor(clientID, LOGOUT_AL_SERVER);
     inviaMessaggio(scriviAlServer, logout);
     messaggioDestructor(logout);
 }
@@ -70,8 +69,7 @@ void * inputUtenteClient(void* arg) {
             case RISPOSTA:
             {
                 if (connesso) {
-                    messaggio* msg = messaggioConstructor();
-                    msg->codiceMsg = INVIA_RISPOSTA;
+                    messaggio* msg = messaggioConstructor(clientID, INVIA_RISPOSTA);
                     msg->risposta = d.risposta;
                     inviaMessaggio(scriviAlServer, msg);
 
@@ -97,8 +95,7 @@ void * inputUtenteClient(void* arg) {
                 if (!connesso) {
                     strcpy(name, d.nome);
 
-                    messaggio* m = messaggioConstructor();
-                    m->codiceMsg = RICHIESTA_PARTECIPAZIONE;
+                    messaggio* m = messaggioConstructor(clientID, RICHIESTA_PARTECIPAZIONE);
                     sprintf(m->pathFifo, "%s", clientFifo);
                     sprintf(m->nomeClient, "%s", d.nome);
                     inviaMessaggio(scriviAlServer, m);
@@ -121,7 +118,7 @@ void * inputUtenteClient(void* arg) {
 /*Rimane in attesa di messaggi dal server*/
 void ascoltaServer() {
     while (1) {
-        messaggio* msg = messaggioConstructor();
+        messaggio* msg = messaggioConstructor(0, 0);
         leggiMessaggio(ascoltoDalServer, msg);
         switch (msg->codiceMsg) {
             case RIFIUTA_CLIENT:
