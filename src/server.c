@@ -17,6 +17,7 @@
 int ascoltoDaiClient;
 int IDServer = 0;
 char tmpMessage [BUFFMESSAGGIO];
+bool testingMode;
 
 void broadcast(messaggio* msg) {
     int i = 0;
@@ -284,6 +285,13 @@ void rimuoviGiocatore(messaggio* msg) {
     logout->IDOggetto = msg->IDMittente;
     broadcast(logout);
     messaggioDestructor(logout);
+
+    if (currentClients == 0 && testingMode) {
+        sprintf(tmpMessage, "%s\n", "Testing terminato!");
+        aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_BLUE);
+        cleanupServer(0);
+
+    }
 }
 
 /*Rimane in ascolto di comunicazioni dai client*/
@@ -317,7 +325,7 @@ void ascoltaClients() {
 int initServer(int Clients, int Win, bool TestMode) {
     maxClients = Clients;
     maxWin = Win;
-
+    testingMode = TestMode;
     /*Inizializza le strutture dati relative al gioco*/
     initLogica();
 
