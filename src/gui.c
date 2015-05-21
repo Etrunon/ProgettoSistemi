@@ -221,6 +221,8 @@ void updateScreen() {
             break;
         case STANDARD_SERVER:
         {
+            clearScreen();
+            header();
             players();
             infoServer();
             messagges(MESSAGGI_A_SCHERMO);
