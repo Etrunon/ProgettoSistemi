@@ -10,6 +10,8 @@
 #include <wchar.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 GUIMode modalitaGUI;
 
@@ -20,7 +22,13 @@ void clearScreen() {
             printf("\n");
         }
      */
-    printf("%c[2J\n", 27);
+    //printf("%c[2J\n", 27);
+    int pid = fork();
+    if (pid == 0) {
+        execlp("tput", "tput", "reset", (char*) NULL);
+    } else {
+        wait(NULL);
+    }
     //printf("ciao\n");
 }
 
@@ -72,6 +80,12 @@ int puntoNormalizzato(int punto) {
 /*Stampa la classifica dei giocatori*/
 void players() {
     if (currentClients == 0) {
+        int i = 0;
+        /*
+                for (int i = 0; i < ALTEZZAPUNTI; i++) {
+                    printf("\n");
+                }
+         */
         /*Non ho giocatori, non stampo classifica*/
         return;
     }
@@ -152,7 +166,7 @@ void printDomanda() {
 void messagges(int number) {
 
     stampaMessaggi(number);
-    HorizontalLine();
+    //HorizontalLine();
 }
 
 /*Informazioni di gioco mostrate sul server*/
