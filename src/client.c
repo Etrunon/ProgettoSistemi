@@ -185,7 +185,7 @@ void ascoltaServer() {
                 //Un giocatore è uscito dalla partita e devo toglierlo dalla struttura
 
                 getNomeGiocatore(msg->IDOggetto, name);
-                togliGiocatore(msg->IDOggetto);
+                togliGiocatore(msg->IDOggetto, msg->timestring);
                 sprintf(msgTmp, "%s%s\n", name, " è uscito dal gioco");
                 aggiungiMessaggio(msgTmp, false, NULL);
             }

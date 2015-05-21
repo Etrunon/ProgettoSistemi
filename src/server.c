@@ -71,6 +71,8 @@ void * inputUtente(void* arg) {
                 printHelp(true);
             }
                 break;
+            case CLASSIFICA: //SetGUIMode(CLASSIFICA);
+                break;
         }
         updateScreen();
     } while (c != CHIUSURA);
@@ -278,7 +280,7 @@ void rimuoviGiocatore(messaggio* msg) {
     sprintf(tmpMessage, "%s%s\n", name, " si è disconnesso");
     aggiungiMessaggio(tmpMessage, false, NULL);
 
-    togliGiocatore(msg->IDMittente);
+    togliGiocatore(msg->IDMittente, msg->timestring);
 
     /*Avviso altri client dell'uscita del giocatore*/
     messaggio* logout = messaggioConstructor(IDServer, GIOCATORE_USCITO);
