@@ -18,6 +18,9 @@ giocatore* giocatoriCorrenti[10] = {};
 //Variabile contenente il prossimo ID da assegnare a un client
 int prossimoID = 1;
 
+saveStat* tot[200] = {};
+int indiceTot = 0;
+
 /**
  * Funzione costruttore che restituisce un puntatore a struct allocato dinamicamente e con tutti i
  * campi allocati vuoti e pronti da usare.
@@ -296,12 +299,72 @@ void clientAggiungiGiocatore(char* nome, int ID, int punteggio) {
 
 /*METODI COMUNI AL SERVER E AL CLIENT*/
 
+void swapStat(int index) {
+
+    //puntatore di servizio
+    saveStat *tmp;
+    //variabile di uscita dal ciclo
+    bool mosso;
+
+    //Se c'è un client solo sarà sempre ordinato
+    if (indiceTot == 1)
+        return;
+
+    // In caso di più client comincia a controllare
+    do {
+
+        //inizializzata a falso per uscire subito nel caso di situazione bilanciata
+        mosso = false;
+
+        //Se il giocatore index e il suo vicino di destra esiste
+        if (tot[index] != NULL && tot[index + 1] != NULL) {
+
+            //E se i punti di index sono minori dei punti del vicino di destra e NON sono sul limite destro dell'array
+            if (tot[index]->g->punteggio < tot[index + 1]->g->punteggio && index < indiceTot) {
+
+                //Allora swappo i due giocatori usando anche tmp
+                tmp = tot[index];
+                tot[index] = tot[index + 1];
+                tot[index + 1] = tmp;
+                //Ho applicato una modifica quindi devo ricontrollare
+                mosso = true;
+                //Aggiorno l'index per tenere controllato il punto di sbilanciamento
+                index++;
+            }
+        }
+
+        //Se il giocatore index e il suo vicino di sinistra esiste
+        if (tot[index] != NULL && tot[index - 1] != NULL) {
+            //E se i punti di index sono maggiori dei punti del vicino di sinistra e NON sono sul limite sinistro dell'array
+            if (index != 0 && tot[index - 1]->g->punteggio < tot[index]->g->punteggio) {
+
+                //Allora swappo i due giocatori usando anche tmp
+                tmp = tot[index];
+                tot[index] = tot[index - 1];
+                tot[index - 1] = tmp;
+                //Ho applicato una modifica quindi devo ricontrollare
+                mosso = true;
+                //Aggiorno l'index per tenere controllato il punto di sbilanciamento
+                index--;
+            }
+        }
+        //Controllo se ho applicato modifiche, potrei ancora essere sbilanciato
+    } while (mosso == true);
+}
+
+void salvaStat(giocatore* g, char *time) {
+
+    tot[indiceTot]->g = g;
+    tot[indiceTot]->time = time;
+    swapStat(indiceTot);
+}
+
 /**
  * Metodo che toglie il giocatore specificato dalla lista di quelli presenti a seguito per esempio di un
  * logout. Riordina la lista di giocatori presenti.
  * @param ID
  */
-void togliGiocatore(int ID) {
+void togliGiocatore(int ID, char* timestring) {
 
     //Prendo l'indice nell'array del giocatore
     int i = cercaGiocatore(ID);
@@ -311,10 +374,16 @@ void togliGiocatore(int ID) {
     swap(i);
     //Decremento i client collegati
     currentClients--;
-    //Tolgo il giocatore dall'array e lo distruggo col metodo apposito
-    giocatore *p = giocatoriCorrenti[currentClients];
+    //Tolgo il giocatore dall'array e lo salvo nella struttura saveStat col metodo apposito
+
+    saveStat *sv = (saveStat*) malloc(1 * sizeof (saveStat));
+    sv->g = giocatoriCorrenti[currentClients];
+    sv->time = (char*) malloc((strlen(timestring) + 1) *(sizeof (char)));
+    strcpy(sv->time, timestring);
+
+    tot[indiceTot] = sv;
+    indiceTot++;
     giocatoriCorrenti[currentClients] = NULL;
-    giocatoreDestructor(p);
 }
 
 /**

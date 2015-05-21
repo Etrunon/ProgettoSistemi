@@ -24,6 +24,11 @@ typedef struct giocatoreTag {
     int punteggio;
 } giocatore;
 
+typedef struct saveStatTag {
+    giocatore *g;
+    char *time;
+} saveStat;
+
 //Costante col limite massimo di giocatori
 extern int maxClients;
 //Costante col limite massimo di punti alla vittoria
@@ -110,7 +115,7 @@ void clientAggiungiGiocatore(char* nome, int ID, int punteggio);
  * logout. Riordina la lista di giocatori presenti.
  * @param ID
  */
-void togliGiocatore(int ID);
+void togliGiocatore(int ID, char* timestring);
 
 /**
  * Getter del nome del giocatore. Riempie una stringa sufficientemente lunga passata per puntatore.
