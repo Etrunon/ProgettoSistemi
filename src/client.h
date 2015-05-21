@@ -11,7 +11,7 @@
 #include "logica.h"
 
 extern bool connesso;
-int initClient();
+int initClient(bool testMode);
 
 #endif	/* CLIENT_H */
 

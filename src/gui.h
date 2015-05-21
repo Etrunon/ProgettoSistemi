@@ -11,6 +11,9 @@
 #include <stdbool.h>
 
 typedef enum GUIMode {
+    INIT,
+    TESTING_CLIENT,
+    TESTING_SERVER,
     STANDARD_CLIENT, //Client mentre gioca
     STANDARD_SERVER, //Server mentre gioca
     LOGIN_CLIENT, //Client prima di entrare in gioco

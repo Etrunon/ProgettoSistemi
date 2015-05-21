@@ -13,7 +13,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-GUIMode modalitaGUI;
+GUIMode modalitaGUI = INIT;
 
 void clearScreen() {
     /*
@@ -91,7 +91,7 @@ void players() {
     }
     int ultimoPuntoStampato = ALTEZZAPUNTI;
     int i;
-    char format [5];
+    char format [20];
 
     /* Vecchio metodo per calcolare larghezza grafico in base a num giocatori
         int larghezzaAutomatica = 17;
@@ -197,25 +197,34 @@ void infoServer() {
 }
 
 void updateScreen() {
-    clearScreen();
-    header();
     switch (modalitaGUI) {
         case LOGIN_CLIENT:
         {
+            clearScreen();
+            header();
             messagges(MESSAGGI_A_SCHERMO);
             printf("\r%s", "Inserisci il nome:");
         }
             break;
         case STANDARD_CLIENT:
         {
+            clearScreen();
+            header();
             players();
             messagges(MESSAGGI_A_SCHERMO);
             printDomanda();
             printf("\r%s", "Client:");
         }
             break;
+        case TESTING_CLIENT:
+        {
+
+        }
+            break;
         case EXIT_CLIENT:
         {
+            clearScreen();
+            header();
             messagges(MESSAGGI_A_SCHERMO);
         }
             break;
@@ -230,8 +239,16 @@ void updateScreen() {
             printf("\r%s", "Server:");
         }
             break;
+        case TESTING_SERVER:
+        {
+            //clearScreen();
+            messagges(1);
+        }
+            break;
         case EXIT_SERVER:
         {
+            clearScreen();
+            header();
             players();
             infoServer();
             messagges(MESSAGGI_A_SCHERMO);
@@ -239,7 +256,7 @@ void updateScreen() {
             break;
         case LOG:
         {
-
+            clearScreen();
             messagges(BUFFERMESSAGGI);
             printf("\r%s", "Q PER TORNARE INDIETRO:");
         }
@@ -250,5 +267,6 @@ void updateScreen() {
 
 /*Wrapper per settare la modalità di visualizzazione della GUI*/
 void SetGUIMode(GUIMode mode) {
-    modalitaGUI = mode;
+    if (modalitaGUI != TESTING_CLIENT && modalitaGUI != TESTING_SERVER)
+        modalitaGUI = mode;
 }
