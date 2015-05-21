@@ -91,7 +91,7 @@ void players() {
     }
     int ultimoPuntoStampato = ALTEZZAPUNTI;
     int i;
-    char format [5];
+    char format [20];
 
     /* Vecchio metodo per calcolare larghezza grafico in base a num giocatori
         int larghezzaAutomatica = 17;
@@ -241,8 +241,8 @@ void updateScreen() {
             break;
         case TESTING_SERVER:
         {
-            clearScreen();
-            messagges(BUFFERMESSAGGI);
+            //clearScreen();
+            messagges(1);
         }
             break;
         case EXIT_SERVER:

@@ -1,17 +1,19 @@
-#include "client.h"
-#include "CONST.h"
-#include "allFifo.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <signal.h>
+#include <string.h>
+#include <pthread.h>
+#include <time.h>
+
+#include "client.h"
+#include "CONST.h"
+#include "allFifo.h"
 #include "riparser.h"
 #include "commands.h"
 #include "gui.h"
 #include "logica.h"
 #include "guiMessages.h"
-#include <signal.h>
-#include <string.h>
-#include <pthread.h>
 
 int ascoltoDalServer;
 int scriviAlServer;
@@ -21,6 +23,7 @@ int clientID;
 char name[MAXNAME];
 
 bool connesso = false;
+bool testing = false;
 
 char msgTmp [BUFFMESSAGGIO];
 
@@ -74,6 +77,12 @@ void * inputUtenteClient(void* arg) {
             {
                 //Se l'input è una risposta E sono connesso a una partita, allora cerco di inviarla
                 if (connesso) {
+
+                    struct timespec intervallo, intervallo2;
+                    intervallo.tv_sec = 0;
+                    intervallo.tv_nsec = 200000000 + 100000000 * (rand() % 30);
+
+                    nanosleep(&intervallo, &intervallo2);
                     messaggio* msg = messaggioConstructor(clientID, INVIA_RISPOSTA);
                     msg->risposta = d.risposta;
                     inviaMessaggio(scriviAlServer, msg);
@@ -103,7 +112,9 @@ void * inputUtenteClient(void* arg) {
                     sprintf(m->pathFifo, "%s", clientFifo);
                     sprintf(m->nomeClient, "%s", d.nome);
                     inviaMessaggio(scriviAlServer, m);
+
                     messaggioDestructor(m);
+
                 }
             }
                 break;
@@ -141,6 +152,12 @@ void ascoltaServer() {
             {
                 //Il server ci ha accettato il login
                 connesso = true;
+
+                if (testing) {
+                    pthread_t threadID;
+                    pthread_create(&threadID, NULL, &inputUtenteClient, NULL);
+                }
+
                 //Si cambia l'interfaccia
                 SetGUIMode(STANDARD_CLIENT);
                 //Aggiungo l'ID assegnatomi dal server alle mie variabili globali
@@ -200,7 +217,7 @@ void ascoltaServer() {
                 break;
             case INVIA_DOMANDA:
             {
-                //Il server mi ha inviato una nuova domanda 
+                //Il server mi ha inviato una nuova domanda
                 domandaCorrente.numero1 = msg->domanda1;
                 domandaCorrente.numero2 = msg->domanda2;
                 sprintf(msgTmp, "%s\n", "Domanda modificata");
@@ -242,6 +259,7 @@ void ascoltaServer() {
 }
 
 int initClient(bool testMode) {
+    testing = testMode;
 
     /*Gestisco segnali di chiusura improvvisa dell'applicazione*/
     signal(SIGTERM, cleanupClient);
@@ -296,13 +314,23 @@ int initClient(bool testMode) {
     }
 
     /*Faccio partire l'ascoltatore di messaggi da terminale*/
-    pthread_t threadID;
-    pthread_create(&threadID, NULL, &inputUtenteClient, NULL);
+    if (!testMode) {
+        pthread_t threadID;
+        pthread_create(&threadID, NULL, &inputUtenteClient, NULL);
+    } else {
+        messaggio* partecipazione = messaggioConstructor(0, RICHIESTA_PARTECIPAZIONE);
+        sprintf(partecipazione->pathFifo, "%s", clientFifo);
+        char nome [MAXNAME];
+        scanf("%s", nome);
+        sprintf(partecipazione->nomeClient, "%s", nome);
+        inviaMessaggio(scriviAlServer, partecipazione);
+        messaggioDestructor(partecipazione);
+    }
 
     /*Ascolto FIFO server*/
     ascoltaServer();
 
-    pthread_join(threadID, NULL);
+    //pthread_join(threadID, NULL);
 
 
     cleanupClient(0);

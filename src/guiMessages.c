@@ -6,7 +6,7 @@
 #include "guiMessages.h"
 #include "gui.h"
 
-pthread_mutex_t aggiungiMessaggioMutex;
+pthread_mutex_t aggiungiMessaggioMutex = PTHREAD_MUTEX_INITIALIZER;
 
 coda codaMessaggi = {
     0,

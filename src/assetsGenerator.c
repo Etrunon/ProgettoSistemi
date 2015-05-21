@@ -15,7 +15,7 @@
 
 FILE* server;
 FILE* client;
-int numClients;
+int numClients = 20;
 
 /*
  *
@@ -26,9 +26,7 @@ void assetServer() {
 };
 
 void rand_str(char *dest, size_t length) {
-    char charset[] = "0123456789"
-            "abcdefghijklmnopqrstuvwxyz"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    char charset[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     while (length-- > 0) {
         size_t index = (double) rand() / RAND_MAX * (sizeof charset - 1);
@@ -38,8 +36,8 @@ void rand_str(char *dest, size_t length) {
 }
 
 void printName() {
-    char name [30];
-    int length = rand() % 30;
+    char name [50];
+    int length = rand() % 6;
     rand_str(name, length);
     fprintf(client, "%s\n", name);
 }
@@ -59,35 +57,40 @@ void printRisposte() {
 
 void assetClient() {
     int i = 0;
-    for (i; i < numClients; i++) {
-        char nomeFile [20];
+    for (i = 0; i < numClients; i++) {
+        char nomeFile [60] = {};
         sprintf(nomeFile, "%s%i%s", CLIENTFILE, i, ".txt");
 
         client = fopen(nomeFile, "w");
         if (client == NULL) {
-            perror("");
             exit(EXIT_FAILURE);
         }
+
         printName();
         printRisposte();
+
+        fclose(client);
     }
 };
 
 int main(int argc, char** argv) {
     printf("Creazione degli assets in corso.. \n");
-    numClients = 1;
+    numClients = 20;
     srand(time(NULL));
 
-    if (argc > 1) {
-        numClients = strtol(argv[1], NULL, 0);
-    }
-    server = fopen(SERVERFILE, "w");
+    /*
+        if (argc > 1) {
+            numClients = strtol(argv[1], NULL, 0);
+        }
+
+     * server = fopen(SERVERFILE, "w");
     if (server == NULL) {
         perror("");
         exit(EXIT_FAILURE);
     }
 
     assetServer();
+     */
     assetClient();
 
     printf("Assets creati!\n");
