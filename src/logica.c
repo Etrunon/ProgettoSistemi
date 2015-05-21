@@ -178,6 +178,9 @@ void serverGeneraClassifica(int* IDclients, int* punteggi) {
  */
 int serverAggiungiGiocatore(char* nome, int handlerFIFO) {
 
+    if (currentClients >= maxClients)
+        return -1;
+
     //Creo un giocatore e lo riempio coi dati in input
     giocatore* g = giocatoreConstructor();
     g->handlerFIFO = handlerFIFO;
