@@ -59,8 +59,14 @@ void aggiungiMessaggio(char* msg, bool centrato, char* colore) {
 
     if (colore != NULL) {
         strcpy(tmpBuffer, colore);
+
+        char tmp = msg[strlen(msg) - 1];
+        msg[strlen(msg) - 1] = '\0';
+
         strcat(tmpBuffer, msg);
         strcat(tmpBuffer, ANSI_COLOR_RESET);
+        strcat(tmpBuffer, &tmp);
+
     } else {
         strcpy(tmpBuffer, msg);
     }
@@ -68,7 +74,7 @@ void aggiungiMessaggio(char* msg, bool centrato, char* colore) {
 
     if (centrato) {
         char tmpBuffer1 [BUFFMESSAGGIO];
-        sprintf(tmpBuffer1, "%*s", LARGHEZZASCHERMO + (int) strlen(tmpBuffer) / 2, tmpBuffer);
+        sprintf(tmpBuffer1, "%*s", LARGHEZZASCHERMO / 2 + (int) strlen(tmpBuffer) / 2, tmpBuffer);
         strcpy(codaMessaggi.messaggi[codaMessaggi.tail], tmpBuffer1);
     }
     codaMessaggi.tail = (codaMessaggi.tail + 1) % BUFFERMESSAGGI;
