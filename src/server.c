@@ -236,7 +236,6 @@ void checkRisposta(messaggio * msg) {
         } else {
 
             //Aggiorno il punto in più al client. Setto il booleano dell'esito a true
-            serverAggiornaPunti(msg->IDMittente, 1);
             esito->corretta = true;
         }
     } else {
@@ -246,7 +245,7 @@ void checkRisposta(messaggio * msg) {
         aggiungiMessaggio(tmpMessage, false, NULL);
 
         //Aggiorno i punti del client al meno uno e setto il bool a falso
-        serverAggiornaPunti(msg->IDMittente, -1);
+        vittoria = serverAggiornaPunti(msg->IDMittente, -1);
         esito->corretta = false;
 
     }
@@ -295,7 +294,7 @@ void ascoltaClients() {
         leggiMessaggio(ascoltoDaiClient, msg);
 
         switch (msg->codiceMsg) {
-            case RISPOSTA:
+            case INVIA_RISPOSTA:
             {
                 checkRisposta(msg);
             }

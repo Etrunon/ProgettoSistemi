@@ -188,9 +188,9 @@ int serverAggiungiGiocatore(char* nome, int handlerFIFO) {
 
     //Assegno il giocatore alla struttura dati
     giocatoriCorrenti[currentClients] = g;
-    swap(currentClients);
-    currentClients++;
 
+    currentClients++;
+    swap(currentClients - 1);
 
     //Ritorno l'id assegnato al client
     return prossimoID - 1;
@@ -232,13 +232,17 @@ bool serverAggiornaPunti(int ID, int punti) {
         giocatoriCorrenti[index]->punteggio += punti;
 
     //Controllo se devo riordinare la classifica
-    swap(index);
+
 
     //Se il giocatore ha vinto allora ritorno true, altrimenti false
-    if (giocatoriCorrenti[index]->punteggio >= maxWin)
+    if (giocatoriCorrenti[index]->punteggio >= maxWin) {
+        swap(index);
         return true;
-    else
-        return true;
+    } else {
+        swap(index);
+        return false;
+
+    }
 }
 
 /**
@@ -263,6 +267,7 @@ void clientAggiornaPunti(int ID, int punti) {
 
     int i = cercaGiocatore(ID);
     giocatoriCorrenti[i]->punteggio = punti;
+    swap(i);
 }
 
 /**
@@ -282,9 +287,8 @@ void clientAggiungiGiocatore(char* nome, int ID, int punteggio) {
 
     //Assegno il giocatore alla struttura dati
     giocatoriCorrenti[currentClients] = g;
-    swap(currentClients);
     currentClients++;
-
+    swap(currentClients - 1);
 }
 
 /*METODI COMUNI AL SERVER E AL CLIENT*/

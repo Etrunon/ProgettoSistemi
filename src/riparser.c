@@ -18,15 +18,24 @@ messaggio* messaggioConstructor(int IDMittente, tipoMessaggio tipoMsg) {
     msg->PIDMittente = getpid();
     msg->codiceMsg = tipoMsg;
     msg->timestring = (char*) malloc(25 * (sizeof (char)));
+    memset(msg->timestring, 0, 25);
+
     msg->msg = (char*) malloc(MSG_SIZE * (sizeof (char)));
+    memset(msg->msg, 0, MSG_SIZE);
+
     msg->pathFifo = (char*) malloc(MAX_FIFONAME * (sizeof (char)));
+    memset(msg->pathFifo, 0, MAX_FIFONAME);
+
     msg->nomeClient = (char*) malloc(MAXNAME * (sizeof (char)));
+    memset(msg->nomeClient, 0, MAXNAME);
+
     msg->risposta = -1;
     msg->IDMittente = IDMittente;
     msg->punti = -1;
     msg->domanda1 = -1;
     msg->domanda2 = -1;
     msg->corretta = false;
+    msg->IDOggetto = -1;
 
     return msg;
 }

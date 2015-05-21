@@ -53,7 +53,10 @@ void serverDisconnesso(int sig) {
 
     sprintf(msgTmp, "%s\n", "Server disconnesso!");
     aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
-    cleanupClient(0);
+    //cleanupClient(0);
+    close(ascoltoDalServer);
+    unlink(clientFifo);
+    exit(EXIT_SUCCESS);
 }
 
 void * inputUtenteClient(void* arg) {
@@ -153,6 +156,7 @@ void ascoltaServer() {
             case NUOVO_GIOCATORE_ENTRATO:
             {
                 //E' arrivato un nuovo giocatore nella partita. Si aggiungono i suoi dati alla classifica
+                strcpy(name, msg->nomeClient);
                 clientAggiungiGiocatore(name, msg->IDOggetto, msg->punti);
                 sprintf(msgTmp, "%s%s\n", msg->nomeClient, " si è unito al gioco");
                 aggiungiMessaggio(msgTmp, false, NULL);
@@ -162,8 +166,10 @@ void ascoltaServer() {
             case GIOCATORE_USCITO:
             {
                 //Un giocatore è uscito dalla partita e devo toglierlo dalla struttura
+
+                getNomeGiocatore(msg->IDOggetto, name);
                 togliGiocatore(msg->IDOggetto);
-                sprintf(msgTmp, "%s%s\n", msg->nomeClient, " è uscito dal gioco");
+                sprintf(msgTmp, "%s%s\n", name, " è uscito dal gioco");
                 aggiungiMessaggio(msgTmp, false, NULL);
             }
                 break;
