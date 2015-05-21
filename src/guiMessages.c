@@ -45,7 +45,7 @@ void stampaMessaggi(int numMessaggi) {
 void aggiungiMessaggio(char* msg, bool centrato, char* colore) {
     pthread_mutex_lock(&aggiungiMessaggioMutex);
 
-    char tmpBuffer [BUFFMESSAGGIO];
+    char tmpBuffer [BUFFMESSAGGIO] = {0};
 
     char* tmp = codaMessaggi.messaggi[codaMessaggi.tail];
     /*Sto sovrascrivendo un messaggio perché ho riempito la coda */
@@ -65,7 +65,10 @@ void aggiungiMessaggio(char* msg, bool centrato, char* colore) {
 
         strcat(tmpBuffer, msg);
         strcat(tmpBuffer, ANSI_COLOR_RESET);
-        strcat(tmpBuffer, &tmp);
+        //strcat(tmpBuffer, &tmp);
+
+        // tmpBuffer[strlen(tmpBuffer) + 1 ] = tmp;
+        sprintf(tmpBuffer, "%s%c", tmpBuffer, tmp);
 
     } else {
         strcpy(tmpBuffer, msg);
