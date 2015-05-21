@@ -15,6 +15,7 @@ typedef struct codaTag {
     int numMessaggi;
     int head;
     int tail;
+    bool centrato [BUFFERMESSAGGI];
     char* messaggi [BUFFERMESSAGGI];
 } coda;
 

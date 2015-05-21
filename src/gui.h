@@ -10,6 +10,8 @@
 
 #include <stdbool.h>
 
+extern int larghezzaSchermo;
+
 typedef enum GUIMode {
     INIT,
     TESTING_CLIENT,
@@ -19,7 +21,8 @@ typedef enum GUIMode {
     LOGIN_CLIENT, //Client prima di entrare in gioco
     EXIT_CLIENT, //Client dopo essere uscito dal gioco
     EXIT_SERVER, //Server dopo aver terminato la sua attività
-    LOG //Mostra lo storico di messaggi ricevuti
+    LOG, //Mostra lo storico di messaggi ricevuti
+    VISUALIZZA_CLASSIFICA //Stampa classifica
 } GUIMode;
 
 GUIMode modalitaGUI;

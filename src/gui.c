@@ -15,6 +15,60 @@
 
 GUIMode modalitaGUI = INIT;
 
+int larghezzaSchermo = 80;
+
+void calcolaLarghezzaSchermo(int arg) {
+    int pid, status;
+    char buff [20];
+    int fd[2];
+
+    char* commands[] = {"tput", "cols", NULL};
+    pipe(fd);
+
+    pid = fork();
+
+    if (pid == 0) {
+        dup2(fd[1], 1);
+        close(fd[0]);
+        execvp("tput", commands);
+    } else {
+
+        wait(&status);
+        read(fd[0], buff, 20);
+        larghezzaSchermo = strtol(buff, NULL, 10);
+        //printf("\nLarghezza schermo: %i\n", number);
+    }
+
+    updateScreen();
+
+    signal(SIGWINCH, calcolaLarghezzaSchermo);
+}
+
+/*
+void calcolaSchermo() {
+    int pid, status;
+    char buff [20];
+    int fd[2];
+    int number;
+
+    char* commands[] = {"tput", "cols", NULL};
+    pipe(fd);
+
+    pid = fork();
+
+    if (pid == 0) {
+        dup2(fd[1], 1);
+        close(fd[0]);
+        execvp("tput", commands);
+    } else {
+
+        wait(&status);
+        read(fd[0], buff, 20);
+        number = strtol(buff, NULL, 10);
+    }
+}
+ */
+
 void clearScreen() {
     /*
         int i;
@@ -27,6 +81,7 @@ void clearScreen() {
     if (pid == 0) {
         execlp("tput", "tput", "reset", (char*) NULL);
     } else {
+
         wait(NULL);
     }
     //printf("ciao\n");
@@ -35,12 +90,13 @@ void clearScreen() {
 /*Stampa la linea di separazione nell'interfaccia grafica*/
 void HorizontalLine() {
     int i;
-    char line [LARGHEZZASCHERMO * 7] = {};
-    for (i = 0; i < LARGHEZZASCHERMO; i++) {
+    char line [400] = {};
+    for (i = 0; i < larghezzaSchermo; i++) {
+
         strcat(line, "\u2501");
     }
 
-    printf("%*s\n", LARGHEZZASCHERMO / 2 + (int) strlen(line) / 2, line);
+    printf("%*s\n", larghezzaSchermo / 2 + (int) strlen(line) / 2, line);
 }
 
 /*Stampa il logo del gioco*/
@@ -55,8 +111,9 @@ void header() {
         size_t size = sizeof (char) * 250;
         int stampati, letti;
         while ((letti = getline(&read_string, &size, fptr)) != -1) {
+
             read_string[letti - 1 ] = '\0';
-            stampati = printf("%*s\n", LARGHEZZASCHERMO / 2 + (int) strlen(read_string) / 2, read_string);
+            stampati = printf("%*s\n", larghezzaSchermo / 2 + (int) strlen(read_string) / 2, read_string);
 
         }
         //printf("\n");
@@ -74,11 +131,12 @@ int puntoNormalizzato(int punto) {
             return 1;
      */
     int punteggio = (ALTEZZAPUNTI * punto) / maxWin;
+
     return punteggio;
 }
 
 /*Stampa la classifica dei giocatori*/
-void players() {
+void playersGraph() {
     if (currentClients == 0) {
         int i = 0;
         /*
@@ -102,7 +160,7 @@ void players() {
      */
 
     /*Calcola dinamicamente lo spazio per centrare la classifica in base al numero di giocatori*/
-    sprintf(format, "%c%i%c", '%', LARGHEZZASCHERMO / (currentClients + 1), 's');
+    sprintf(format, "%c%i%c", '%', larghezzaSchermo / (currentClients + 1), 's');
 
     for (ultimoPuntoStampato; ultimoPuntoStampato > 0; ultimoPuntoStampato--) {
         /*Cicla stampando dal punteggio più alto al più basso*/
@@ -125,7 +183,7 @@ void players() {
     }
 
     /*Stampa l'ID del giocatore*/
-    sprintf(format, "%c%i%c", '%', LARGHEZZASCHERMO / (currentClients + 1), 'i');
+    sprintf(format, "%c%i%c", '%', larghezzaSchermo / (currentClients + 1), 'i');
     for (i = 0; i < currentClients; i++) {
         printf(format, getPuntiGiocatore(giocatoriCorrenti[i]->IDGiocatore));
     }
@@ -133,10 +191,11 @@ void players() {
 
 
     /*TODO: Stampa punteggio e nome*/
-    sprintf(format, "%c%i%c", '%', -(LARGHEZZASCHERMO / (currentClients + 1)) + 2, 's');
+    sprintf(format, "%c%i%c", '%', -(larghezzaSchermo / (currentClients + 1)) + 2, 's');
     printf(format, "");
-    sprintf(format, "%c%i%c", '%', -(LARGHEZZASCHERMO / (currentClients + 1)), 's');
+    sprintf(format, "%c%i%c", '%', -(larghezzaSchermo / (currentClients + 1)), 's');
     for (i = 0; i < currentClients; i++) {
+
         char tmp [MAXNAME], nomeAbbreviato [4];
         getNomeGiocatore(giocatoriCorrenti[i]->IDGiocatore, tmp);
 
@@ -150,6 +209,7 @@ void players() {
 
 /*Stampa la domanda*/
 void printDomanda() {
+
     char line [200];
     sprintf(line, "%s%s%i%s%s%s%i%s%s", "Quanto fa ",
             ANSI_COLOR_MAGENTA, domandaCorrente.numero1, ANSI_COLOR_RESET,
@@ -157,7 +217,7 @@ void printDomanda() {
             ANSI_COLOR_MAGENTA, domandaCorrente.numero2, ANSI_COLOR_RESET,
             "?");
 
-    printf("%*s", LARGHEZZASCHERMO / 2 + ((int) strlen(line) / 2) + 5, line);
+    printf("%*s", larghezzaSchermo / 2 + ((int) strlen(line) / 2) + 5, line);
     printf("\n");
 }
 
@@ -174,7 +234,7 @@ void infoServer() {
 
     char informazione [BUFFMESSAGGIO];
     int spazioRimanente;
-    int spazio = (LARGHEZZASCHERMO / 2) - 2;
+    int spazio = (larghezzaSchermo / 2) - 2;
 
     strcpy(informazione, "Max giocatori:");
     spazioRimanente = spazio - strlen(informazione);
@@ -197,6 +257,8 @@ void infoServer() {
 }
 
 void updateScreen() {
+    signal(SIGWINCH, calcolaLarghezzaSchermo);
+
     switch (modalitaGUI) {
         case LOGIN_CLIENT:
         {
@@ -210,7 +272,7 @@ void updateScreen() {
         {
             clearScreen();
             header();
-            players();
+            playersGraph();
             messagges(MESSAGGI_A_SCHERMO);
             printDomanda();
             printf("\r%s", "Client:");
@@ -232,7 +294,7 @@ void updateScreen() {
         {
             clearScreen();
             header();
-            players();
+            playersGraph();
             infoServer();
             messagges(MESSAGGI_A_SCHERMO);
             printDomanda();
@@ -249,15 +311,17 @@ void updateScreen() {
         {
             clearScreen();
             header();
-            players();
+            playersGraph();
             infoServer();
             messagges(MESSAGGI_A_SCHERMO);
         }
             break;
         case LOG:
         {
+
             clearScreen();
             messagges(BUFFERMESSAGGI);
+            HorizontalLine();
             printf("\r%s", "Q PER TORNARE INDIETRO:");
         }
             break;
