@@ -223,9 +223,9 @@ void printDomanda() {
 
     char line [200];
     sprintf(line, "%s%s%i%s%s%s%i%s%s", "Quanto fa ",
-            ANSI_COLOR_MAGENTA, domandaCorrente.numero1, ANSI_COLOR_RESET,
+            ANSI_COLOR_VIOLET, domandaCorrente.numero1, ANSI_COLOR_RESET,
             " + ",
-            ANSI_COLOR_MAGENTA, domandaCorrente.numero2, ANSI_COLOR_RESET,
+            ANSI_COLOR_VIOLET, domandaCorrente.numero2, ANSI_COLOR_RESET,
             "?");
 
     printf("%*s", larghezzaSchermo / 2 + ((int) strlen(line) / 2) + 5, line);

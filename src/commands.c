@@ -19,7 +19,7 @@ comando analizzaInput(data* output, char* input) {
     int numero;
     numero = strtol(input, &carattereErrore, 10);
     //se ho un numero, controllo se è nel range ammissibile per essere inviato al server
-    if (*carattereErrore == '\0') {
+    if (strcmp(carattereErrore, "\0") == 0) {
         if (numero > 999999 || numero < -99999) {
             char msg [BUFFMESSAGGIO];
             sprintf(msg, "%s\n", "Risposta non ammissibile");
@@ -38,7 +38,7 @@ comando analizzaInput(data* output, char* input) {
 comando leggiInput(data* inputUtente) {
     char* commands = NULL;
     size_t size;
-    char command [MAXCOMMAND];
+    char command [MAXCOMMAND] = {};
     char msgAschermo [BUFFMESSAGGIO];
 
     /*Leggo l'intera linea da terminale*/
@@ -60,13 +60,17 @@ comando leggiInput(data* inputUtente) {
     sscanf(commands, "%s", command);
     free(commands);
 
+    if (strlen(command) == 0) {
+        return ERRORE;
+    };
+
     /*Controllo se l'input è un comando da eseguire*/
 
     if ((strcasecmp(command, "exit")) == 0) {
         return CHIUSURA;
     }
-    if ((strcasecmp(command, "classifica")) == 0) {
-        return CLASSIFICA;
+    if ((strcasecmp(command, "storico")) == 0) {
+        return STORICO;
     }
     if ((strcasecmp(command, "help")) == 0) {
         return HELP;
@@ -101,8 +105,7 @@ void printHelp(bool server) {
     sprintf(msg, "%-15s%s\n", "exit", "Esci dalla partita");
     aggiungiMessaggio(msg, false, ANSI_COLOR_GREEN);
 
-    if (!server) {
-        sprintf(msg, "%-15s%s\n", "classifica", "Stampa la classifica di giocatori");
-        aggiungiMessaggio(msg, false, ANSI_COLOR_GREEN);
-    }
+    sprintf(msg, "%-15s%s\n", "storico", "Visualizza i giocatori che hanno partecipato al gioco");
+    aggiungiMessaggio(msg, false, ANSI_COLOR_GREEN);
+
 }

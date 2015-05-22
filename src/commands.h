@@ -13,7 +13,7 @@
 /*Tipo di comando che l'utente ha dato in input*/
 typedef enum comando {
     CHIUSURA,
-    CLASSIFICA,
+    STORICO,
     HELP,
     LOG_SHOW,
     LOG_EXIT,

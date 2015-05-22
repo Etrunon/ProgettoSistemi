@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 
     int server = 0;
     int testing = 0;
-    int maxClients = 1;
+    int maxClients = 10;
     int winPoints = 10;
 
     if (argc == 1) {
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
                 explainParameters();
                 return (EXIT_FAILURE);
             }
-            break;
+                break;
         }
     }
 

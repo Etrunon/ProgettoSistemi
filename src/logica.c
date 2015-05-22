@@ -49,12 +49,8 @@ void giocatoreDestructor(giocatore *g) {
  * mettendo in risalto i campi interni.
  * @param g puntatore al giocatore da stampare
  */
-void* testStampaGiocatore(giocatore *g) {
-
-
-    printf("Ecco il giocatore %s\n", g->name);
-    printf("ID: %i, Handler: %i, Punti: %i\n", g->IDGiocatore, g->handlerFIFO, g->punteggio);
-    printf("\n");
+void* StampaGiocatore(giocatore *g, char* riempi) {
+    sprintf(riempi, "ID:%i punti:%i nome:%s\n", g->IDGiocatore, g->punteggio, g->name);
 }
 
 /**
@@ -70,7 +66,7 @@ void testStampaClassifica(char* str) {
 
     int i = 0;
     for (i; i < currentClients; i++) {
-        testStampaGiocatore(giocatoriCorrenti[i]);
+        StampaGiocatore(giocatoriCorrenti[i], NULL);
     }
     printf("\tFine classifica\n\n");
 }

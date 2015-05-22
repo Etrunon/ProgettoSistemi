@@ -61,7 +61,7 @@ void serverCambiaDomanda();
 /**
  * Funzione che riempie gli array passati per parametro con i punteggi dei giocatori presenti.
  * Assume che la classifica sia già correttamente ordinata.
- * @param IDclients array con gli id 
+ * @param IDclients array con gli id
  * @param punteggi  array con i punti
  */
 void serverGeneraClassifica(int* IDclients, int* punteggi);
@@ -80,7 +80,7 @@ int serverAggiungiGiocatore(char* nome, int handlerFIFO);
  * Ritorna true se il giocatore in questione ha vinto
  * @param ID
  * @param punti
- * @return 
+ * @return
  */
 bool serverAggiornaPunti(int ID, int punti);
 
@@ -128,10 +128,14 @@ void togliGiocatore(int ID, char* timestring);
 void getNomeGiocatore(int ID, char* riempi);
 
 /**
- * Getter dei punti del giocatore con ID. 
+ * Getter dei punti del giocatore con ID.
  * @param ID
- * @return punti 
+ * @return punti
  */
 int getPuntiGiocatore(int ID);
+
+
+void* StampaGiocatore(giocatore *g, char* riempi);
+int cercaGiocatore(int ID);
 #endif	/* LOGICA_H */
 

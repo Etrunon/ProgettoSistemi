@@ -13,6 +13,7 @@
 #include "logica.h"
 #include "gui.h"
 #include "guiMessages.h"
+#include "messaggiASchermo.h"
 
 int ascoltoDaiClient;
 int IDServer = 0;
@@ -71,7 +72,7 @@ void * inputUtente(void* arg) {
                 printHelp(true);
             }
                 break;
-            case CLASSIFICA: SetGUIMode(VISUALIZZA_CLASSIFICA_SERVER);
+            case STORICO: SetGUIMode(VISUALIZZA_CLASSIFICA_SERVER);
                 break;
         }
         updateScreen();
@@ -146,12 +147,19 @@ void aggiungiGiocatore(messaggio * msg) {
         inviaMessaggio(handlerFIFO, rifiutato);
         messaggioDestructor(rifiutato);
         close(handlerFIFO);
+        if (testingMode) {
+            printf(tmpMessage, "%s%s\n", "Non ho spazio sul server per ", msg->nomeClient);
+            StampaTesting(tmpMessage);
+        }
         return;
     } else {
 
         //Stampo sul server che c'è un nuovo player
-        sprintf(tmpMessage, "%s %s\n", "Si è aggiunto al gioco il giocatore", msg->nomeClient);
-        aggiungiMessaggio(tmpMessage, false, ANSI_COLOR_GREEN);
+        StampaNuovoGiocatore(msg->nomeClient);
+
+        if (testingMode) {
+            StampaTestingGiocatore(IDGiocatore);
+        }
 
         /*Giocatore accettato*/
         messaggio* accettato = messaggioConstructor(IDServer, ACCETTA_CLIENT);
@@ -195,8 +203,12 @@ void vincitore(int ID) {
     getNomeGiocatore(ID, nome);
 
     //Stampo sul server il messaggio in cui dico che ha vinto
-    sprintf(tmpMessage, "%s%s\n", nome, " ha vinto! BRAVOh!");
-    aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_YELLOW);
+    StampaVittoria(nome);
+
+    /*Print usata per avere informazioni sul giocatore in testing*/
+    if (testingMode) {
+        StampaTestingGiocatore(ID);
+    }
 
     //Creo il messaggio di vittoria da mandare in broadcast
     messaggio* vittoria = messaggioConstructor(IDServer, VITTORIA);
@@ -206,9 +218,8 @@ void vincitore(int ID) {
 
     SetGUIMode(VISUALIZZA_CLASSIFICA_SERVER);
 
-    //Stampo a server che la partita terminata e chiudo tutto
-    sprintf(tmpMessage, "%s\n", "Partita terminata!");
-    aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_YELLOW);
+    //Stampo a server che la partita terminata
+    StampaPartitaTerminata();
     //cleanupServer(0);
 }
 
@@ -228,16 +239,17 @@ void checkRisposta(messaggio * msg) {
 
     if (risultato == rispostaCorretta) {
 
-        /*Ha risposto correttamente e lo stampo a video sul server*/
-        if (testingMode) {
-            sprintf(tmpMessage, "%s%i%s%s%s\n", "ID: ", msg->IDMittente, " nome: ", name, " risposta corretta");
-        } else {
-            sprintf(tmpMessage, "%s%s\n", name, " ha risposto correttamente, Bravo!");
-        }
-        aggiungiMessaggio(tmpMessage, false, NULL);
-
         /*Aggiorno i suoi punti, controllo se ha vinto*/
         vittoria = serverAggiornaPunti(msg->IDMittente, 1);
+
+
+        /*Ha risposto correttamente e lo stampo a video sul server*/
+        StampaEsitoRisposta(name, true);
+
+        /*Print usata per avere informazioni sul giocatore in testing*/
+        if (testingMode) {
+            StampaTestingGiocatore(msg->IDMittente);
+        }
 
         if (vittoria) {
             /*Il client ha vinto, vado nella routine dedicata*/
@@ -249,15 +261,20 @@ void checkRisposta(messaggio * msg) {
         }
     } else {
 
-        /*Risposta errata, lo stampo sul server*/
-        sprintf(tmpMessage, "%s%s\n", name, " ha sbagliato risposta, accidenti!");
-        aggiungiMessaggio(tmpMessage, false, NULL);
 
         //Aggiorno i punti del client al meno uno e setto il bool a falso
         vittoria = serverAggiornaPunti(msg->IDMittente, -1);
         esito->corretta = false;
 
+        /*Risposta errata, lo stampo sul server*/
+        StampaEsitoRisposta(name, false);
+
+        /*Print usata per avere informazioni sul giocatore in testing*/
+        if (testingMode) {
+            StampaTestingGiocatore(msg->IDMittente);
+        }
     }
+
     /*Avviso il client che ha risposto correttamente o meno*/
     esito->punti = getPuntiGiocatore(msg->IDMittente);
     int fifo = serverFIFOGiocatore(msg->IDMittente);
@@ -271,11 +288,12 @@ void checkRisposta(messaggio * msg) {
     avvisaAltriClient(msg->IDMittente, risposta);
     messaggioDestructor(risposta);
 
-    //Se la risposta era corretta devo generare una nuova domanda
-    if (risultato == rispostaCorretta) {
-        nuovaDomanda();
+    if (!vittoria) {
+        //Se la risposta era corretta devo generare una nuova domanda
+        if (risultato == rispostaCorretta) {
+            nuovaDomanda();
+        }
     }
-
 }
 
 void rimuoviGiocatore(messaggio* msg) {
@@ -283,10 +301,10 @@ void rimuoviGiocatore(messaggio* msg) {
 
     /*Stampo a schermo*/
     getNomeGiocatore(msg->IDMittente, name);
-    sprintf(tmpMessage, "%s%s\n", name, " si è disconnesso");
-    aggiungiMessaggio(tmpMessage, false, NULL);
-
     togliGiocatore(msg->IDMittente, msg->timestring);
+
+    StampaGiocatoreUscito(name);
+
 
     /*Avviso altri client dell'uscita del giocatore*/
     messaggio* logout = messaggioConstructor(IDServer, GIOCATORE_USCITO);
