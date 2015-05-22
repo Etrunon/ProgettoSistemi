@@ -227,7 +227,11 @@ void checkRisposta(messaggio * msg) {
     if (risultato == rispostaCorretta) {
 
         /*Ha risposto correttamente e lo stampo a video sul server*/
-        sprintf(tmpMessage, "%s%s\n", name, " ha risposto correttamente, Bravo!");
+        if (testingMode) {
+            sprintf(tmpMessage, "%s%i%s%s%s\n", "ID: ", msg->IDMittente, " nome: ", name, " risposta corretta");
+        } else {
+            sprintf(tmpMessage, "%s%s\n", name, " ha risposto correttamente, Bravo!");
+        }
         aggiungiMessaggio(tmpMessage, false, NULL);
 
         /*Aggiorno i suoi punti, controllo se ha vinto*/

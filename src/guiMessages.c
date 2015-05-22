@@ -35,7 +35,13 @@ void stampaMessaggi(int numMessaggi) {
         }
 
         while (daStampare > 0) {
-            printf("\r%s", codaMessaggi.messaggi[i]);
+            char tmpBuffer1 [BUFFMESSAGGIO] = {};
+            if (codaMessaggi.centrato[i]) {
+                sprintf(tmpBuffer1, "%*s", larghezzaSchermo / 2 + (int) strlen(codaMessaggi.messaggi[i]) / 2, codaMessaggi.messaggi[i]);
+            } else {
+                sprintf(tmpBuffer1, "%s", codaMessaggi.messaggi[i]);
+            }
+            printf("\r%s", tmpBuffer1);
             i = (i + 1) % BUFFERMESSAGGI;
             daStampare--;
         }
@@ -49,10 +55,11 @@ void aggiungiMessaggio(char* msg, bool centrato, char* colore) {
     char tmpBuffer [BUFFMESSAGGIO] = {};
 
     char* tmp = codaMessaggi.messaggi[codaMessaggi.tail];
-    /*Sto sovrascrivendo un messaggio perché ho riempito la coda */
     if (tmp != NULL) {
+        /*Sto sovrascrivendo un messaggio perché ho riempito la coda */
         free(tmp);
         codaMessaggi.head = (codaMessaggi.head + 1) % BUFFERMESSAGGI;
+        codaMessaggi.centrato[codaMessaggi.tail] = false;
     } else {
         codaMessaggi.numMessaggi++;
     }
@@ -74,13 +81,12 @@ void aggiungiMessaggio(char* msg, bool centrato, char* colore) {
     } else {
         strcpy(tmpBuffer, msg);
     }
-    strcpy(codaMessaggi.messaggi[codaMessaggi.tail], tmpBuffer);
 
     if (centrato) {
-        char tmpBuffer1 [BUFFMESSAGGIO];
-        sprintf(tmpBuffer1, "%*s", LARGHEZZASCHERMO / 2 + (int) strlen(tmpBuffer) / 2, tmpBuffer);
-        strcpy(codaMessaggi.messaggi[codaMessaggi.tail], tmpBuffer1);
+        codaMessaggi.centrato[codaMessaggi.tail] = true;
     }
+
+    strcpy(codaMessaggi.messaggi[codaMessaggi.tail], tmpBuffer);
     codaMessaggi.tail = (codaMessaggi.tail + 1) % BUFFERMESSAGGI;
 
     pthread_mutex_unlock(&aggiungiMessaggioMutex);

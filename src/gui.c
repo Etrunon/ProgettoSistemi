@@ -90,7 +90,7 @@ void clearScreen() {
 /*Stampa la linea di separazione nell'interfaccia grafica*/
 void HorizontalLine() {
     int i;
-    char line [400] = {};
+    char line [800] = {};
     for (i = 0; i < larghezzaSchermo; i++) {
 
         strcat(line, "\u2501");

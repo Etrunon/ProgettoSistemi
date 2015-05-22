@@ -45,9 +45,10 @@ comando leggiInput(data* inputUtente) {
     fflush(stdin);
     int read = getline(&commands, &size, stdin);
 
-    /*Chiudo la stringa letta da terminale con \0*/
-    commands[read - 1] = '\0';
-
+    if (read > 1) {
+        /*Chiudo la stringa letta da terminale con \0*/
+        commands[read - 1] = '\0';
+    }
     /*Controllo di non avere stringhe troppo lunghe in input*/
     if (strlen(commands) > MAXCOMMAND) {
         sprintf(msgAschermo, "%s\n", "Input non valido");
