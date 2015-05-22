@@ -43,7 +43,7 @@ extern giocatore* giocatoriCorrenti[10];
 int prossimoID;
 
 saveStat* storico[200];
-int indiceTot;
+int indiceStorico;
 
 /*INIZIALIZZAZIONE*/
 /**

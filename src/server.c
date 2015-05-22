@@ -204,10 +204,12 @@ void vincitore(int ID) {
     broadcast(vittoria);
     messaggioDestructor(vittoria);
 
+    SetGUIMode(VISUALIZZA_CLASSIFICA_SERVER);
+
     //Stampo a server che la partita terminata e chiudo tutto
     sprintf(tmpMessage, "%s\n", "Partita terminata!");
     aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_YELLOW);
-    cleanupServer(0);
+    //cleanupServer(0);
 }
 
 void checkRisposta(messaggio * msg) {

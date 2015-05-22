@@ -103,7 +103,7 @@ void stampaClassifica() {
 
     printf("\tTempo di Uscita\tNome\tID\tPunti\n");
     int i = 0;
-    for (i; i < indiceTot; i++) {
+    for (i; i < indiceStorico; i++) {
         char tmp[400] = {};
         sprintf(tmp, "\t%s\t%s\t%i\t%i", storico[i]->time, storico[i]->g->name, storico[i]->g->IDGiocatore, storico[i]->g->punteggio);
         printf("%s\n", tmp);

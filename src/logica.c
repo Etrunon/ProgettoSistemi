@@ -19,7 +19,7 @@ giocatore* giocatoriCorrenti[10] = {};
 int prossimoID = 1;
 
 saveStat* storico[200] = {};
-int indiceTot = 0;
+int indiceStorico = 0;
 
 /**
  * Funzione costruttore che restituisce un puntatore a struct allocato dinamicamente e con tutti i
@@ -219,6 +219,71 @@ int cercaGiocatore(int ID) {
     return -1;
 }
 
+void swapStat(int index) {
+
+    //puntatore di servizio
+    saveStat *tmp;
+    //variabile di uscita dal ciclo
+    bool mosso;
+
+    //Se c'è un client solo sarà sempre ordinato
+    if (indiceStorico == 1)
+        return;
+
+    // In caso di più client comincia a controllare
+    do {
+
+        //inizializzata a falso per uscire subito nel caso di situazione bilanciata
+        mosso = false;
+
+        //Se il giocatore index e il suo vicino di destra esiste
+        if (storico[index] != NULL && storico[index + 1] != NULL) {
+
+            //E se i punti di index sono minori dei punti del vicino di destra e NON sono sul limite destro dell'array
+            if (storico[index]->g->punteggio < storico[index + 1]->g->punteggio && index < indiceStorico) {
+
+                //Allora swappo i due giocatori usando anche tmp
+                tmp = storico[index];
+                storico[index] = storico[index + 1];
+                storico[index + 1] = tmp;
+                //Ho applicato una modifica quindi devo ricontrollare
+                mosso = true;
+                //Aggiorno l'index per tenere controllato il punto di sbilanciamento
+                index++;
+            }
+        }
+
+        //Se il giocatore index e il suo vicino di sinistra esiste
+        if (storico[index] != NULL && storico[index - 1] != NULL) {
+            //E se i punti di index sono maggiori dei punti del vicino di sinistra e NON sono sul limite sinistro dell'array
+            if (index != 0 && storico[index - 1]->g->punteggio < storico[index]->g->punteggio) {
+
+                //Allora swappo i due giocatori usando anche tmp
+                tmp = storico[index];
+                storico[index] = storico[index - 1];
+                storico[index - 1] = tmp;
+                //Ho applicato una modifica quindi devo ricontrollare
+                mosso = true;
+                //Aggiorno l'index per tenere controllato il punto di sbilanciamento
+                index--;
+            }
+        }
+        //Controllo se ho applicato modifiche, potrei ancora essere sbilanciato
+    } while (mosso == true);
+}
+
+void salvaStat(giocatore* g, char *time) {
+
+    saveStat *sv = (saveStat*) malloc(1 * sizeof (saveStat));
+    sv->g = g;
+    sv->time = (char*) malloc((strlen(time) + 1) *(sizeof (char)));
+    strcpy(sv->time, time);
+
+    storico[indiceStorico] = sv;
+    swapStat(indiceStorico);
+    indiceStorico++;
+}
+
 /**
  * Funzione che aggiunge o toglie UN punto solo. Lancia automaticamente un ordinamento della classifica
  * Ritorna true se il giocatore in questione ha vinto
@@ -242,6 +307,7 @@ bool serverAggiornaPunti(int ID, int punti) {
 
     //Se il giocatore ha vinto allora ritorno true, altrimenti false
     if (giocatoriCorrenti[index]->punteggio >= maxWin) {
+
         swap(index);
         return true;
     } else {
@@ -299,66 +365,6 @@ void clientAggiungiGiocatore(char* nome, int ID, int punteggio) {
 
 /*METODI COMUNI AL SERVER E AL CLIENT*/
 
-void swapStat(int index) {
-
-    //puntatore di servizio
-    saveStat *tmp;
-    //variabile di uscita dal ciclo
-    bool mosso;
-
-    //Se c'è un client solo sarà sempre ordinato
-    if (indiceTot == 1)
-        return;
-
-    // In caso di più client comincia a controllare
-    do {
-
-        //inizializzata a falso per uscire subito nel caso di situazione bilanciata
-        mosso = false;
-
-        //Se il giocatore index e il suo vicino di destra esiste
-        if (storico[index] != NULL && storico[index + 1] != NULL) {
-
-            //E se i punti di index sono minori dei punti del vicino di destra e NON sono sul limite destro dell'array
-            if (storico[index]->g->punteggio < storico[index + 1]->g->punteggio && index < indiceTot) {
-
-                //Allora swappo i due giocatori usando anche tmp
-                tmp = storico[index];
-                storico[index] = storico[index + 1];
-                storico[index + 1] = tmp;
-                //Ho applicato una modifica quindi devo ricontrollare
-                mosso = true;
-                //Aggiorno l'index per tenere controllato il punto di sbilanciamento
-                index++;
-            }
-        }
-
-        //Se il giocatore index e il suo vicino di sinistra esiste
-        if (storico[index] != NULL && storico[index - 1] != NULL) {
-            //E se i punti di index sono maggiori dei punti del vicino di sinistra e NON sono sul limite sinistro dell'array
-            if (index != 0 && storico[index - 1]->g->punteggio < storico[index]->g->punteggio) {
-
-                //Allora swappo i due giocatori usando anche tmp
-                tmp = storico[index];
-                storico[index] = storico[index - 1];
-                storico[index - 1] = tmp;
-                //Ho applicato una modifica quindi devo ricontrollare
-                mosso = true;
-                //Aggiorno l'index per tenere controllato il punto di sbilanciamento
-                index--;
-            }
-        }
-        //Controllo se ho applicato modifiche, potrei ancora essere sbilanciato
-    } while (mosso == true);
-}
-
-void salvaStat(giocatore* g, char *time) {
-
-    storico[indiceTot]->g = g;
-    storico[indiceTot]->time = time;
-    swapStat(indiceTot);
-}
-
 /**
  * Metodo che toglie il giocatore specificato dalla lista di quelli presenti a seguito per esempio di un
  * logout. Riordina la lista di giocatori presenti.
@@ -366,31 +372,26 @@ void salvaStat(giocatore* g, char *time) {
  */
 void togliGiocatore(int ID, char* timestring) {
 
-
-
-    //Prendo l'indice nell'array del giocatore
+    //Prendo l'indice nell'array della clasifica del giocatore
     int i = cercaGiocatore(ID);
-
+    //Metto in una var temporanea i suoi punti per poterli ripristinare nello storico
     int puntiTmp = giocatoriCorrenti[i]->punteggio;
-    saveStat *sv = (saveStat*) malloc(1 * sizeof (saveStat));
-    sv->g = giocatoriCorrenti[i];
-    sv->time = (char*) malloc((strlen(timestring) + 1) *(sizeof (char)));
-    strcpy(sv->time, timestring);
 
-    storico[indiceTot] = sv;
-    indiceTot++;
+    giocatore *gtmp = giocatoriCorrenti[i];
+    salvaStat(gtmp, timestring);
 
     //Gli setto il punteggio a -1 per farlo scalare nell'ultima posizione
     giocatoriCorrenti[i]->punteggio = -1;
     //Applico l'ordinamento
     swap(i);
-    giocatoriCorrenti[i]->punteggio = puntiTmp;
+
+    //Una volta scalato gli devo ripristinare i punti
+    gtmp->punteggio = puntiTmp;
 
     //Decremento i client collegati
     currentClients--;
 
-    //Tolgo il giocatore dall'array e lo salvo nella struttura saveStat col metodo apposito
-
+    //Tolgo il giocatore dalla classifica
     giocatoriCorrenti[currentClients] = NULL;
 }
 
