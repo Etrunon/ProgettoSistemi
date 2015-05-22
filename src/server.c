@@ -72,8 +72,16 @@ void * inputUtente(void* arg) {
                 printHelp(true);
             }
                 break;
-            case STORICO: SetGUIMode(VISUALIZZA_CLASSIFICA_SERVER);
+            case STORICO:
+            {
+                SetGUIMode(VISUALIZZA_CLASSIFICA_SERVER);
+            }
                 break;
+            default:
+            {
+                sprintf(tmpMessage, "%s\n", "Input non valido");
+                aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_RED);
+            }
         }
         updateScreen();
     } while (c != CHIUSURA);
@@ -379,6 +387,7 @@ int initServer(int Clients, int Win, bool TestMode) {
         SetGUIMode(STANDARD_SERVER);
 
     }
+    calcolaLarghezzaSchermo(0);
     updateScreen();
 
     /*Controllo se esiste già un server*/

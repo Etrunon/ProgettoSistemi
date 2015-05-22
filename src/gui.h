@@ -33,5 +33,7 @@ void SetGUIMode(GUIMode mode);
 /*Aggiorna la schermata del terminale*/
 void updateScreen();
 
+void calcolaLarghezzaSchermo(int arg);
+
 #endif	/* GUI_H */
 

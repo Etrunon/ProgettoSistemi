@@ -50,18 +50,18 @@ void calcolaLarghezzaSchermo(int arg) {
  char buff [20];
  int fd[2];
  int number;
- 
+
  char* commands[] = {"tput", "cols", NULL};
  pipe(fd);
- 
+
  pid = fork();
- 
+
  if (pid == 0) {
  dup2(fd[1], 1);
  close(fd[0]);
  execvp("tput", commands);
  } else {
- 
+
  wait(&status);
  read(fd[0], buff, 20);
  number = strtol(buff, NULL, 10);
@@ -99,14 +99,38 @@ void HorizontalLine() {
     printf("%*s\n", larghezzaSchermo / 2 + (int) strlen(line) / 2, line);
 }
 
-void stampaClassifica() {
+void stampaStorico() {
+    char line [BUFFMESSAGGIO];
+    int spazio = larghezzaSchermo / 3;
+#ifndef DEBUGSTORICO
+    if (indiceStorico == 0) {
+        sprintf(line, "Nessun dato presente nello storico\n");
+        printf("%*s\n", larghezzaSchermo / 2 + (int) strlen(line) / 2, line);
+        return;
+    }
+#endif
+    //sprintf(line, "%20s\u2503%10s%3s%10s\n", "Tempo di Uscita", "Nome", "ID", "Punti");
+    sprintf(line, "Tempo di uscita");
+    printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+    sprintf(line, "Nome");
+    printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+    sprintf(line, "ID");
+    printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+    sprintf(line, "Punti");
+    printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+    printf("\n");
 
-    printf("\tTempo di Uscita\tNome\tID\tPunti\n");
     int i = 0;
     for (i; i < indiceStorico; i++) {
-        char tmp[400] = {};
-        sprintf(tmp, "\t%s\t%s\t%i\t%i", storico[i]->time, storico[i]->g->name, storico[i]->g->IDGiocatore, storico[i]->g->punteggio);
-        printf("%s\n", tmp);
+        sprintf(line, "%s", storico[i]->time);
+        printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+        sprintf(line, "%s", storico[i]->g->name);
+        printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+        sprintf(line, "%i", storico[i]->g->IDGiocatore);
+        printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+        sprintf(line, "%i", storico[i]->g->punteggio);
+        printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+        printf("\n");
     }
 }
 
@@ -322,8 +346,10 @@ void updateScreen() {
         {
             clearScreen();
             header();
-            playersGraph();
+            //playersGraph();
             infoServer();
+            stampaStorico();
+            HorizontalLine();
             messagges(MESSAGGI_A_SCHERMO);
         }
             break;
@@ -341,7 +367,7 @@ void updateScreen() {
             clearScreen();
             header();
             infoServer();
-            stampaClassifica();
+            stampaStorico();
             HorizontalLine();
             printf("\r%s", "Q PER TORNARE INDIETRO:");
 

@@ -40,10 +40,10 @@ extern domanda domandaCorrente;
 //Inizializzazione a null dell'array dei giocatori correnti
 extern giocatore* giocatoriCorrenti[10];
 //Variabile contenente il prossimo ID da assegnare a un client
-int prossimoID;
+
+extern int indiceStorico;
 
 saveStat* storico[200];
-int indiceStorico;
 
 /*INIZIALIZZAZIONE*/
 /**
