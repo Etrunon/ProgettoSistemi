@@ -50,4 +50,7 @@ Togliere il file delle cose da fare;
     - 11: Vittoria(int ID)
 
 
-TODO, settare l'ID del server a 0 o valore importante!
+TODO CLassifica, 
+        aggiungere i player mano a mano ogni tot azioni. Definire quali.
+        BUG punteggio in classifica a -1 (trololol)
+        BUG nome in lassifica sempre uguale

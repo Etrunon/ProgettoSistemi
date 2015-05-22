@@ -45,36 +45,36 @@ void calcolaLarghezzaSchermo(int arg) {
 }
 
 /*
-void calcolaSchermo() {
-    int pid, status;
-    char buff [20];
-    int fd[2];
-    int number;
-
-    char* commands[] = {"tput", "cols", NULL};
-    pipe(fd);
-
-    pid = fork();
-
-    if (pid == 0) {
-        dup2(fd[1], 1);
-        close(fd[0]);
-        execvp("tput", commands);
-    } else {
-
-        wait(&status);
-        read(fd[0], buff, 20);
-        number = strtol(buff, NULL, 10);
-    }
-}
+ void calcolaSchermo() {
+ int pid, status;
+ char buff [20];
+ int fd[2];
+ int number;
+ 
+ char* commands[] = {"tput", "cols", NULL};
+ pipe(fd);
+ 
+ pid = fork();
+ 
+ if (pid == 0) {
+ dup2(fd[1], 1);
+ close(fd[0]);
+ execvp("tput", commands);
+ } else {
+ 
+ wait(&status);
+ read(fd[0], buff, 20);
+ number = strtol(buff, NULL, 10);
+ }
+ }
  */
 
 void clearScreen() {
     /*
-        int i;
-        for (i = 0; i < 50; i++) {
-            printf("\n");
-        }
+     int i;
+     for (i = 0; i < 50; i++) {
+     printf("\n");
+     }
      */
     //printf("%c[2J\n", 27);
     int pid = fork();
@@ -90,13 +90,24 @@ void clearScreen() {
 /*Stampa la linea di separazione nell'interfaccia grafica*/
 void HorizontalLine() {
     int i;
-    char line [400] = {};
+    char line [800] = {};
     for (i = 0; i < larghezzaSchermo; i++) {
 
         strcat(line, "\u2501");
     }
 
     printf("%*s\n", larghezzaSchermo / 2 + (int) strlen(line) / 2, line);
+}
+
+void stampaClassifica() {
+
+    printf("\tTempo di Uscita\tNome\tID\tPunti\n");
+    int i = 0;
+    for (i; i < indiceTot; i++) {
+        char tmp[400] = {};
+        sprintf(tmp, "\t%s\t%s\t%i\t%i", storico[i]->time, storico[i]->g->name, storico[i]->g->IDGiocatore, storico[i]->g->punteggio);
+        printf("%s\n", tmp);
+    }
 }
 
 /*Stampa il logo del gioco*/
@@ -127,8 +138,8 @@ void header() {
 /*Calcola l'altezza della colonna dei punti da stampare*/
 int puntoNormalizzato(int punto) {
     /*
-        if (punto == 1)
-            return 1;
+     if (punto == 1)
+     return 1;
      */
     int punteggio = (ALTEZZAPUNTI * punto) / maxWin;
 
@@ -140,9 +151,9 @@ void playersGraph() {
     if (currentClients == 0) {
         int i = 0;
         /*
-                for (int i = 0; i < ALTEZZAPUNTI; i++) {
-                    printf("\n");
-                }
+         for (int i = 0; i < ALTEZZAPUNTI; i++) {
+         printf("\n");
+         }
          */
         /*Non ho giocatori, non stampo classifica*/
         return;
@@ -152,11 +163,11 @@ void playersGraph() {
     char format [20];
 
     /* Vecchio metodo per calcolare larghezza grafico in base a num giocatori
-        int larghezzaAutomatica = 17;
-        if (currentClients < 5)
-            larghezzaAutomatica = 20;
-        if (currentClients < 3)
-            larghezzaAutomatica = 25;
+     int larghezzaAutomatica = 17;
+     if (currentClients < 5)
+     larghezzaAutomatica = 20;
+     if (currentClients < 3)
+     larghezzaAutomatica = 25;
      */
 
     /*Calcola dinamicamente lo spazio per centrare la classifica in base al numero di giocatori*/
@@ -325,6 +336,16 @@ void updateScreen() {
             printf("\r%s", "Q PER TORNARE INDIETRO:");
         }
             break;
+        case VISUALIZZA_CLASSIFICA_SERVER:
+        {
+            clearScreen();
+            header();
+            infoServer();
+            stampaClassifica();
+            HorizontalLine();
+            printf("\r%s", "Q PER TORNARE INDIETRO:");
+
+        }
     }
     fflush(stdout);
 }

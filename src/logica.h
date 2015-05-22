@@ -42,6 +42,9 @@ extern giocatore* giocatoriCorrenti[10];
 //Variabile contenente il prossimo ID da assegnare a un client
 int prossimoID;
 
+saveStat* storico[200];
+int indiceTot;
+
 /*INIZIALIZZAZIONE*/
 /**
  * Funzione che inizializza la parte logica del SERVER

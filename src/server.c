@@ -71,7 +71,7 @@ void * inputUtente(void* arg) {
                 printHelp(true);
             }
                 break;
-            case CLASSIFICA: //SetGUIMode(CLASSIFICA);
+            case CLASSIFICA: SetGUIMode(VISUALIZZA_CLASSIFICA_SERVER);
                 break;
         }
         updateScreen();
