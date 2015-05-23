@@ -22,7 +22,8 @@ typedef enum GUIMode {
     EXIT_CLIENT, //Client dopo essere uscito dal gioco
     EXIT_SERVER, //Server dopo aver terminato la sua attività
     LOG, //Mostra lo storico di messaggi ricevuti
-    VISUALIZZA_CLASSIFICA_SERVER //Stampa classifica
+    VISUALIZZA_CLASSIFICA_SERVER, //Stampa classifica
+    EXIT_CLASSIFICA
 } GUIMode;
 
 GUIMode modalitaGUI;

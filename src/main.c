@@ -6,6 +6,10 @@
 #include "gui.h"
 #include "CONST.h"
 
+/*Variabile globale per sapere se siamo in modalità testing
+ *Impostata dal main e poi usata in sola lettura nel resto del programma*/
+int testing = 0;
+
 void explainParameters() {
     printf("Per avviare il server, usare l'opzione --server, con argomenti --max <numero massimo giocatori> e --win <punteggio per vittoria>\n");
     printf("Per avviare il client, usare l'opzione --client\n");
@@ -17,7 +21,6 @@ void explainParameters() {
 int main(int argc, char** argv) {
 
     int server = -1;
-    int testing = 0;
     int maxClients = 10;
     int winPoints = 10;
 
@@ -77,9 +80,9 @@ int main(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
     if (server) {
-        initServer(maxClients, winPoints, testing);
+        initServer(maxClients, winPoints);
     } else {
-        initClient(testing);
+        initClient();
     }
     return (EXIT_SUCCESS);
 }

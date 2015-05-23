@@ -40,8 +40,8 @@ assets:
 
 test: assets bin
 	@#fa partire il testing
-	@(./$(BUILDIR)/$(BUILDNAME) --server --max 3 --testing &)
-	@$(foreach var,$(NUMBERS),./$(BUILDIR)/$(BUILDNAME) --client --testing < ./assets/ClientFile$(var).txt &)
+	@#(./$(BUILDIR)/$(BUILDNAME) --server --max 3 --testing &)
+	@#$(foreach var,$(NUMBERS),./$(BUILDIR)/$(BUILDNAME) --client --testing < ./assets/ClientFile$(var).txt &)
 
 
 checkDir:

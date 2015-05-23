@@ -47,9 +47,9 @@ void StampaPartitaTerminata() {
 
 void StampaEsitoRisposta(char* nome, bool corretto) {
     if (corretto) {
-        sprintf(messaggioASchermo, "%s%s\n", nome, " ha risposto correttamente");
+        sprintf(messaggioASchermo, "%-7s%s\n", nome, " ha risposto correttamente");
     } else {
-        sprintf(messaggioASchermo, "%s%s\n", nome, " ha sbagliato");
+        sprintf(messaggioASchermo, "%-7s%s\n", nome, " ha sbagliato");
     }
 
     aggiungiMessaggio(messaggioASchermo, false, NULL);

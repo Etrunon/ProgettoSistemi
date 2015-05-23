@@ -18,7 +18,6 @@
 int ascoltoDaiClient;
 int IDServer = 0;
 char tmpMessage [BUFFMESSAGGIO];
-bool testingMode;
 
 void broadcast(messaggio* msg) {
     int i = 0;
@@ -44,13 +43,15 @@ void cleanupServer(int sig) {
     if (currentClients > 0) {
         AvvisaSpegnimentoServer();
     }
-    sprintf(tmpMessage, "%s\n", "Server disattivato");
-    SetGUIMode(EXIT_SERVER);
-    aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_CYAN);
 
+    if (!testing) {
+        sprintf(tmpMessage, "%s\n", "Server disattivato");
+        SetGUIMode(EXIT_SERVER);
+        aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_CYAN);
+    }
     close(ascoltoDaiClient);
     unlink(SERVERPATH);
-    exit(errno);
+    exit(EXIT_SUCCESS);
 }
 
 void * inputUtente(void* arg) {
@@ -155,7 +156,7 @@ void aggiungiGiocatore(messaggio * msg) {
         inviaMessaggio(handlerFIFO, rifiutato);
         messaggioDestructor(rifiutato);
         close(handlerFIFO);
-        if (testingMode) {
+        if (testing) {
             printf(tmpMessage, "%s%s\n", "Non ho spazio sul server per ", msg->nomeClient);
             StampaTesting(tmpMessage);
         }
@@ -165,7 +166,7 @@ void aggiungiGiocatore(messaggio * msg) {
         //Stampo sul server che c'è un nuovo player
         StampaNuovoGiocatore(msg->nomeClient);
 
-        if (testingMode) {
+        if (testing) {
             StampaTestingGiocatore(IDGiocatore);
         }
 
@@ -214,7 +215,7 @@ void vincitore(int ID) {
     StampaVittoria(nome);
 
     /*Print usata per avere informazioni sul giocatore in testing*/
-    if (testingMode) {
+    if (testing) {
         StampaTestingGiocatore(ID);
     }
 
@@ -238,7 +239,7 @@ void checkRisposta(messaggio * msg) {
     int rispostaCorretta = msg->risposta;
 
     //Creo la stringa temporanea col nome del client
-    char name [MAXNAME];
+    char name [MAXNAME] = {};
     getNomeGiocatore(msg->IDMittente, name);
 
     //Variabile bool di gestione della routine e istanziazione messaggio di esito al client
@@ -255,7 +256,7 @@ void checkRisposta(messaggio * msg) {
         StampaEsitoRisposta(name, true);
 
         /*Print usata per avere informazioni sul giocatore in testing*/
-        if (testingMode) {
+        if (testing) {
             StampaTestingGiocatore(msg->IDMittente);
         }
 
@@ -278,7 +279,7 @@ void checkRisposta(messaggio * msg) {
         StampaEsitoRisposta(name, false);
 
         /*Print usata per avere informazioni sul giocatore in testing*/
-        if (testingMode) {
+        if (testing) {
             StampaTestingGiocatore(msg->IDMittente);
         }
     }
@@ -320,7 +321,8 @@ void rimuoviGiocatore(messaggio* msg) {
     broadcast(logout);
     messaggioDestructor(logout);
 
-    if (currentClients == 0 && testingMode) {
+    if (currentClients == 0 && testing) {
+        SetGUIMode(EXIT_CLASSIFICA);
         sprintf(tmpMessage, "%s\n", "Testing terminato!");
         aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_BLUE);
         cleanupServer(0);
@@ -356,15 +358,14 @@ void ascoltaClients() {
     }
 }
 
-int initServer(int Clients, int Win, bool TestMode) {
+int initServer(int Clients, int Win) {
     maxClients = Clients;
     maxWin = Win;
-    testingMode = TestMode;
     /*Inizializza le strutture dati relative al gioco*/
     initLogica();
 
     /*Segnali di chiusura*/
-    signal(SIGSEGV, cleanupServer);
+    signal(SIGSEGV, SIG_IGN);
     signal(SIGABRT, cleanupServer);
     /*Chiusura terminale*/
     signal(SIGHUP, cleanupServer);
@@ -381,13 +382,12 @@ int initServer(int Clients, int Win, bool TestMode) {
     signal(SIGPIPE, SIG_IGN);
 
     /*Avvio interfaccia grafica*/
-    if (TestMode) {
+    if (testing) {
         SetGUIMode(TESTING_SERVER);
     } else {
+        calcolaLarghezzaSchermo(0);
         SetGUIMode(STANDARD_SERVER);
-
     }
-    calcolaLarghezzaSchermo(0);
     updateScreen();
 
     /*Controllo se esiste già un server*/
@@ -410,7 +410,7 @@ int initServer(int Clients, int Win, bool TestMode) {
     }
 
     /*Avvio thread per interazione da terminale*/
-    if (!TestMode) {
+    if (!testing) {
         pthread_t threadID;
         pthread_create(&threadID, NULL, &inputUtente, NULL);
     }

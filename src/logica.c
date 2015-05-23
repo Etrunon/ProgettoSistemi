@@ -50,7 +50,7 @@ void giocatoreDestructor(giocatore *g) {
  * @param g puntatore al giocatore da stampare
  */
 void* StampaGiocatore(giocatore *g, char* riempi) {
-    sprintf(riempi, "ID:%i punti:%i nome:%s\n", g->IDGiocatore, g->punteggio, g->name);
+    sprintf(riempi, "%-6s%-10s %-5s%-5i %-10s%02i\n", "Nome", g->name, "ID", g->IDGiocatore, "Punti", g->punteggio);
 }
 
 /**
@@ -399,7 +399,8 @@ void togliGiocatore(int ID, char* timestring) {
 void getNomeGiocatore(int ID, char* riempi) {
 
     int i = cercaGiocatore(ID);
-    strcpy(riempi, giocatoriCorrenti[i]->name);
+    if (i >= 0)
+        strcpy(riempi, giocatoriCorrenti[i]->name);
 }
 
 /**

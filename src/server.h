@@ -9,11 +9,12 @@
 #define	SERVER_H
 
 #include <stdbool.h>
+
 /*Controlla che il server sia unico
  * Se vi è già un server, abortisce il programma
  * In caso non vi sia un altro server, prepara i mezzi di comunicazione con i client
  */
-int initServer(int maxClients, int maxWin, bool TestMode);
+int initServer(int maxClients, int maxWin);
 
 #endif	/* SERVER_H */
 

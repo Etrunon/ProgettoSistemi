@@ -305,8 +305,9 @@ void infoServer() {
 }
 
 void updateScreen() {
-    signal(SIGWINCH, calcolaLarghezzaSchermo);
-
+    if (!testing) {
+        signal(SIGWINCH, calcolaLarghezzaSchermo);
+    }
     switch (modalitaGUI) {
         case LOGIN_CLIENT:
         {
@@ -384,12 +385,23 @@ void updateScreen() {
             printf("\r%s", "Q PER TORNARE INDIETRO:");
 
         }
+            break;
+        case EXIT_CLASSIFICA:
+        {
+            stampaStorico();
+        }
+
     }
     fflush(stdout);
 }
 
 /*Wrapper per settare la modalità di visualizzazione della GUI*/
 void SetGUIMode(GUIMode mode) {
-    if (modalitaGUI != TESTING_CLIENT && modalitaGUI != TESTING_SERVER)
+    if (modalitaGUI == TESTING_CLIENT || modalitaGUI == TESTING_SERVER || modalitaGUI == EXIT_CLASSIFICA) {
+        if (mode == EXIT_CLASSIFICA) {
+            modalitaGUI = EXIT_CLASSIFICA;
+        }
+    } else {
         modalitaGUI = mode;
+    }
 }

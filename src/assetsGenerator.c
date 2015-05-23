@@ -43,13 +43,16 @@ void printName() {
 }
 
 void printRisposte() {
-    int numeroRisposte = rand() % 200;
+    int numeroRisposte = 200 + rand() % 100;
     int i = 0;
     for (i; i < numeroRisposte; i++) {
         fprintf(client, "%i\n", rand() % 200);
-        int uscita = rand() % RAND_MAX;
-        if (uscita >= RAND_MAX / 100 * 97) {
-            fprintf(client, "%s\n", "exit");
+        if (i > 150) {
+            int uscita = rand() % RAND_MAX;
+            if (uscita >= RAND_MAX / 100 * 97) {
+                fprintf(client, "%s\n", "exit");
+                i = numeroRisposte;
+            }
         }
     }
     fprintf(client, "%s\n", "exit");

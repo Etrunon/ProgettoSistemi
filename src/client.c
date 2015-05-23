@@ -24,7 +24,6 @@ int clientID;
 char name[MAXNAME];
 
 bool connesso = false;
-bool testing = false;
 
 char msgTmp [BUFFMESSAGGIO];
 
@@ -78,12 +77,14 @@ void * inputUtenteClient(void* arg) {
 
                     StampaRispostaInviata(d.risposta);
 
-                    if (testing) {
-                        struct timespec intervallo, intervallo2;
-                        intervallo.tv_sec = 0;
-                        intervallo.tv_nsec = 200000000 + 100000000 * (rand() % 30);
-                        nanosleep(&intervallo, &intervallo2);
-                    }
+                    /*
+                                        if (testing) {
+                                            struct timespec intervallo, intervallo2;
+                                            intervallo.tv_sec = 0;
+                                            intervallo.tv_nsec = 200000000 + 100000000 * (rand() % 30);
+                                            nanosleep(&intervallo, &intervallo2);
+                                        }
+                     */
 
                     messaggio* msg = messaggioConstructor(clientID, INVIA_RISPOSTA);
                     msg->risposta = d.risposta;
@@ -158,6 +159,7 @@ void ascoltaServer() {
                 connesso = true;
 
                 if (testing) {
+                    sleep(3);
                     pthread_t threadID;
                     pthread_create(&threadID, NULL, &inputUtenteClient, NULL);
                 }
@@ -255,8 +257,7 @@ void ascoltaServer() {
     }
 }
 
-int initClient(bool testMode) {
-    testing = testMode;
+int initClient() {
 
     /*Gestisco segnali di chiusura improvvisa dell'applicazione*/
     signal(SIGTERM, cleanupClient);
@@ -272,11 +273,11 @@ int initClient(bool testMode) {
     initLogica();
 
     /*Inizializzo GUI*/
-    if (testMode) {
+    if (testing) {
         SetGUIMode(TESTING_CLIENT);
     } else {
+        calcolaLarghezzaSchermo(0);
         SetGUIMode(LOGIN_CLIENT);
-
     }
     updateScreen();
 
@@ -311,7 +312,7 @@ int initClient(bool testMode) {
     }
 
     /*Faccio partire l'ascoltatore di messaggi da terminale*/
-    if (!testMode) {
+    if (!testing) {
         pthread_t threadID;
         pthread_create(&threadID, NULL, &inputUtenteClient, NULL);
     } else {
