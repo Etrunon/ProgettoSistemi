@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "riparser.h"
+#include "parser.h"
 #include "CONST.h"
 #include "commands.h"
 #include "guiMessages.h"

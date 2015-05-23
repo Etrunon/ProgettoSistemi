@@ -49,15 +49,6 @@ void printRisposte() {
     int i = 0;
     for (i; i < numeroRisposte; i++) {
         fprintf(client, "%i\n", (rand() % 99) + (rand() % 99));
-        /*
-                if (i > 150) {
-                    int uscita = rand() % RAND_MAX;
-                    if (uscita >= RAND_MAX / 100 * 98) {
-                        fprintf(client, "%s\n", "exit");
-                        i = numeroRisposte;
-                    }
-                }
-         */
     }
     fprintf(client, "%s\n", "exit");
 }
@@ -90,15 +81,6 @@ int main(int argc, char** argv) {
     }
 
     srand(seed);
-
-    /*
-     * server = fopen(SERVERFILE, "w");
-        if (server == NULL) {
-            perror("");
-            exit(EXIT_FAILURE);
-        }
-        assetServer();
-     */
 
     assetClient();
 

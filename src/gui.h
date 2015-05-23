@@ -28,7 +28,7 @@ typedef enum GUIMode {
 
 GUIMode modalitaGUI;
 
-/*/*Permette di cambiare la modalità di visualizzazione della GUI*/
+/*Permette di cambiare la modalità di visualizzazione della GUI*/
 void SetGUIMode(GUIMode mode);
 
 /*Aggiorna la schermata del terminale*/

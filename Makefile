@@ -1,7 +1,7 @@
 #lista delle librerie necessarie
-OBJ = main.o server.o client.o allFifo.o commands.o logica.o gui.o guiMessages.o riparser.o messaggiASchermo.o
+OBJ = main.o server.o client.o allFifo.o commands.o logica.o gui.o guiMessages.o parser.o messaggiASchermo.o
 #lista delle librerie da testare
-OBJTEST = allFifo.o riparser.o logica.o gui.o guiMessages.o TestGui.o
+OBJTEST = allFifo.o parser.o logica.o gui.o guiMessages.o TestGui.o
 
 NUMBERS = 0 1 2 3 4 5 6 7 8 9
 #Definiamo quali direttive non producono file
@@ -54,7 +54,7 @@ checkDir:
 $(BUILDNAME): $(OBJ)
 	@#linking finale
 	@gcc -pthread $(addprefix $(BUILDIR)/,$(^F)) -o $(BUILDIR)/$@
-	@-cp src/art.txt /tmp/art.txt
+	@-cp -f src/art.txt /tmp/art.txt
 	@#-rm $(addprefix $(BUILDIR)/,$(^F))
 
 

@@ -9,7 +9,7 @@
 #include "client.h"
 #include "CONST.h"
 #include "allFifo.h"
-#include "riparser.h"
+#include "parser.h"
 #include "commands.h"
 #include "gui.h"
 #include "logica.h"
@@ -27,14 +27,17 @@ bool connesso = false;
 
 char msgTmp [BUFFMESSAGGIO];
 
+/**
+ * Funzione che avverte il server del logout del client
+ */
 void avvisaServer() {
     messaggio* logout = messaggioConstructor(clientID, LOGOUT_AL_SERVER);
     inviaMessaggio(scriviAlServer, logout);
     messaggioDestructor(logout);
 }
 
-/*Chiude la FIFO ed eventuali altre risorse
- * rimaste aperte
+/*
+ * Chiude la FIFO ed eventuali altre risorse rimaste aperte
  */
 void cleanupClient(int sig) {
     sprintf(msgTmp, "%s\n", "Client disattivato");
@@ -59,6 +62,11 @@ void serverDisconnesso(int sig) {
     exit(EXIT_SUCCESS);
 }
 
+/**
+ * Funzione usata da un thread per ascoltare l'utente, sanitizzare eventuali comandi ed infine eseguirli 
+ * @param arg
+ * @return 
+ */
 void * inputUtenteClient(void* arg) {
 
     printHelp(false);
@@ -77,6 +85,7 @@ void * inputUtenteClient(void* arg) {
 
                     StampaRispostaInviata(d.risposta);
 
+                    //Introduciamo un po' di latenza variabile sulle risposte dei client al server
                     if (testing) {
                         struct timespec intervallo, intervallo2;
                         intervallo.tv_sec = 0;

@@ -17,6 +17,12 @@ GUIMode modalitaGUI = INIT;
 
 int larghezzaSchermo = 80;
 
+/**
+ * Funzione che forka il programma e gli fa eseguire il comando di terminale "tput" che ritorna la larghezza 
+ * del terminale sul quale è usato. 
+ * Utilizzata per rendere l'interfaccia ridimensionabile
+ * @param arg
+ */
 void calcolaLarghezzaSchermo(int arg) {
     int pid, status;
     char buff [20];
@@ -80,10 +86,14 @@ void horizontalSeparator(int spazio) {
     printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
 }
 
+/**
+ * Modalità d'interfaccia che consente di stampare lo storico di gioco
+ */
 void stampaStorico() {
     char line [BUFFMESSAGGIO] = {};
     int spazio = larghezzaSchermo / 3;
     int spazioRimanente;
+
 #ifndef DEBUGSTORICO
     if (indiceStorico == 0) {
         sprintf(line, "Nessun dato presente nello storico\n");
@@ -91,12 +101,11 @@ void stampaStorico() {
         return;
     }
 #endif
-    //sprintf(line, "%20s\u2503%10s%3s%10s\n", "Tempo di Uscita", "Nome", "ID", "Punti");
 
+    //Stampo l'intestazione dello storico
     printf(ANSI_COLOR_BLUE);
     sprintf(line, "Tempo di uscita");
     printf("\r%*s", spazio / 2 + (int) strlen(line) / 2, line);
-    //horizontalSeparator(spazio);
     spazioRimanente = spazio - (spazio / 2 + (int) strlen(line) / 2);
     printf("%*s", spazioRimanente, "");
 
@@ -104,14 +113,12 @@ void stampaStorico() {
     printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
     spazioRimanente = spazio - (spazio / 2 + (int) strlen(line) / 2);
     printf("%*s", spazioRimanente, "");
-    //horizontalSeparator(spazio);
 
     sprintf(line, "ID");
     spazio = larghezzaSchermo / 8;
     printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
     spazioRimanente = spazio - (spazio / 2 + (int) strlen(line) / 2);
     printf("%*s", spazioRimanente, "");
-    //horizontalSeparator(spazio / 2);
 
     sprintf(line, "Punti");
     printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
@@ -121,6 +128,7 @@ void stampaStorico() {
     printf("\n"ANSI_COLOR_RESET);
 
 
+    //Stampo tutti i giocatori nello storico
     int i = 0;
     for (i; i < indiceStorico; i++) {
         spazio = larghezzaSchermo / 3;
@@ -128,7 +136,6 @@ void stampaStorico() {
         printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
         spazioRimanente = spazio - (spazio / 2 + (int) strlen(line) / 2) + 2;
         printf("%*s", spazioRimanente, "\u2502");
-
 
         sprintf(line, "%s", storico[i]->g->name);
         printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
@@ -164,9 +171,8 @@ void header() {
             stampati = printf("%*s\n", larghezzaSchermo / 2 + (int) strlen(read_string) / 2, read_string);
 
         }
-        //printf("\n");
-        free(read_string);
 
+        free(read_string);
         fclose(fptr);
         HorizontalLine("\u2500");
     }
@@ -174,12 +180,8 @@ void header() {
 
 /*Calcola l'altezza della colonna dei punti da stampare*/
 int puntoNormalizzato(int punto) {
-    /*
-     if (punto == 1)
-     return 1;
-     */
-    int punteggio = (ALTEZZAPUNTI * punto) / maxWin;
 
+    int punteggio = (ALTEZZAPUNTI * punto) / maxWin;
     return punteggio;
 }
 
@@ -187,25 +189,12 @@ int puntoNormalizzato(int punto) {
 void playersGraph() {
     if (currentClients == 0) {
         int i = 0;
-        /*
-         for (int i = 0; i < ALTEZZAPUNTI; i++) {
-         printf("\n");
-         }
-         */
         /*Non ho giocatori, non stampo classifica*/
         return;
     }
     int ultimoPuntoStampato = ALTEZZAPUNTI;
     int i;
     char format [20];
-
-    /* Vecchio metodo per calcolare larghezza grafico in base a num giocatori
-     int larghezzaAutomatica = 17;
-     if (currentClients < 5)
-     larghezzaAutomatica = 20;
-     if (currentClients < 3)
-     larghezzaAutomatica = 25;
-     */
 
     /*Calcola dinamicamente lo spazio per centrare la classifica in base al numero di giocatori*/
     sprintf(format, "%c%i%c", '%', larghezzaSchermo / (currentClients + 1), 's');
@@ -238,7 +227,7 @@ void playersGraph() {
     printf("\n");
 
 
-    /*TODO: Stampa punteggio e nome*/
+    /*Stampa punteggio e nome*/
     sprintf(format, "%c%i%c", '%', -(larghezzaSchermo / (currentClients + 1)) + 2, 's');
     printf(format, "");
     sprintf(format, "%c%i%c", '%', -(larghezzaSchermo / (currentClients + 1)), 's');
@@ -274,7 +263,6 @@ void printDomanda() {
 void messagges(int number) {
 
     stampaMessaggi(number);
-    //HorizontalLine();
 }
 
 /*Informazioni di gioco mostrate sul server*/
@@ -352,7 +340,6 @@ void updateScreen() {
             break;
         case TESTING_SERVER:
         {
-            //clearScreen();
             messagges(1);
         }
             break;
@@ -360,7 +347,6 @@ void updateScreen() {
         {
             clearScreen();
             header();
-            //playersGraph();
             infoServer();
             stampaStorico();
             HorizontalLine("\u2501");

@@ -10,7 +10,7 @@
 
 #include <stdbool.h>
 
-#include "riparser.h"
+#include "parser.h"
 #include "CONST.h"
 
 

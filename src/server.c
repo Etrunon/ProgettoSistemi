@@ -15,10 +15,17 @@
 #include "guiMessages.h"
 #include "messaggiASchermo.h"
 
+
 int ascoltoDaiClient;
+//Id speciale assegnato al server
 int IDServer = 0;
+//Buffer temporaneo per scrivere i messaggi
 char tmpMessage [BUFFMESSAGGIO];
 
+/**
+ * Funzione che dato un messaggio ne permette l'invio in "broadcast" a tutti i client
+ * @param msg
+ */
 void broadcast(messaggio* msg) {
     int i = 0;
     for (i; i < currentClients; i++) {
@@ -28,16 +35,18 @@ void broadcast(messaggio* msg) {
     }
 }
 
+/**
+ * Routine che avvisa i client quando il server va in spegnimento
+ */
 void AvvisaSpegnimentoServer() {
+
     messaggio* msg = messaggioConstructor(IDServer, SERVER_SPEGNIMENTO);
     broadcast(msg);
-
     messaggioDestructor(msg);
-
 }
 
-/*Chiude la FIFO ed eventuali altre risorse
- * rimaste aperte
+/*
+ * Chiude la FIFO ed eventuali altre risorse rimaste aperte.
  */
 void cleanupServer(int sig) {
     if (currentClients > 0) {
@@ -54,6 +63,11 @@ void cleanupServer(int sig) {
     exit(EXIT_SUCCESS);
 }
 
+/**
+ * Funzione che ascolta continuatamente l'input ricevuto dall'utente e in base ai casi dopo averlo sanitizzato
+ * esegue i comandi associati.
+ * @param arg
+ */
 void * inputUtente(void* arg) {
 
     printHelp(true);
@@ -83,17 +97,22 @@ void * inputUtente(void* arg) {
                 sprintf(tmpMessage, "%s\n", "Input non valido");
                 aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_RED);
             }
-            break;
+                break;
             default: break;
         }
         updateScreen();
     } while (c != CHIUSURA);
 
     cleanupServer(0);
-
     return NULL;
 }
 
+/**
+ * Funzione che dato un id di un client e un messaggio, si occupa di inviare il messaggio a tutti i client eccetto
+ * quello avente come id il parametro.
+ * @param IDNonAvvisare
+ * @param msg
+ */
 void avvisaAltriClient(int IDNonAvvisare, messaggio* msg) {
     int i = 0;
     for (i; i < currentClients; i++) {
@@ -105,6 +124,11 @@ void avvisaAltriClient(int IDNonAvvisare, messaggio* msg) {
     }
 }
 
+/**
+ * Funzione che invia tutti i messaggi di aggiornamento al client che si è appena aggiunto al gioco
+ * @param idNuovoGiocatore
+ * @param fifo
+ */
 void setupNuovoGiocatore(int idNuovoGiocatore, int fifo) {
     char tmp [MAXNAME];
     int id, i;
@@ -137,12 +161,17 @@ void setupNuovoGiocatore(int idNuovoGiocatore, int fifo) {
     messaggioDestructor(domanda);
 }
 
+/**
+ * Funzione che aggiunge un nuovo giocatore al gioco, allocandolo in memoria e aggiornando gli altri client della sua presenza
+ * @param msg
+ */
 void aggiungiGiocatore(messaggio * msg) {
 
     int handlerFIFO = creaFiFoScrittura(msg->pathFifo);
 
     /*Errore apertura FIFO client*/
     if (handlerFIFO == -1) {
+
 #ifdef DEBUGFIFO
         printf("%s %s\n", "FIFO errata:", msg->pathFifo);
         perror("");
@@ -194,6 +223,9 @@ void aggiungiGiocatore(messaggio * msg) {
 
 }
 
+/**
+ * Routine che fa generare una nuova domanda e la invia a tutti i client in gioco
+ */
 void nuovaDomanda() {
     serverCambiaDomanda();
 
@@ -207,6 +239,11 @@ void nuovaDomanda() {
     messaggioDestructor(domanda);
 }
 
+/**
+ * Funzione che gestisce la chiusura della partita e del server in caso di vittoria di un client
+ * @param ID
+ * @param msg
+ */
 void vincitore(int ID, messaggio* msg) {
 
     //Mi salvo il nome del vincitore
@@ -243,6 +280,13 @@ void vincitore(int ID, messaggio* msg) {
     }
 }
 
+/**
+ * Funzione che fa controllare la risposta e ne gestisce tutte le situazioni successive,
+ *  - Risposta errata
+ *  - Risposta giusta, ma gioco ancora in corso
+ *  - Risposta giusta e fine gioco
+ * @param msg
+ */
 void checkRisposta(messaggio * msg) {
 
     //Calcolo le variabili per controllare la risposta
@@ -316,6 +360,10 @@ void checkRisposta(messaggio * msg) {
     }
 }
 
+/**
+ * Funzione che rimuove un giocatore che ha fatto logout
+ * @param msg
+ */
 void rimuoviGiocatore(messaggio* msg) {
     char name [MAXNAME];
 
@@ -369,6 +417,12 @@ void ascoltaClients() {
     }
 }
 
+/**
+ * Funzione che inizializza il server. Eseguita solo una volta all'avvio
+ * @param Clients
+ * @param Win
+ * @return 
+ */
 int initServer(int Clients, int Win) {
     maxClients = Clients;
     maxWin = Win;
@@ -376,7 +430,7 @@ int initServer(int Clients, int Win) {
     initLogica();
 
     /*Segnali di chiusura*/
-    signal(SIGSEGV, SIG_IGN);
+    signal(SIGSEGV, cleanupServer);
     signal(SIGABRT, cleanupServer);
     /*Chiusura terminale*/
     signal(SIGHUP, cleanupServer);

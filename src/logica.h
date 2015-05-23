@@ -9,7 +9,7 @@
 #ifndef LOGICA_H
 #define	LOGICA_H
 
-#include "riparser.h"
+#include "parser.h"
 #include "CONST.h"
 
 typedef struct domanda {
@@ -134,8 +134,19 @@ void getNomeGiocatore(int ID, char* riempi);
  */
 int getPuntiGiocatore(int ID);
 
-
+/**
+ * FUnzione che riempie la stringa dta per parametro con le informazioni del giocatore
+ * @param g
+ * @param riempi
+ * @return 
+ */
 void* StampaGiocatore(giocatore *g, char* riempi);
+
+/**
+ * Funzione che dato un id ritorna l'indirizzo del giocatore nell'array, oppure -1 se non lo trova
+ * @param ID
+ * @return 
+ */
 int cercaGiocatore(int ID);
 #endif	/* LOGICA_H */
 

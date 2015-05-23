@@ -1,11 +1,3 @@
-/*
- * costruttore messggio                 x
- * metodi invio ricevi
- * creazione messaggio metodo unico
- * refactoring con funzioni coerenti
- */
-
-
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -18,7 +10,7 @@
 #include <string.h>
 
 #include "allFifo.h"
-#include "riparser.h"
+#include "parser.h"
 
 /**
  * Funzione che crea una fifo da LETTURA al path specificato, aprendola in READ and WRITE
@@ -63,23 +55,6 @@ int creaFifoLettura(char* path) {
 int creaFiFoScrittura(char* path) {
 
     int hand = 0;
-
-    /*
-     S_IWUSR write permission owner
-     S_IRUSR read permission owner
-     S_IRGRP read permission group
-     S_IROTH read permission other
-     */
-    //errCheck = mkfifo(path, O_CREAT | S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
-
-    /*
-        if (errCheck == -1) {
-            perror("mkfifo:");
-            return -1;
-        }
-     */
-
-    //Questa chiamata blocca il processo nel caso in cui non ci sia nessuno a leggere dalla fifo
     hand = open(path, O_WRONLY | O_NONBLOCK);
 
     return hand;
@@ -106,6 +81,12 @@ int chiudiFifo(char* path, int fileDescriptor, bool eliminare) {
     return errore;
 }
 
+/**
+ * Funzione che legge un messaggio dall'handler specificato, lo riconverte da stringa a messaggio logico e lo ritorna
+ * @param handlerFifo
+ * @param msg
+ * @return 
+ */
 bool leggiMessaggio(int handlerFifo, messaggio *msg) {
     int letti;
 
@@ -118,6 +99,13 @@ bool leggiMessaggio(int handlerFifo, messaggio *msg) {
     return true;
 }
 
+/**
+ * Funzione che prende in input un messaggio logico, lo converte in stringa tramite la libreria riparser 
+ * e lo invia all'handler specificato
+ * @param handlerFifo
+ * @param msg
+ * @return 
+ */
 bool inviaMessaggio(int handlerFifo, messaggio *msg) {
 
     creaMessaggio(msg);

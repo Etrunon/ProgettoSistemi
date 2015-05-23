@@ -10,7 +10,8 @@
 #include "guiMessages.h"
 #include "gui.h"
 
-/*Cerca di analizzare l'input come risposta numerico o stringa
+/*
+ * Cerca di analizzare l'input come risposta numerico o stringa
  * L'utente può aver inserito un numero come risposta
  * L'utente può aver inserito il suo nome per loggarsi al server
  */
