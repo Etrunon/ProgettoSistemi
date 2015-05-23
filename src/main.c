@@ -4,6 +4,7 @@
 #include "server.h"
 #include "client.h"
 #include "gui.h"
+#include "CONST.h"
 
 void explainParameters() {
     printf("Per avviare il server, usare l'opzione --server, con argomenti --max <numero massimo giocatori> e --win <punteggio per vittoria>\n");
@@ -15,7 +16,7 @@ void explainParameters() {
  */
 int main(int argc, char** argv) {
 
-    int server = 0;
+    int server = -1;
     int testing = 0;
     int maxClients = 10;
     int winPoints = 10;
@@ -71,7 +72,10 @@ int main(int argc, char** argv) {
                 break;
         }
     }
-
+    if (server == -1) {
+        explainParameters();
+        exit(EXIT_FAILURE);
+    }
     if (server) {
         initServer(maxClients, winPoints, testing);
     } else {

@@ -44,31 +44,6 @@ void calcolaLarghezzaSchermo(int arg) {
     signal(SIGWINCH, calcolaLarghezzaSchermo);
 }
 
-/*
- void calcolaSchermo() {
- int pid, status;
- char buff [20];
- int fd[2];
- int number;
-
- char* commands[] = {"tput", "cols", NULL};
- pipe(fd);
-
- pid = fork();
-
- if (pid == 0) {
- dup2(fd[1], 1);
- close(fd[0]);
- execvp("tput", commands);
- } else {
-
- wait(&status);
- read(fd[0], buff, 20);
- number = strtol(buff, NULL, 10);
- }
- }
- */
-
 void clearScreen() {
     /*
      int i;
@@ -88,20 +63,27 @@ void clearScreen() {
 }
 
 /*Stampa la linea di separazione nell'interfaccia grafica*/
-void HorizontalLine() {
+void HorizontalLine(char* linea) {
     int i;
     char line [800] = {};
     for (i = 0; i < larghezzaSchermo; i++) {
 
-        strcat(line, "\u2501");
+        strcat(line, linea);
     }
 
     printf("%*s\n", larghezzaSchermo / 2 + (int) strlen(line) / 2, line);
 }
 
+void horizontalSeparator(int spazio) {
+    char line [50] = {};
+    sprintf(line, "\u2502");
+    printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+}
+
 void stampaStorico() {
-    char line [BUFFMESSAGGIO];
+    char line [BUFFMESSAGGIO] = {};
     int spazio = larghezzaSchermo / 3;
+    int spazioRimanente;
 #ifndef DEBUGSTORICO
     if (indiceStorico == 0) {
         sprintf(line, "Nessun dato presente nello storico\n");
@@ -110,24 +92,55 @@ void stampaStorico() {
     }
 #endif
     //sprintf(line, "%20s\u2503%10s%3s%10s\n", "Tempo di Uscita", "Nome", "ID", "Punti");
+
+    printf(ANSI_COLOR_BLUE);
     sprintf(line, "Tempo di uscita");
-    printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+    printf("\r%*s", spazio / 2 + (int) strlen(line) / 2, line);
+    //horizontalSeparator(spazio);
+    spazioRimanente = spazio - (spazio / 2 + (int) strlen(line) / 2);
+    printf("%*s", spazioRimanente, "");
+
     sprintf(line, "Nome");
     printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+    spazioRimanente = spazio - (spazio / 2 + (int) strlen(line) / 2);
+    printf("%*s", spazioRimanente, "");
+    //horizontalSeparator(spazio);
+
     sprintf(line, "ID");
+    spazio = larghezzaSchermo / 8;
     printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+    spazioRimanente = spazio - (spazio / 2 + (int) strlen(line) / 2);
+    printf("%*s", spazioRimanente, "");
+    //horizontalSeparator(spazio / 2);
+
     sprintf(line, "Punti");
     printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
-    printf("\n");
+    spazioRimanente = spazio - (spazio / 2 + (int) strlen(line) / 2);
+    printf("%*s", spazioRimanente, "");
+
+    printf("\n"ANSI_COLOR_RESET);
+
 
     int i = 0;
     for (i; i < indiceStorico; i++) {
+        spazio = larghezzaSchermo / 3;
         sprintf(line, "%s", storico[i]->time);
         printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+        spazioRimanente = spazio - (spazio / 2 + (int) strlen(line) / 2) + 2;
+        printf("%*s", spazioRimanente, "\u2502");
+
+
         sprintf(line, "%s", storico[i]->g->name);
         printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
-        sprintf(line, "%i", storico[i]->g->IDGiocatore);
+        spazioRimanente = spazio - (spazio / 2 + (int) strlen(line) / 2) + 2;
+        printf("%*s", spazioRimanente, "\u2502");
+
+        spazio = larghezzaSchermo / 8;
+        sprintf(line, "%02i", storico[i]->g->IDGiocatore);
         printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
+        spazioRimanente = spazio - (spazio / 2 + (int) strlen(line) / 2) + 2;
+        printf("%*s", spazioRimanente, "\u2502");
+
         sprintf(line, "%i", storico[i]->g->punteggio);
         printf("%*s", spazio / 2 + (int) strlen(line) / 2, line);
         printf("\n");
@@ -155,7 +168,7 @@ void header() {
         free(read_string);
 
         fclose(fptr);
-        HorizontalLine();
+        HorizontalLine("\u2500");
     }
 }
 
@@ -239,7 +252,7 @@ void playersGraph() {
         printf(format, nomeAbbreviato);
     }
     printf("\n");
-    HorizontalLine();
+    HorizontalLine("\u2501");
 }
 
 /*Stampa la domanda*/
@@ -287,7 +300,7 @@ void infoServer() {
     printf(" \u2503 ");
 
     printf("\n");
-    HorizontalLine();
+    HorizontalLine("\u2501");
 
 }
 
@@ -349,7 +362,7 @@ void updateScreen() {
             //playersGraph();
             infoServer();
             stampaStorico();
-            HorizontalLine();
+            HorizontalLine("\u2501");
             messagges(MESSAGGI_A_SCHERMO);
         }
             break;
@@ -358,7 +371,7 @@ void updateScreen() {
 
             clearScreen();
             messagges(BUFFERMESSAGGI);
-            HorizontalLine();
+            HorizontalLine("\u2501");
             printf("\r%s", "Q PER TORNARE INDIETRO:");
         }
             break;
@@ -368,7 +381,6 @@ void updateScreen() {
             header();
             infoServer();
             stampaStorico();
-            HorizontalLine();
             printf("\r%s", "Q PER TORNARE INDIETRO:");
 
         }

@@ -171,7 +171,6 @@ void ascoltaServer() {
                 clientAggiungiGiocatore(name, clientID, msg->punti);
                 //Stampo messaggio di benvenuto
                 StampaBenvenutoClient(name);
-                aggiungiMessaggio(msgTmp, true, ANSI_COLOR_BLUE);
             }
                 break;
             case NUOVO_GIOCATORE_ENTRATO:
