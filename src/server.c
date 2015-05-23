@@ -205,7 +205,7 @@ void nuovaDomanda() {
     messaggioDestructor(domanda);
 }
 
-void vincitore(int ID) {
+void vincitore(int ID, messaggio* msg) {
 
     //Mi salvo il nome del vincitore
     char nome [MAXNAME];
@@ -229,7 +229,16 @@ void vincitore(int ID) {
 
     //Stampo a server che la partita terminata
     StampaPartitaTerminata();
-    //cleanupServer(0);
+    if (testing) {
+        int i = 0;
+        int max = currentClients;
+        for (i; i < max; i++)
+            togliGiocatore(giocatoriCorrenti[0]->IDGiocatore, msg->timestring);
+        SetGUIMode(EXIT_CLASSIFICA);
+        sprintf(tmpMessage, "%s\n", "Testing terminato!");
+        aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_BLUE);
+        cleanupServer(0);
+    }
 }
 
 void checkRisposta(messaggio * msg) {
@@ -262,7 +271,7 @@ void checkRisposta(messaggio * msg) {
 
         if (vittoria) {
             /*Il client ha vinto, vado nella routine dedicata*/
-            vincitore(msg->IDMittente);
+            vincitore(msg->IDMittente, msg);
         } else {
 
             //Aggiorno il punto in più al client. Setto il booleano dell'esito a true

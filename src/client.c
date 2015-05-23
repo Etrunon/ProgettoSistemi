@@ -77,17 +77,19 @@ void * inputUtenteClient(void* arg) {
 
                     StampaRispostaInviata(d.risposta);
 
-                    /*
-                                        if (testing) {
-                                            struct timespec intervallo, intervallo2;
-                                            intervallo.tv_sec = 0;
-                                            intervallo.tv_nsec = 200000000 + 100000000 * (rand() % 30);
-                                            nanosleep(&intervallo, &intervallo2);
-                                        }
-                     */
+                    if (testing) {
+                        struct timespec intervallo, intervallo2;
+                        intervallo.tv_sec = 0;
+                        intervallo.tv_nsec = 200000000 + 100000000 * (rand() % 30);
+                        nanosleep(&intervallo, &intervallo2);
+                    }
 
                     messaggio* msg = messaggioConstructor(clientID, INVIA_RISPOSTA);
-                    msg->risposta = d.risposta;
+                    int giusto = rand() % 100;
+                    if (giusto >= 10)
+                        msg->risposta = d.risposta;
+                    else
+                        msg->risposta = d.risposta + giusto;
                     inviaMessaggio(scriviAlServer, msg);
                     messaggioDestructor(msg);
                 }
@@ -270,7 +272,7 @@ int initClient() {
     signal(SIGPIPE, serverDisconnesso);
 
     /*Inizializza logica di gioco*/
-    initLogica();
+    //initLogica();
 
     /*Inizializzo GUI*/
     if (testing) {

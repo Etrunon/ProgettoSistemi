@@ -9,6 +9,7 @@
 /*Variabile globale per sapere se siamo in modalità testing
  *Impostata dal main e poi usata in sola lettura nel resto del programma*/
 int testing = 0;
+int seed = -1;
 
 void explainParameters() {
     printf("Per avviare il server, usare l'opzione --server, con argomenti --max <numero massimo giocatori> e --win <punteggio per vittoria>\n");
@@ -37,6 +38,7 @@ int main(int argc, char** argv) {
         {"server", no_argument, &server, 1},
         {"client", no_argument, &server, 0},
         {"testing", no_argument, &testing, 1},
+        {"seed", required_argument, NULL, 's'},
         {NULL, 0, NULL, 0}
     };
 
@@ -44,6 +46,11 @@ int main(int argc, char** argv) {
     while ((argument_value = getopt_long(argc, argv, "", long_options, &option_index)) != -1) {
         switch (argument_value) {
             case 0: case 1:
+                break;
+            case 's':
+            {
+                seed = strtol(optarg, NULL, 10);
+            }
                 break;
             case 'm':
             {

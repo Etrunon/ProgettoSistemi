@@ -14,7 +14,7 @@ int currentClients = 0;
 //Inizializzazione della domanda in corso
 domanda domandaCorrente = {};
 //Inizializzazione a null dell'array dei giocatori correnti
-giocatore* giocatoriCorrenti[10] = {};
+giocatore* giocatoriCorrenti[11] = {};
 //Variabile contenente il prossimo ID da assegnare a un client
 int prossimoID = 1;
 
@@ -83,8 +83,11 @@ void serverCambiaDomanda() {
  * Funzione che inizializza la parte logica del SERVER
  */
 void initLogica() {
+    if (seed != -1)
+        srand(seed);
+    else
+        srand(time(NULL));
 
-    srand(time(NULL));
     serverCambiaDomanda();
 }
 
@@ -370,6 +373,8 @@ void togliGiocatore(int ID, char* timestring) {
 
     //Prendo l'indice nell'array della clasifica del giocatore
     int i = cercaGiocatore(ID);
+    if (i < 0)
+        return;
     //Metto in una var temporanea i suoi punti per poterli ripristinare nello storico
     int puntiTmp = giocatoriCorrenti[i]->punteggio;
 

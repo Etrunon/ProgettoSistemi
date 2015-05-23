@@ -3,7 +3,7 @@ OBJ = main.o server.o client.o allFifo.o commands.o logica.o gui.o guiMessages.o
 #lista delle librerie da testare
 OBJTEST = allFifo.o riparser.o logica.o gui.o guiMessages.o TestGui.o
 
-NUMBERS = 0 1 2 3 4 5
+NUMBERS = 0 1 2 3 4 5 6 7 8 9
 #Definiamo quali direttive non producono file
 .PHONY: clean test
 
@@ -16,7 +16,7 @@ SRCDIR = src
 #nome e posizione dell'eseguibile
 BUILDNAME = main
 BUILDIR = bin
-CFLAGS = -c -g -pthread -std=c99 -DDEBUGSTORICO
+CFLAGS = -c -g -pthread -std=c99 #-DDEBUGSTORICO
 
 all:
 	@printf "%s\n" "Target Make disponibili:"
@@ -35,13 +35,13 @@ assets:
 	@#compila il file sorgente dedicato alla creazione di assets, lo esegue e lo cancella
 	@-mkdir -p assets
 	@gcc $(SRCDIR)/assetsGenerator.c -o assets/assetsGenerator -g
-	@./assets/assetsGenerator
+	@(./assets/assetsGenerator 5)
 	@-rm -rf assets/assetsGenerator
 
 test: assets bin
 	@#fa partire il testing
-	@#(./$(BUILDIR)/$(BUILDNAME) --server --max 3 --testing &)
-	@#$(foreach var,$(NUMBERS),./$(BUILDIR)/$(BUILDNAME) --client --testing < ./assets/ClientFile$(var).txt &)
+	@(./$(BUILDIR)/$(BUILDNAME) --server --max 10 --win 20 --testing --seed 5 &)
+	@$(foreach var,$(NUMBERS),./$(BUILDIR)/$(BUILDNAME) --client --testing < ./assets/ClientFile$(var).txt &)
 
 
 checkDir:
