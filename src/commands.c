@@ -105,7 +105,7 @@ void printHelp(bool server) {
     sprintf(msg, "%-15s%s\n", "exit", "Esci dalla partita");
     aggiungiMessaggio(msg, false, ANSI_COLOR_GREEN);
 
-    if (!server) {
+    if (server) {
         sprintf(msg, "%-15s%s\n", "storico", "Visualizza i giocatori che hanno partecipato al gioco");
         aggiungiMessaggio(msg, false, ANSI_COLOR_GREEN);
     }

@@ -5,7 +5,7 @@ OBJTEST = allFifo.o riparser.o logica.o gui.o guiMessages.o TestGui.o
 
 NUMBERS = 0 1 2 3 4 5 6 7 8 9
 #Definiamo quali direttive non producono file
-.PHONY: clean test
+.PHONY: all clean test
 
 #path in cui cercare i file sorgenti e binari per verificare che siano presenti
 VPATH = bin:src
@@ -16,7 +16,7 @@ SRCDIR = src
 #nome e posizione dell'eseguibile
 BUILDNAME = main
 BUILDIR = bin
-CFLAGS = -c -g -pthread -std=c99 #-DDEBUGSTORICO
+CFLAGS = -c -pthread -std=c99 -w #-DDEBUGSTORICO
 
 all:
 	@printf "%s\n" "Target Make disponibili:"
@@ -25,13 +25,13 @@ all:
 	@printf "\t%s\t\t%s\n" "test" "avvia il testing"
 	@printf "\t%s\t\t%s\n" "clean" "elimina i file generati dalla compilazione o testing"
 
-bin: checkDir $(BUILDNAME)
+bin: clean checkDir $(BUILDNAME)
 
 clean:
 	-@rm -rf $(BUILDIR)
 	-@rm -rf assets
 
-assets:
+assets: clean
 	@#compila il file sorgente dedicato alla creazione di assets, lo esegue e lo cancella
 	@-mkdir -p assets
 	@gcc $(SRCDIR)/assetsGenerator.c -o assets/assetsGenerator -g

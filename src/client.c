@@ -126,6 +126,12 @@ void * inputUtenteClient(void* arg) {
                 }
             }
                 break;
+            case ERRORE:
+            {
+                sprintf(msgTmp, "%s\n", "Input non valido");
+                aggiungiMessaggio(msgTmp, true, ANSI_COLOR_RED);
+            }
+                break;
             default:
                 break;
         }

@@ -78,11 +78,13 @@ void * inputUtente(void* arg) {
                 SetGUIMode(VISUALIZZA_CLASSIFICA_SERVER);
             }
                 break;
-            default:
+            case ERRORE:
             {
                 sprintf(tmpMessage, "%s\n", "Input non valido");
                 aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_RED);
             }
+            break;
+            default: break;
         }
         updateScreen();
     } while (c != CHIUSURA);
