@@ -1,3 +1,10 @@
+/*
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
+ */
+
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,9 +12,9 @@
 
 #include "logica.h"
 
-//Costante col limite massimo di giocatori
+//Limite massimo di giocatori
 int maxClients;
-//Costante col limite massimo di punti alla vittoria
+//Limite massimo di punti alla vittoria
 int maxWin;
 //Variabile con il numero di client presenti al momento nel gioco
 int currentClients = 0;

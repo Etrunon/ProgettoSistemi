@@ -1,3 +1,10 @@
+/*
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -6,8 +13,10 @@
 #include "guiMessages.h"
 #include "gui.h"
 
+/*Mutex che protegge l'aggiunta dei messaggi alla coda*/
 pthread_mutex_t aggiungiMessaggioMutex = PTHREAD_MUTEX_INITIALIZER;
 
+/*Inizializza la coda*/
 coda codaMessaggi = {
     0,
     0,
@@ -16,6 +25,9 @@ coda codaMessaggi = {
     {}
 };
 
+/*Funzione che permette di calcolare l'indice da cui stampare i messaggi,
+ considerando l'oridne cronologico di arrivo e la posizione dell'ultimo messaggio
+ nella coda circolare*/
 int returnFromTail(int tail, int steps) {
     int result = tail - steps;
     if (tail - steps < 0) {
@@ -24,6 +36,8 @@ int returnFromTail(int tail, int steps) {
     return result;
 }
 
+/*Stampa un numero di messaggi pari al parametro passato,
+ *mostrandoli in ordine fino all'ultimo ricveuto */
 void stampaMessaggi(int numMessaggi) {
     if (numMessaggi > 0) {
         int i = codaMessaggi.head;
@@ -36,6 +50,8 @@ void stampaMessaggi(int numMessaggi) {
 
         while (daStampare > 0) {
             char tmpBuffer1 [BUFFMESSAGGIO] = {};
+
+            /*Controlla se il messaggio è da centrare, e se lo è, calcola il padding appropriato*/
             if (codaMessaggi.centrato[i]) {
                 sprintf(tmpBuffer1, "%*s", larghezzaSchermo / 2 + (int) strlen(codaMessaggi.messaggi[i]) / 2, codaMessaggi.messaggi[i]);
             } else {
@@ -49,6 +65,7 @@ void stampaMessaggi(int numMessaggi) {
 
 };
 
+/*Aggiunge un messaggio alla coda, utilizzado il mutex per proteggerla*/
 void aggiungiMessaggio(char* msg, bool centrato, char* colore) {
     pthread_mutex_lock(&aggiungiMessaggioMutex);
 
@@ -66,6 +83,7 @@ void aggiungiMessaggio(char* msg, bool centrato, char* colore) {
     codaMessaggi.messaggi[codaMessaggi.tail] = (char*) malloc(sizeof (char)*BUFFMESSAGGIO);
 
     if (colore != NULL) {
+        /*Applica il colore al messaggio, se indicato*/
         char tmpBuffer1[BUFFMESSAGGIO] = {};
 
         strcpy(tmpBuffer1, colore);
@@ -93,6 +111,7 @@ void aggiungiMessaggio(char* msg, bool centrato, char* colore) {
     updateScreen();
 };
 
+/*Utility per svuotare la coda dei messaggi*/
 void svuotaMessaggi() {
     int i = codaMessaggi.head;
     int daCancellare = codaMessaggi.numMessaggi;

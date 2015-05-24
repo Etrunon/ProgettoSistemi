@@ -1,8 +1,8 @@
 /*
- * File:   riparser.h
- * Author: etrunon
- *
- * Created on May 15, 2015, 12:53 PM
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
  */
 
 #ifndef RIPARSER_H

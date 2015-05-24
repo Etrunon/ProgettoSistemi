@@ -1,3 +1,11 @@
+/*
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
+ */
+
+
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -13,16 +21,11 @@
 #include "parser.h"
 
 /**
- * Funzione che crea una fifo da LETTURA al path specificato, aprendola in READ and WRITE
+ * Funzione che crea una fifo da LETTURA al path specificato, aprendola in modalità READ and WRITE
+ * (È necessario utilizzare questa modalità, altrimenti utilizzando solo la modalità READ i messaggi rimangono nella FIFO nonstante avvenga correttamente la read().
  * @param path stringa con il path bersaglio
  * @return int hand, handler della fifo
  */
-void gestisciErrore(char* path) {
-    if (errno == EEXIST) {
-        printf("Errore, il file della fifo %s esiste\n", path);
-    }
-}
-
 int creaFifoLettura(char* path) {
 
     int hand = 0, errCheck = 0;
@@ -48,8 +51,8 @@ int creaFifoLettura(char* path) {
  * Funzione che apre la FIFO al path specificato, aprendola WRITE only
  * Nel caso in cui nessuno stia leggendo o la FIFO non esista la funzione rileva uno stato d'errore e lo comunica tramite un valore di
  *      hand di -1
- * @param path stringa con il path beraglio
- * @return hand, handler della pipe
+ * @param path stringa con il path bersaglio
+ * @return hand, handler della FIFO
  * @exception -1 se la FIFO non esiste o nessuno la ha aperta in lettura
  */
 int creaFiFoScrittura(char* path) {
@@ -61,31 +64,10 @@ int creaFiFoScrittura(char* path) {
 }
 
 /**
- * Funzione che chiude una fifo e se delete è true ne cerca di eliminare il file
- * @param handler, handler della fifo da chiudere
- * @param delete, settare vero se si vuole eliminare la fifo
- */
-int chiudiFifo(char* path, int fileDescriptor, bool eliminare) {
-    int errore = 0;
-
-    errore = close(fileDescriptor);
-    if (errore == -1) {
-        return errore;
-    }
-
-    errore = unlink(path);
-
-    if (errore = -1) {
-        return errore;
-    }
-    return errore;
-}
-
-/**
- * Funzione che legge un messaggio dall'handler specificato, lo riconverte da stringa a messaggio logico e lo ritorna
+ * Funzione che legge un messaggio dall'handler specificato e lo converte da stringa a messaggio logico
  * @param handlerFifo
  * @param msg
- * @return 
+ * @return
  */
 bool leggiMessaggio(int handlerFifo, messaggio *msg) {
     int letti;
@@ -94,17 +76,18 @@ bool leggiMessaggio(int handlerFifo, messaggio *msg) {
 
     traduciComm(msg);
 #ifdef DEBUGFIFO
+    /*Print di debug*/
     testStampaMessaggio(msg, "Ricezione");
 #endif
     return true;
 }
 
 /**
- * Funzione che prende in input un messaggio logico, lo converte in stringa tramite la libreria riparser 
- * e lo invia all'handler specificato
+ * Funzione che prende in input un messaggio logico, lo converte in stringa tramite la libreria riparser
+ * e lo invia tramite l'handler specificato
  * @param handlerFifo
  * @param msg
- * @return 
+ * @return
  */
 bool inviaMessaggio(int handlerFifo, messaggio *msg) {
 
@@ -112,6 +95,7 @@ bool inviaMessaggio(int handlerFifo, messaggio *msg) {
     int written = write(handlerFifo, msg->msg, MSG_SIZE + 1);
 
 #ifdef DEBUGFIFO
+    /*Print di debug*/
     testStampaMessaggio(msg, "Invio");
 #endif
 

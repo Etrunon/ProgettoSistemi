@@ -1,6 +1,14 @@
+/*
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+
 #include "server.h"
 #include "client.h"
 #include "gui.h"
@@ -11,6 +19,7 @@
 int testing = 0;
 int seed = -1;
 
+/*Stampa la spiegazione dei parametri*/
 void explainParameters() {
     printf("Per avviare il server, usare l'opzione --server, con argomenti --max <numero massimo giocatori> e --win <punteggio per vittoria>\n");
     printf("Per avviare il client, usare l'opzione --client\n");
@@ -21,7 +30,10 @@ void explainParameters() {
  */
 int main(int argc, char** argv) {
 
+    /*Indica se sono il server od il client*/
     int server = -1;
+
+    /*Valori di default nel caso in cui non siamo specificati come argomenti*/
     int maxClients = 10;
     int winPoints = 10;
 
@@ -32,6 +44,7 @@ int main(int argc, char** argv) {
 
     int option_index = 0;
 
+    /*Lista dei parametri accettati*/
     struct option long_options[] = {
         {"max", required_argument, NULL, 'm'},
         {"win", required_argument, NULL, 'w'},
@@ -87,8 +100,10 @@ int main(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
     if (server) {
+        /*Avvio il server*/
         initServer(maxClients, winPoints);
     } else {
+        /*Avvio il client*/
         initClient();
     }
     return (EXIT_SUCCESS);

@@ -1,6 +1,12 @@
 #ifndef CONST_H
 #define	CONST_H
 
+/*
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
+ */
 
 extern int testing;
 extern int seed;
@@ -33,8 +39,7 @@ extern int seed;
 #define MAXANSWER 5
 #define NUM_CLIENT 10
 
-#define LARGHEZZASCHERMO 80
-
+//Costanti usate per l'interfaccia del terminale
 #define ALTEZZAPUNTI 12
 #define BUFFERMESSAGGI 75
 #define MESSAGGI_A_SCHERMO 5

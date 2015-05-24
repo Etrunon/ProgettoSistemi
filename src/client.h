@@ -1,14 +1,14 @@
 /*
- * File:   client.h
- * Author: mion00
- *
- * Created on May 7, 2015, 5:23 PM
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
  */
 
 #ifndef CLIENT_H
 #define	CLIENT_H
 
-#include "logica.h"
+#include <stdbool.h>
 
 extern bool connesso;
 int initClient();

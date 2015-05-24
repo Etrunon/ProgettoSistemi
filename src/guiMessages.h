@@ -1,9 +1,10 @@
 /*
- * File:   guiMessages.h
- * Author: mion00
- *
- * Created on May 16, 2015, 10:19 PM
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
  */
+
 
 #ifndef GUIMESSAGES_H
 #define	GUIMESSAGES_H

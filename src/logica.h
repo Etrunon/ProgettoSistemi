@@ -1,10 +1,10 @@
-
 /*
- * File:   Logica.h
- * Author: etrunon
- *
- * Created on May 13, 2015, 2:42 PM
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
  */
+
 
 #ifndef LOGICA_H
 #define	LOGICA_H
@@ -29,9 +29,9 @@ typedef struct saveStatTag {
     char *time;
 } saveStat;
 
-//Costante col limite massimo di giocatori
+//Limite massimo di giocatori
 extern int maxClients;
-//Costante col limite massimo di punti alla vittoria
+//Limite massimo di punti alla vittoria
 extern int maxWin;
 //Variabile con il numero di client presenti al momento nel gioco
 extern int currentClients;
@@ -138,14 +138,14 @@ int getPuntiGiocatore(int ID);
  * FUnzione che riempie la stringa dta per parametro con le informazioni del giocatore
  * @param g
  * @param riempi
- * @return 
+ * @return
  */
 void* StampaGiocatore(giocatore *g, char* riempi);
 
 /**
  * Funzione che dato un id ritorna l'indirizzo del giocatore nell'array, oppure -1 se non lo trova
  * @param ID
- * @return 
+ * @return
  */
 int cercaGiocatore(int ID);
 #endif	/* LOGICA_H */

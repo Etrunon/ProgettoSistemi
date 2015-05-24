@@ -1,9 +1,10 @@
 /*
- * File:   messaggiASchermo.h
- * Author: mion00
- *
- * Created on May 22, 2015, 11:46 AM
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
  */
+
 
 #ifndef MESSAGGIASCHERMO_H
 #define	MESSAGGIASCHERMO_H
@@ -11,10 +12,9 @@
 #include "guiMessages.h"
 #include "CONST.h"
 
-typedef enum language {
-    ITA
-} language;
-
+/* Librearia che permette di centralizzare la gestione dei messaggi a schermo
+ * I nomi delle funzioni sono esplicativi del messaggio che stampano.
+ */
 void StampaNuovoGiocatore(char* name);
 void StampaGiocatoreUscito(char* name);
 void StampaServerPieno();
@@ -27,8 +27,8 @@ void StampaRispostaInviata(int risposta);
 void StampaDomandaModificata();
 void StampaServerDisconnesso();
 
+/*Usate in fase di testing*/
 void StampaTesting(char* messaggio);
-
 void StampaTestingGiocatore(int ID);
 
 #endif	/* MESSAGGIASCHERMO_H */

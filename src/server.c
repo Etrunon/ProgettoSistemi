@@ -1,23 +1,32 @@
+/*
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
+ */
+
 #include <unistd.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
-#include "allFifo.h"
-#include "server.h"
-#include "CONST.h"
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
+
+#include "CONST.h"
+#include "server.h"
 #include "commands.h"
 #include "logica.h"
+#include "allFifo.h"
 #include "gui.h"
 #include "guiMessages.h"
 #include "messaggiASchermo.h"
 
-
+/*Handler della FIFO da cui ricevere i messaggi dei client*/
 int ascoltoDaiClient;
-//Id speciale assegnato al server
+//ID speciale assegnato al server
 int IDServer = 0;
 //Buffer temporaneo per scrivere i messaggi
 char tmpMessage [BUFFMESSAGGIO];
@@ -76,23 +85,28 @@ void * inputUtente(void* arg) {
     do {
         c = leggiInput(NULL);
 
+        /*In base al comando impartito, agisco di conseguenza*/
         switch (c) {
+                /*L'utente esce dalla schermata che mostra tutti i messaggi*/
             case LOG_EXIT:
             {
                 SetGUIMode(STANDARD_SERVER);
             }
                 break;
             case HELP:
+                /*L'utente chiede la lista dei comandi disponibili*/
             {
                 printHelp(true);
             }
                 break;
             case STORICO:
+                /*L'utente vuole visualizzare lo storic dei giocatori*/
             {
-                SetGUIMode(VISUALIZZA_CLASSIFICA_SERVER);
+                SetGUIMode(VISUALIZZA_STORICO_SERVER);
             }
                 break;
             case ERRORE:
+                /*Comando non riconosciuto*/
             {
                 sprintf(tmpMessage, "%s\n", "Input non valido");
                 aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_RED);
@@ -101,6 +115,7 @@ void * inputUtente(void* arg) {
             default: break;
         }
         updateScreen();
+        /*Rimane in ascolto di messaggi fino a quando non riceve il comando di chiusura*/
     } while (c != CHIUSURA);
 
     cleanupServer(0);
@@ -125,14 +140,14 @@ void avvisaAltriClient(int IDNonAvvisare, messaggio* msg) {
 }
 
 /**
- * Funzione che invia tutti i messaggi di aggiornamento al client che si è appena aggiunto al gioco
+ * Funzione che invia tutti i messaggi per aggiornare il client che si è appena aggiunto al gioco
+ * sulla situazione corrente della partita
  * @param idNuovoGiocatore
  * @param fifo
  */
 void setupNuovoGiocatore(int idNuovoGiocatore, int fifo) {
     char tmp [MAXNAME];
     int id, i;
-    int punti;
 
     /*Avviso il nuovo giocatore degli altri giocatori presenti*/
     for (i = 0; i < currentClients; i++) {
@@ -169,7 +184,7 @@ void aggiungiGiocatore(messaggio * msg) {
 
     int handlerFIFO = creaFiFoScrittura(msg->pathFifo);
 
-    /*Errore apertura FIFO client*/
+    /*Errore apertura FIFO del client*/
     if (handlerFIFO == -1) {
 
 #ifdef DEBUGFIFO
@@ -187,16 +202,18 @@ void aggiungiGiocatore(messaggio * msg) {
         inviaMessaggio(handlerFIFO, rifiutato);
         messaggioDestructor(rifiutato);
         close(handlerFIFO);
+        /*Print in fase di testing*/
         if (testing) {
             printf(tmpMessage, "%s%s\n", "Non ho spazio sul server per ", msg->nomeClient);
             StampaTesting(tmpMessage);
         }
         return;
     } else {
-
+        /*Giocatore aggiunto correttamente nel gioco*/
         //Stampo sul server che c'è un nuovo player
         StampaNuovoGiocatore(msg->nomeClient);
 
+        /*Print in fase di testing*/
         if (testing) {
             StampaTestingGiocatore(IDGiocatore);
         }
@@ -228,8 +245,6 @@ void aggiungiGiocatore(messaggio * msg) {
  */
 void nuovaDomanda() {
     serverCambiaDomanda();
-
-    int i;
     messaggio* domanda = messaggioConstructor(IDServer, INVIA_DOMANDA);
     domanda->domanda1 = domandaCorrente.numero1;
     domanda->domanda2 = domandaCorrente.numero2;
@@ -264,16 +279,18 @@ void vincitore(int ID, messaggio* msg) {
     broadcast(vittoria);
     messaggioDestructor(vittoria);
 
-    SetGUIMode(VISUALIZZA_CLASSIFICA_SERVER);
+    SetGUIMode(VISUALIZZA_STORICO_SERVER);
 
-    //Stampo a server che la partita terminata
+    //Stampo a server che la partita è terminata
     StampaPartitaTerminata();
     if (testing) {
+        /*Se sono in testing, chiudo forzatamente la partita, senza aspettare che i client facciano logout
+         Per mostrare a video correttamente lo storico*/
         int i = 0;
         int max = currentClients;
         for (i; i < max; i++)
             togliGiocatore(giocatoriCorrenti[0]->IDGiocatore, msg->timestring);
-        SetGUIMode(EXIT_CLASSIFICA);
+        SetGUIMode(EXIT_STORICO);
         sprintf(tmpMessage, "%s\n", "Testing terminato!");
         aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_BLUE);
         cleanupServer(0);
@@ -284,7 +301,7 @@ void vincitore(int ID, messaggio* msg) {
  * Funzione che fa controllare la risposta e ne gestisce tutte le situazioni successive,
  *  - Risposta errata
  *  - Risposta giusta, ma gioco ancora in corso
- *  - Risposta giusta e fine gioco
+ *  - Risposta giusta e vittoria di un giocatore
  * @param msg
  */
 void checkRisposta(messaggio * msg) {
@@ -297,10 +314,11 @@ void checkRisposta(messaggio * msg) {
     char name [MAXNAME] = {};
     getNomeGiocatore(msg->IDMittente, name);
 
-    //Variabile bool di gestione della routine e istanziazione messaggio di esito al client
+    //Variabile bool di gestione della routine di vittoria e istanziazione messaggio di esito al client
     bool vittoria;
     messaggio* esito = messaggioConstructor(IDServer, ESITO_RISPOSTA);
 
+    /*Controllo se ha risposto correttamete*/
     if (risultato == rispostaCorretta) {
 
         /*Aggiorno i suoi punti, controllo se ha vinto*/
@@ -324,9 +342,8 @@ void checkRisposta(messaggio * msg) {
             esito->corretta = true;
         }
     } else {
-
-
-        //Aggiorno i punti del client al meno uno e setto il bool a falso
+        /*Non ha risposto correttamente*/
+        //Tolgo un punto al client setto il booleano di risposta corretta a falso
         vittoria = serverAggiornaPunti(msg->IDMittente, -1);
         esito->corretta = false;
 
@@ -353,7 +370,7 @@ void checkRisposta(messaggio * msg) {
     messaggioDestructor(risposta);
 
     if (!vittoria) {
-        //Se la risposta era corretta devo generare una nuova domanda
+        //Se la risposta era corretta devo generare una nuova domanda, a meno che non sia avvenuta una vittoria
         if (risultato == rispostaCorretta) {
             nuovaDomanda();
         }
@@ -370,9 +387,7 @@ void rimuoviGiocatore(messaggio* msg) {
     /*Stampo a schermo*/
     getNomeGiocatore(msg->IDMittente, name);
     togliGiocatore(msg->IDMittente, msg->timestring);
-
     StampaGiocatoreUscito(name);
-
 
     /*Avviso altri client dell'uscita del giocatore*/
     messaggio* logout = messaggioConstructor(IDServer, GIOCATORE_USCITO);
@@ -381,7 +396,8 @@ void rimuoviGiocatore(messaggio* msg) {
     messaggioDestructor(logout);
 
     if (currentClients == 0 && testing) {
-        SetGUIMode(EXIT_CLASSIFICA);
+        /*Se sono in fase di testing e non ho più giocatori, termino la partita*/
+        SetGUIMode(EXIT_STORICO);
         sprintf(tmpMessage, "%s\n", "Testing terminato!");
         aggiungiMessaggio(tmpMessage, true, ANSI_COLOR_BLUE);
         cleanupServer(0);
@@ -389,25 +405,28 @@ void rimuoviGiocatore(messaggio* msg) {
     }
 }
 
-/*Rimane in ascolto di comunicazioni dai client*/
+/*Rimane in ascolto di comunicazioni dai client sulla FIFO*/
 void ascoltaClients() {
     while (1) {
         messaggio* msg = messaggioConstructor(0, 0);
 
         leggiMessaggio(ascoltoDaiClient, msg);
-
+        /*In base al messaggio ricevuto, agisce di conseguenza*/
         switch (msg->codiceMsg) {
             case INVIA_RISPOSTA:
+                /*Qualcuno ha inviato una risposta*/
             {
                 checkRisposta(msg);
             }
                 break;
             case RICHIESTA_PARTECIPAZIONE:
+                /*Qualcuno ha chiesto di partecipare al gioco*/
             {
                 aggiungiGiocatore(msg);
             }
                 break;
             case LOGOUT_AL_SERVER:
+                /*Qualche giocatore ha abbanonato il gioco*/
             {
                 rimuoviGiocatore(msg);
             }
@@ -417,15 +436,15 @@ void ascoltaClients() {
     }
 }
 
-/**
- * Funzione che inizializza il server. Eseguita solo una volta all'avvio
- * @param Clients
- * @param Win
- * @return 
+/*Controlla che il server sia unico
+ * Se vi è già un server, abortisce il programma
+ * Prepara la FIFO di ascolto e si mette in ascolto
  */
 int initServer(int Clients, int Win) {
+    /*Inizializzazione delle variabili globali*/
     maxClients = Clients;
     maxWin = Win;
+
     /*Inizializza le strutture dati relative al gioco*/
     initLogica();
 
@@ -443,7 +462,7 @@ int initServer(int Clients, int Win) {
     /*Ctrl-\*/
     signal(SIGQUIT, cleanupServer);
 
-    /*Ignoro la scrittura in una fifo rotta, gestendolo tramite la write() per evitare loop infiniti stile CMP*/
+    /*Ignoro la scrittura in una FIFO rotta, gestendolo tramite la write() per evitare loop infiniti stile CMP*/
     signal(SIGPIPE, SIG_IGN);
 
     /*Avvio interfaccia grafica*/
@@ -474,12 +493,11 @@ int initServer(int Clients, int Win) {
         exit(EXIT_FAILURE);
     }
 
-    /*Avvio thread per interazione da terminale*/
+    /*Avvio thread per interazione da terminale se non sono in fase di testing*/
     if (!testing) {
         pthread_t threadID;
         pthread_create(&threadID, NULL, &inputUtente, NULL);
     }
-
 
     /*Mi metto in ascolto dei client sulla FIFO*/
     ascoltaClients();

@@ -1,4 +1,10 @@
-#include "CONST.h"
+/*
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
+ */
+
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +12,8 @@
 #include <string.h>
 #include <strings.h>
 #include "commands.h"
+
+#include "CONST.h"
 #include "logica.h"
 #include "guiMessages.h"
 #include "gui.h"
@@ -19,8 +27,8 @@ comando analizzaInput(data* output, char* input) {
     char* carattereErrore = NULL;
     int numero;
     numero = strtol(input, &carattereErrore, 10);
-    //se ho un numero, controllo se è nel range ammissibile per essere inviato al server
     if (strcmp(carattereErrore, "\0") == 0) {
+        //se ho un numero, controllo se è nel range ammissibile per essere inviato al server
         if (numero > 999999 || numero < -99999) {
             char msg [BUFFMESSAGGIO];
             sprintf(msg, "%s\n", "Risposta non ammissibile");
@@ -30,12 +38,19 @@ comando analizzaInput(data* output, char* input) {
         output->risposta = numero;
         return RISPOSTA;
     } else {
+        /*L'utente ha inserito una stringa, che interpreto come il suo nome*/
         strcpy(output->nome, input);
         return NOME;
     }
     return ERRORE;
 }
 
+/** Interpreta l'input dell'utente gestendo i casi di input errato
+ * @param inputUtente
+ * struct udata per ritornare il nome o la risposta, se riconosciuta nell'input
+ * @return
+ * Il tipo di comando impartito dall'utente
+ */
 comando leggiInput(data* inputUtente) {
     char* commands = NULL;
     size_t size;
@@ -47,9 +62,10 @@ comando leggiInput(data* inputUtente) {
     int read = getline(&commands, &size, stdin);
 
     if (read > 1) {
-        /*Chiudo la stringa letta da terminale con \0*/
+        /*Se ho letto qualcosa, chiudo la stringa letta da terminale con \0*/
         commands[read - 1] = '\0';
     }
+
     /*Controllo di non avere stringhe troppo lunghe in input*/
     if (strlen(commands) > MAXCOMMAND) {
         sprintf(msgAschermo, "%s\n", "Input non valido");
@@ -62,10 +78,11 @@ comando leggiInput(data* inputUtente) {
     free(commands);
 
     if (strlen(command) == 0) {
+        /*L'utente ha premuto Return senza inserire niente*/
         return ERRORE;
     };
 
-    /*Controllo se l'input è un comando da eseguire*/
+    /*Controllo se l'input è un comando da eseguire, e nel caso ritorno il comando relativo come valore di enumeratore*/
 
     if ((strcasecmp(command, "exit")) == 0) {
         return CHIUSURA;
@@ -91,7 +108,7 @@ comando leggiInput(data* inputUtente) {
         return ERRORE;
 }
 
-/*Stampa il messaggio di help, diverso tra client e server*/
+/*Stampa il messaggio di help con i comandi disponibili, diversi se si è client o server*/
 void printHelp(bool server) {
     char msg [BUFFMESSAGGIO];
     sprintf(msg, "%s\n", "Comandi disponibili");

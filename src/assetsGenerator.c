@@ -1,8 +1,8 @@
 /*
- * File:   assetsGenerator.c
- * Author: mion00
- *
- * Created on May 17, 2015, 11:22 AM
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
  */
 
 #include <stdio.h>
@@ -13,19 +13,12 @@
 #define SERVERFILE "assets/ServerFile.txt"
 #define CLIENTFILE "assets/ClientFile"
 
-FILE* server;
+/*Variabili usate per scrivere i file da usare come input per i client in testing*/
 FILE* client;
 int numClients = 20;
 int seed = 0;
 
-/*
- *
- */
-
-void assetServer() {
-
-};
-
+/*Stampa una stringa casuale, scegliendo tra i caratteri dell'array charset[]*/
 void rand_str(char *dest, size_t length) {
     char charset[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -36,6 +29,7 @@ void rand_str(char *dest, size_t length) {
     *dest = '\0';
 }
 
+/*Stampa nella prima riga del file un nome casuale, usato per identificare il client*/
 void printName() {
     char name [50];
     int length = rand() % 6;
@@ -43,16 +37,20 @@ void printName() {
     fprintf(client, "%s\n", name);
 }
 
+/*stampa un numero variabile di risposte, una per riga, usando un seed prestabilito*/
 void printRisposte() {
     int numeroRisposte = 100 + (rand() % 100);
+    /*Inizializza il seed perché corrisponda con quello usato dal server per generare le domande*/
     srand(seed);
     int i = 0;
     for (i; i < numeroRisposte; i++) {
         fprintf(client, "%i\n", (rand() % 99) + (rand() % 99));
     }
+    /*Dopo aver stampato la lista di risposte, stampa un comando di uscita, che fa terminare il client*/
     fprintf(client, "%s\n", "exit");
 }
 
+/*Genera negli asssets un file per ogni client*/
 void assetClient() {
     int i = 0;
     for (i = 0; i < numClients; i++) {
@@ -71,12 +69,15 @@ void assetClient() {
     }
 };
 
+/*Genera i file di assets usati dai client come input durante il testing*/
 int main(int argc, char** argv) {
     printf("Creazione degli assets in corso.. \n");
 
     if (argc > 1) {
+        /*Ho ricevuto il seed come parametro, e lo uso per generare le risposte*/
         seed = strtol(argv[1], NULL, 0);
     } else {
+        /*Non ho seed come parametro, e uso il tempo attuale come seed*/
         seed = time(NULL);
     }
 

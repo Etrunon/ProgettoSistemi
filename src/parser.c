@@ -1,3 +1,10 @@
+/*
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
+ */
+
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
@@ -57,6 +64,7 @@ void messaggioDestructor(messaggio *x) {
     free(x);
 }
 
+/*Usata nel debugging della FIFO*/
 void testStampaMessaggio(messaggio *msg, char* testo) {
     /*
      * TODO creare la stampa "formattata" per fare debrugging
@@ -135,6 +143,7 @@ void timestamp(char* s) {
 
 }
 
+/*Crea l'header del messagio*/
 void headerMsg(messaggio *msg) {
 
     concatInt(msg->msg, msg->IDMittente);

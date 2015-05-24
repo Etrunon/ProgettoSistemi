@@ -1,3 +1,10 @@
+/*
+ * Progetto: Multiplayer Game
+ * A.A 2014/2015
+ * Carlo Mion   165878
+ * Luca Bosotti 164403
+ */
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -5,6 +12,7 @@
 #include "messaggiASchermo.h"
 #include "logica.h"
 
+/*Buffer temporaneo per creare la stringa da stampare a schermo*/
 char messaggioASchermo [BUFFMESSAGGIO] = {};
 
 void StampaNuovoGiocatore(char* name) {
