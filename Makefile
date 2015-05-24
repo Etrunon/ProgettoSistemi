@@ -38,7 +38,7 @@ bin: clean checkDir $(BUILDNAME)
 clean:
 	-@rm -rf $(BUILDIR)
 	-@rm -rf assets
-	@printf "%s\n" "Binari e assets cancellati sono stati eliminati"
+	@printf "%s\n" "File binari e assets compilati precedentemente sono stati eliminati"
 
 
 #compila il file sorgente dedicato alla creazione di assets, lo esegue e lo cancella
