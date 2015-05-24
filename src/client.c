@@ -318,6 +318,7 @@ void ascoltaServer() {
         }
         /*Distruggo l'istanza di messaggio usata dopo aver intraprso l'azione correlata, per evitare memory leak*/
         messaggioDestructor(msg);
+        updateScreen();
     }
 }
 

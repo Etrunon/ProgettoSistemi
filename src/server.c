@@ -316,11 +316,12 @@ void checkRisposta(messaggio * msg) {
 
     //Variabile bool di gestione della routine di vittoria e istanziazione messaggio di esito al client
     bool vittoria;
+    bool corretta;
     messaggio* esito = messaggioConstructor(IDServer, ESITO_RISPOSTA);
 
     /*Controllo se ha risposto correttamete*/
     if (risultato == rispostaCorretta) {
-
+        corretta = true;
         /*Aggiorno i suoi punti, controllo se ha vinto*/
         vittoria = serverAggiornaPunti(msg->IDMittente, 1);
 
@@ -342,6 +343,7 @@ void checkRisposta(messaggio * msg) {
             esito->corretta = true;
         }
     } else {
+        corretta = false;
         /*Non ha risposto correttamente*/
         //Tolgo un punto al client setto il booleano di risposta corretta a falso
         vittoria = serverAggiornaPunti(msg->IDMittente, -1);
@@ -365,6 +367,7 @@ void checkRisposta(messaggio * msg) {
     /*Avviso tutti gli altri client della risposta e del conseguente cambio di punteggio*/
     messaggio* risposta = messaggioConstructor(IDServer, MODIFICA_PUNTEGGIO_GIOCATORE);
     risposta->IDOggetto = msg->IDMittente;
+    risposta->corretta = corretta;
     risposta->punti = getPuntiGiocatore(msg->IDMittente);
     avvisaAltriClient(msg->IDMittente, risposta);
     messaggioDestructor(risposta);
