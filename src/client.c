@@ -325,12 +325,19 @@ void ascoltaServer() {
 /*Funzione chiamata dal main per avviare il processo come client*/
 int initClient() {
 
-    /*Gestisco segnali di chiusura improvvisa dell'applicazione*/
-    signal(SIGTERM, cleanupClient);
-    signal(SIGINT, cleanupClient);
+    /*Segnali di chiusura*/
     signal(SIGSEGV, cleanupClient);
     signal(SIGABRT, cleanupClient);
+    /*Chiusura terminale*/
     signal(SIGHUP, cleanupClient);
+    signal(SIGTERM, cleanupClient);
+    /*Ctrl-C*/
+    signal(SIGINT, cleanupClient);
+    /*Ctrl-Z*/
+    signal(SIGTSTP, cleanupClient);
+    signal(SIGSTOP, cleanupClient);
+    /*Ctrl-\*/
+    signal(SIGQUIT, cleanupClient);
 
     /*Segnali di chiusura FIFO, se perdo collegamento con il server brutalmente*/
     signal(SIGPIPE, serverDisconnesso);

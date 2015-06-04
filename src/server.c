@@ -250,7 +250,7 @@ void nuovaDomanda() {
     domanda->domanda2 = domandaCorrente.numero2;
 
     broadcast(domanda);
-
+    StampaDomandaModificata();
     messaggioDestructor(domanda);
 }
 
